@@ -1,0 +1,18 @@
+# Terraform Variables
+# Copy this file to terraform.tfvars and customize
+
+project_name = "ma-teachers-contracts"
+aws_region   = "us-east-1"
+environment  = "prod"
+
+# Lambda configuration
+lambda_runtime = "python3.12"
+lambda_timeout = 30
+lambda_memory  = 512
+
+# Tags
+tags = {
+  Project   = "MA Teachers Contracts"
+  ManagedBy = "Terraform"
+  Owner     = "Your Name"
+}

@@ -1,0 +1,3 @@
+# Deployment temporary files
+scripts/.deploy-temp/
+*.zip
