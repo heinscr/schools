@@ -82,6 +82,9 @@ resource "aws_cloudfront_distribution" "frontend" {
   comment             = "${var.project_name} frontend distribution"
   default_root_object = "index.html"
 
+  # Custom domain aliases (if provided)
+  aliases = var.cloudfront_domain_name != "" ? concat([var.cloudfront_domain_name], var.cloudfront_aliases) : []
+
   origin {
     domain_name              = aws_s3_bucket.main.bucket_regional_domain_name
     origin_id                = aws_s3_bucket.main.id
@@ -116,11 +119,11 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
-    # To use custom domain:
-    # acm_certificate_arn      = aws_acm_certificate.cert.arn
-    # ssl_support_method       = "sni-only"
-    # minimum_protocol_version = "TLSv1.2_2021"
+    # Use custom certificate if domain is specified, otherwise use CloudFront default
+    cloudfront_default_certificate = var.cloudfront_domain_name == ""
+    acm_certificate_arn            = var.cloudfront_domain_name != "" ? var.cloudfront_certificate_arn : null
+    ssl_support_method             = var.cloudfront_domain_name != "" ? "sni-only" : null
+    minimum_protocol_version       = var.cloudfront_domain_name != "" ? "TLSv1.2_2021" : "TLSv1"
   }
 
   tags = merge(
@@ -204,6 +207,86 @@ resource "aws_iam_role" "lambda" {
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# DynamoDB Tables
+resource "aws_dynamodb_table" "districts" {
+  name           = "${var.project_name}-districts"
+  billing_mode   = "PAY_PER_REQUEST"  # On-demand pricing
+  hash_key       = "PK"
+  range_key      = "SK"
+
+  attribute {
+    name = "PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "SK"
+    type = "S"
+  }
+
+  attribute {
+    name = "GSI1PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "GSI1SK"
+    type = "S"
+  }
+
+  # Global Secondary Index for town searches
+  global_secondary_index {
+    name            = "GSI1"
+    hash_key        = "GSI1PK"
+    range_key       = "GSI1SK"
+    projection_type = "ALL"
+  }
+
+  # Enable point-in-time recovery
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  # Server-side encryption
+  server_side_encryption {
+    enabled = true
+  }
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.project_name}-districts"
+    }
+  )
+}
+
+# IAM Policy for Lambda to access DynamoDB
+resource "aws_iam_role_policy" "lambda_dynamodb" {
+  name = "${var.project_name}-lambda-dynamodb"
+  role = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
+        ]
+        Resource = [
+          aws_dynamodb_table.districts.arn,
+          "${aws_dynamodb_table.districts.arn}/index/*"
+        ]
+      }
+    ]
+  })
 }
 
 # Note: Lambda function itself is created by deployment script

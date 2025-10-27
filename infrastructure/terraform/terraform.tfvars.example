@@ -10,6 +10,13 @@ lambda_runtime = "python3.12"
 lambda_timeout = 30
 lambda_memory  = 512
 
+# CloudFront Custom Domain (Optional)
+# IMPORTANT: ACM certificate MUST be in us-east-1 region for CloudFront
+# Leave empty to use CloudFront's default domain (xxxxx.cloudfront.net)
+cloudfront_domain_name       = ""  # e.g., "www.example.com"
+cloudfront_certificate_arn   = ""  # e.g., "arn:aws:acm:us-east-1:123456789012:certificate/xxxxx"
+cloudfront_aliases           = []  # e.g., ["example.com", "www.example.com"]
+
 # Tags
 tags = {
   Project   = "MA Teachers Contracts"

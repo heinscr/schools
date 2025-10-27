@@ -49,3 +49,32 @@ variable "tags" {
     ManagedBy   = "Terraform"
   }
 }
+
+# CloudFront custom domain configuration
+variable "cloudfront_domain_name" {
+  description = "Custom domain name for CloudFront distribution (e.g., www.example.com). Leave empty to use CloudFront default domain."
+  type        = string
+  default     = ""
+}
+
+variable "cloudfront_certificate_arn" {
+  description = "ARN of ACM certificate in us-east-1 for custom domain. Required if cloudfront_domain_name is set."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.cloudfront_domain_name == "" || (var.cloudfront_domain_name != "" && var.cloudfront_certificate_arn != "")
+    error_message = "cloudfront_certificate_arn is required when cloudfront_domain_name is specified."
+  }
+
+  validation {
+    condition     = var.cloudfront_certificate_arn == "" || can(regex("^arn:aws:acm:us-east-1:[0-9]{12}:certificate/.+$", var.cloudfront_certificate_arn))
+    error_message = "cloudfront_certificate_arn must be a valid ACM certificate ARN in us-east-1 region."
+  }
+}
+
+variable "cloudfront_aliases" {
+  description = "Additional domain aliases for CloudFront (e.g., ['example.com', 'www.example.com']). Leave empty to use only cloudfront_domain_name."
+  type        = list(string)
+  default     = []
+}
