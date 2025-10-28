@@ -33,13 +33,18 @@ const DistrictMap = ({ address, districtName, selectedDistrict }) => {
       })
       .catch(() => setGeojsonLoaded(false));
   }, [geojsonLoaded, geojson]);
-  // Highlight towns for selected district
+  // Highlight towns for selected district and clear pin if needed
   useEffect(() => {
     if (!mapInstanceRef.current || !geojson || !selectedDistrict) {
       // Remove previous geojson layer if present
       if (geoJsonLayerRef.current) {
         geoJsonLayerRef.current.remove();
         geoJsonLayerRef.current = null;
+      }
+      // Remove marker if present (clear pin)
+      if (markerRef.current) {
+        markerRef.current.remove();
+        markerRef.current = null;
       }
       return;
     }
@@ -97,6 +102,11 @@ const DistrictMap = ({ address, districtName, selectedDistrict }) => {
       if (geoJsonLayerRef.current) {
         geoJsonLayerRef.current.remove();
         geoJsonLayerRef.current = null;
+      }
+      // Remove marker if present (clear pin)
+      if (markerRef.current) {
+        markerRef.current.remove();
+        markerRef.current = null;
       }
     };
   }, [selectedDistrict, geojson]);
