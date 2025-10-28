@@ -30,6 +30,7 @@ function DistrictBrowser() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    setSelectedDistrict(null); // Clear highlight on new search
     if (!searchQuery.trim()) {
       loadDistricts();
       return;
@@ -69,6 +70,7 @@ function DistrictBrowser() {
 
   const handleClearSearch = () => {
     setSearchQuery('');
+    setSelectedDistrict(null); // Clear highlight on clear
     loadDistricts();
   };
 
