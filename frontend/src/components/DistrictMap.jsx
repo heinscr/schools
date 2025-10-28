@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './DistrictMap.css';
@@ -15,10 +15,91 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const DistrictMap = ({ address, districtName }) => {
+const DistrictMap = ({ address, districtName, selectedDistrict }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
+  const geoJsonLayerRef = useRef(null);
+  const [geojson, setGeojson] = useState(null);
+  const [geojsonLoaded, setGeojsonLoaded] = useState(false);
+  // Load GeoJSON once and cache
+  useEffect(() => {
+    if (geojsonLoaded || geojson) return;
+    fetch('/geojson.json')
+      .then((res) => res.json())
+      .then((data) => {
+        setGeojson(data);
+        setGeojsonLoaded(true);
+      })
+      .catch(() => setGeojsonLoaded(false));
+  }, [geojsonLoaded, geojson]);
+  // Highlight towns for selected district
+  useEffect(() => {
+    if (!mapInstanceRef.current || !geojson || !selectedDistrict) {
+      // Remove previous geojson layer if present
+      if (geoJsonLayerRef.current) {
+        geoJsonLayerRef.current.remove();
+        geoJsonLayerRef.current = null;
+      }
+      return;
+    }
+
+    // Remove previous geojson layer
+    if (geoJsonLayerRef.current) {
+      geoJsonLayerRef.current.remove();
+      geoJsonLayerRef.current = null;
+    }
+
+    // Get towns for selected district
+    const towns = selectedDistrict.members || selectedDistrict.towns || [];
+    // Normalize for matching
+    const townSet = new Set(towns.map(t => t.trim().toLowerCase()));
+
+    // Filter geojson features for these towns
+    const matchedFeatures = geojson.features.filter(f => {
+      const props = f.properties;
+      // Try multiple possible property keys
+      const keys = ['NAME', 'TOWN', 'TOWN_NAME'];
+      let name = '';
+      for (const k of keys) {
+        if (props[k]) {
+          name = props[k];
+          break;
+        }
+      }
+      return townSet.has(name.trim().toLowerCase());
+    });
+
+    if (matchedFeatures.length === 0) return;
+
+    // Create a new geojson layer for these towns
+    const layer = L.geoJSON({ type: 'FeatureCollection', features: matchedFeatures }, {
+      style: {
+        color: '#1976d2',
+        weight: 2,
+        fillColor: '#1976d2',
+        fillOpacity: 0.5,
+      },
+      onEachFeature: (feature, layer) => {
+        layer.bindPopup(feature.properties.NAME || feature.properties.TOWN || feature.properties.TOWN_NAME || '');
+      }
+    });
+    layer.addTo(mapInstanceRef.current);
+    geoJsonLayerRef.current = layer;
+
+    // Optionally zoom to bounds
+    try {
+      mapInstanceRef.current.fitBounds(layer.getBounds(), { animate: true, duration: 0.5 });
+    } catch {}
+
+    // Cleanup on district change
+    return () => {
+      if (geoJsonLayerRef.current) {
+        geoJsonLayerRef.current.remove();
+        geoJsonLayerRef.current = null;
+      }
+    };
+  }, [selectedDistrict, geojson]);
 
   // Massachusetts center coordinates
   const MA_CENTER = [42.4072, -71.3824];

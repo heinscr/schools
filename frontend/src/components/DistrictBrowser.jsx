@@ -166,6 +166,7 @@ function DistrictBrowser() {
             <DistrictMap
               address={selectedDistrict?.main_address}
               districtName={selectedDistrict?.name}
+              selectedDistrict={selectedDistrict}
             />
           </div>
 

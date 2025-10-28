@@ -127,8 +127,13 @@ echo -e "${GREEN}✓ Lambda function deployed${NC}"
 cd ..
 
 # Deploy Frontend
+
 echo -e "\n${YELLOW}=== Deploying Frontend ===${NC}"
 cd frontend
+
+# Copy filtered GeoJSON to public for deployment
+echo "Copying geojson.json to frontend/public/geojson.json..."
+cp ../data/geojson.json public/geojson.json
 
 # Build production bundle with API endpoint from Terraform
 echo "Building frontend with API endpoint: $API_ENDPOINT"

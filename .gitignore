@@ -63,3 +63,6 @@ infrastructure/terraform/placeholder/
 
 # Deployment artifacts
 *.zip
+data/ma_municipalities.geojson
+data/extract_town_geojson.py
+frontend/public/geojson.json

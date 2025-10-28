@@ -7,68 +7,76 @@ A web application for looking up details about Massachusetts teachers contracts.
 ```
 school/
 ├── backend/                      # Python FastAPI backend
-│   ├── main.py                   # API entry point with Lambda handler and CORS
-│   ├── database.py               # DynamoDB client configuration
-│   ├── schemas.py                # Pydantic request/response schemas
-│   ├── services/                 # Business logic layer
-│   │   ├── district_service.py          # SQLAlchemy district service (legacy)
-│   │   └── dynamodb_district_service.py # DynamoDB district operations
-│   ├── import_districts.py       # Import districts from JSON to DynamoDB
-│   ├── init_dynamodb_sample_data.py  # Sample data loader
-│   ├── models.py                 # SQLAlchemy models (legacy, unused)
-│   ├── init_sample_data.py       # Legacy sample data (unused)
-│   ├── requirements.txt          # Python dependencies
-│   └── .env.example              # Environment template
+│   ├── main.py                   # API entry point
+│   ├── database.py               # DynamoDB client
+│   ├── schemas.py                # Pydantic schemas
+│   ├── services/
+│   │   ├── district_service.py
+│   │   └── dynamodb_district_service.py
+│   ├── import_districts.py
+│   ├── init_dynamodb_sample_data.py
+│   ├── models.py
+│   ├── requirements.txt
+│   └── .env.example
+│
+├── data/                         # District and map data
+│   ├── all_districts.json
+│   ├── districts.json
+│   ├── extract_town_geojson.py
+│   ├── geojson.json              # Filtered GeoJSON for towns
+│   ├── ma_municipalities.geojson # Source GeoJSON
+│   └── README.md
+│
+├── docs/                         # Documentation
+│   ├── CUSTOM_DOMAIN_SETUP.md
+│   ├── DEPLOYMENT_GUIDE.md
+│   ├── DYNAMODB_SETUP.md
+│   ├── INFRASTRUCTURE.md
+│   ├── QUICK_START.md
+│   ├── README.md
+│   └── TERRAFORM_IMPROVEMENTS.md
 │
 ├── frontend/                     # React frontend (Vite)
+│   ├── public/
+│   │   ├── geojson.json          # Copied for deployment
+│   │   └── vite.svg
 │   ├── src/
-│   │   ├── components/           # React components
-│   │   │   ├── DistrictBrowser.jsx   # Main district browser with search
-│   │   │   ├── DistrictBrowser.css   # Browser styles
-│   │   │   ├── DistrictMap.jsx       # Interactive Leaflet map
-│   │   │   └── DistrictMap.css       # Map styles
-│   │   ├── services/             # API integration
+│   │   ├── components/
+│   │   │   ├── DistrictBrowser.jsx
+│   │   │   ├── DistrictBrowser.css
+│   │   │   ├── DistrictMap.jsx
+│   │   │   └── DistrictMap.css
+│   │   ├── services/
 │   │   │   └── api.js
-│   │   ├── App.jsx               # Main app component
-│   │   ├── App.css               # App styles
-│   │   ├── main.jsx              # Entry point
-│   │   └── index.css             # Global styles
-│   ├── .env.example              # Environment template
-│   ├── .env.production           # Production API config (deprecated - use deploy.sh)
-│   ├── package.json              # Node dependencies
-│   └── vite.config.js            # Vite configuration
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── .env.example
+│   ├── .env.production
+│   └── README.md
 │
-├── infrastructure/               # AWS deployment (Terraform)
-│   ├── terraform/                # Infrastructure as Code
-│   │   ├── main.tf               # Main resources (S3, CloudFront, DynamoDB, IAM, Lambda, API Gateway)
-│   │   ├── placeholder_lambda.tf # Placeholder Lambda package for initial deployment
-│   │   ├── frontend_config.tf    # Runtime config file for frontend
-│   │   ├── frontend_build.tf.example  # Optional: Build frontend with Terraform
-│   │   ├── variables.tf          # Input variables
-│   │   ├── outputs.tf            # Output values
-│   │   ├── terraform.tfvars      # Configuration values (gitignored)
-│   │   └── terraform.tfvars.example  # Configuration template
-│   └── scripts/                  # Legacy deployment scripts
-│       ├── deploy-backend-tf.sh
-│       └── deploy-frontend-tf.sh
+├── infrastructure/
+│   └── terraform/
+│       ├── main.tf
+│       ├── outputs.tf
+│       ├── placeholder_lambda.tf
+│       ├── frontend_config.tf
+│       ├── frontend_build.tf.example
+│       ├── variables.tf
+│       ├── terraform.tfvars
+│       ├── terraform.tfvars.example
+│       ├── terraform.tfstate
+│       ├── terraform.tfstate.backup
+│       └── .gitignore
 │
-├── data/                         # District data files
-│   ├── districts.json            # Massachusetts school districts with addresses
-│   └── all_districts.json        # Complete districts dataset
-│
-├── docs/                         # Project documentation
-│   ├── README.md                 # Documentation index
-│   ├── QUICK_START.md            # Development setup guide
-│   ├── DEPLOYMENT_GUIDE.md       # Production deployment
-│   ├── INFRASTRUCTURE.md         # AWS infrastructure overview
-│   ├── TERRAFORM_IMPROVEMENTS.md # Terraform configuration details
-│   ├── CUSTOM_DOMAIN_SETUP.md    # CloudFront SSL setup
-│   └── DYNAMODB_SETUP.md         # Database schema and usage
-│
-├── deploy.sh                     # Main deployment script (deploys backend + frontend)
-├── deploy-simple.sh              # Legacy simplified deployment
-├── LICENSE                       # MIT License
-└── README.md                     # This file
+├── deploy.sh                     # Main deployment script
+├── deploy-simple.sh              # Legacy deployment
+├── LICENSE
+└── README.md
 ```
 
 ## Quick Start
@@ -167,6 +175,7 @@ See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for detailed deployment
 - **District Browser** - Browse all Massachusetts school districts (356 districts)
 - **Interactive Map** - View district locations on OpenStreetMap (powered by Leaflet.js)
 - **Smart Geocoding** - Automatic address-to-coordinates conversion with fallback
+- **Smart Highlight** - Selecting district will highlight all towns on map
 - **Search by District** - Filter by district name
 - **Search by Town** - Find districts by town name
 - **District Details** - View detailed information in JSON format
