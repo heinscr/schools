@@ -1,0 +1,47 @@
+# Example: Use Terraform to build and deploy frontend
+# This makes `terraform apply` handle everything
+# Uncomment and modify if you want Terraform to build the frontend
+
+# Build frontend with correct API URL
+resource "null_resource" "frontend_build" {
+  # Rebuild whenever API endpoint changes
+  triggers = {
+    api_endpoint = aws_api_gateway_deployment.main.invoke_url
+  }
+
+  provisioner "local-exec" {
+    command     = "npm run build"
+    working_dir = "${path.module}/../../frontend"
+    environment = {
+      VITE_API_URL = aws_api_gateway_deployment.main.invoke_url
+    }
+  }
+
+  depends_on = [
+    aws_api_gateway_deployment.main
+  ]
+}
+
+# Upload frontend files to S3
+resource "null_resource" "frontend_deploy" {
+  triggers = {
+    # Redeploy when build changes
+    build_trigger = null_resource.frontend_build.id
+  }
+
+  provisioner "local-exec" {
+    command = "aws s3 sync ${path.module}/../../frontend/dist/ s3://${aws_s3_bucket.main.id}/frontend/ --delete"
+  }
+
+  depends_on = [
+    null_resource.frontend_build,
+    aws_s3_bucket.main
+  ]
+}
+
+# Note: This requires the null provider
+# Add to required_providers:
+#   null = {
+#     source  = "hashicorp/null"
+#     version = "~> 3.0"
+#   }

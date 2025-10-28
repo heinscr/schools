@@ -18,14 +18,24 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Allow CloudFront domains (*.cloudfront.net) and custom domain
+import os
+
+# Get allowed origins from environment or use defaults
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://school.crackpow.com"
+]
+
+# Add CloudFront domain from environment if set
+cloudfront_domain = os.getenv("CLOUDFRONT_DOMAIN")
+if cloudfront_domain:
+    allowed_origins.append(f"https://{cloudfront_domain}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "https://d3hl4i100v66fx.cloudfront.net",
-        "https://school.crackpow.com"
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

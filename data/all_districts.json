@@ -1,0 +1,3390 @@
+{
+  "metadata": {
+    "description": "Merged MA districts with addresses from latest districts.json and known regional memberships.",
+    "source_files": [
+      "districts.json (latest)",
+      "ma_school_districts_addresses_batch1.json"
+    ]
+  },
+  "regional_academic": [
+    {
+      "district": "Acton-Boxborough",
+      "members": [
+        "Acton",
+        "Boxborough"
+      ],
+      "address": "15 Charter Rd, Acton, MA 01720"
+    },
+    {
+      "district": "Amherst-Pelham",
+      "members": [
+        "Amherst",
+        "Leverett",
+        "Pelham",
+        "Shutesbury"
+      ],
+      "notes": "Grades 7\u201312 for some member towns",
+      "address": "170 Chestnut Street, Amherst, MA 01002"
+    },
+    {
+      "district": "Ashburnham-Westminster",
+      "members": [
+        "Ashburnham",
+        "Westminster"
+      ],
+      "address": "11 Oakmont Drive, Ashburnham, MA 01430"
+    },
+    {
+      "district": "Athol-Royalston",
+      "members": [
+        "Athol",
+        "Royalston"
+      ],
+      "address": "1062 Pleasant Street, Athol, MA 01331"
+    },
+    {
+      "district": "Ayer-Shirley",
+      "members": [
+        "Ayer",
+        "Shirley"
+      ],
+      "address": "115 Washington St, Ayer, MA 01432"
+    },
+    {
+      "district": "Berkshire Hills",
+      "members": [
+        "Great Barrington",
+        "Stockbridge",
+        "West Stockbridge"
+      ],
+      "address": "50 Main Street PO Box 617, Stockbridge, MA 01262"
+    },
+    {
+      "district": "Berlin-Boylston",
+      "members": [
+        "Berlin",
+        "Boylston"
+      ],
+      "address": "215 Main Street, Boylston, MA 01505"
+    },
+    {
+      "district": "Central Berkshire",
+      "members": [
+        "Becket",
+        "Cummington",
+        "Dalton",
+        "Hinsdale",
+        "Peru",
+        "Washington",
+        "Windsor"
+      ],
+      "address": "PO Box 299, Dalton, MA 01227"
+    },
+    {
+      "district": "Chesterfield-Goshen",
+      "members": [
+        "Chesterfield",
+        "Goshen"
+      ],
+      "notes": "PK\u20136",
+      "address": "PO Box 300, Chesterfield, MA 01012"
+    },
+    {
+      "district": "Concord-Carlisle",
+      "members": [
+        "Carlisle",
+        "Concord"
+      ],
+      "notes": "9\u201312",
+      "address": "120 Meriam Rd, Concord, MA 01742"
+    },
+    {
+      "district": "Dennis-Yarmouth",
+      "members": [
+        "Dennis",
+        "Yarmouth"
+      ],
+      "address": "296 Station Avenue, South Yarmouth, MA 02664"
+    },
+    {
+      "district": "Dighton-Rehoboth",
+      "members": [
+        "Dighton",
+        "Rehoboth"
+      ],
+      "address": "2700 Regional Road, North Dighton, MA 02764"
+    },
+    {
+      "district": "Dover-Sherborn",
+      "members": [
+        "Dover",
+        "Sherborn"
+      ],
+      "notes": "6\u201312",
+      "address": "157 Farm Street, Dover, MA 02030"
+    },
+    {
+      "district": "Dudley-Charlton",
+      "members": [
+        "Charlton",
+        "Dudley"
+      ],
+      "address": "68 Dudley Oxford Rd, Dudley, MA 01571"
+    },
+    {
+      "district": "Farmington River",
+      "members": [
+        "Otis",
+        "Sandisfield"
+      ],
+      "notes": "PK\u20136",
+      "address": "555 North Main Rd, Otis, MA 01253"
+    },
+    {
+      "district": "Freetown-Lakeville",
+      "members": [
+        "Freetown",
+        "Lakeville"
+      ],
+      "address": "98 Howland Rd, Lakeville, MA 02347"
+    },
+    {
+      "district": "Frontier",
+      "members": [
+        "Conway",
+        "Deerfield",
+        "Sunderland",
+        "Whately"
+      ],
+      "notes": "7\u201312",
+      "address": "113 North Main Street, Office C101, South Deerfield, MA 01373"
+    },
+    {
+      "district": "Gateway",
+      "members": [
+        "Blandford",
+        "Chester",
+        "Huntington",
+        "Middlefield",
+        "Montgomery",
+        "Russell"
+      ],
+      "address": "12 Littleville Road, Huntington, MA 01050"
+    },
+    {
+      "district": "Gill-Montague",
+      "members": [
+        "Gill",
+        "Montague"
+      ],
+      "address": "35 Crocker Avenue, Turners Falls, MA 01376"
+    },
+    {
+      "district": "Groton-Dunstable",
+      "members": [
+        "Dunstable",
+        "Groton"
+      ],
+      "address": "344 Main Street, Groton, MA 01450"
+    },
+    {
+      "district": "Hamilton-Wenham",
+      "members": [
+        "Hamilton",
+        "Wenham"
+      ],
+      "address": "5 School Street, Wenham, MA 01984"
+    },
+    {
+      "district": "Hampden-Wilbraham",
+      "members": [
+        "Hampden",
+        "Wilbraham"
+      ],
+      "address": "621 Main Street, Wilbraham, MA 01095"
+    },
+    {
+      "district": "Hampshire",
+      "members": [
+        "Chesterfield",
+        "Goshen",
+        "Southampton",
+        "Westhampton",
+        "Williamsburg"
+      ],
+      "notes": "7\u201312",
+      "address": "19 Stage Rd, Westhampton, MA 01027"
+    },
+    {
+      "district": "Hawlemont",
+      "members": [
+        "Charlemont",
+        "Hawley"
+      ],
+      "notes": "PK\u20136",
+      "address": "24 Ashfield Rd, Shelburne Falls, MA 01370"
+    },
+    {
+      "district": "Hoosac Valley",
+      "members": [
+        "Adams",
+        "Cheshire"
+      ],
+      "address": "49 Park Street, Adams, MA 01220"
+    },
+    {
+      "district": "King Philip",
+      "members": [
+        "Norfolk",
+        "Plainville",
+        "Wrentham"
+      ],
+      "notes": "7\u201312",
+      "address": "18 King Street, Norfolk, MA 02056"
+    },
+    {
+      "district": "Lincoln-Sudbury",
+      "members": [
+        "Lincoln",
+        "Sudbury"
+      ],
+      "notes": "9\u201312",
+      "address": "390 Lincoln Rd, Sudbury, MA 01776"
+    },
+    {
+      "district": "Manchester-Essex",
+      "members": [
+        "Essex",
+        "Manchester-by-the-Sea"
+      ],
+      "address": "36 Lincoln St, Manchester, MA 01944"
+    },
+    {
+      "district": "Martha's Vineyard Regional",
+      "members": [
+        "Aquinnah",
+        "Chilmark",
+        "Edgartown",
+        "Oak Bluffs",
+        "Tisbury",
+        "West Tisbury"
+      ],
+      "notes": "9\u201312",
+      "address": "PO Box 1150, West Tisbury, MA 02575"
+    },
+    {
+      "district": "Masconomet",
+      "members": [
+        "Boxford",
+        "Middleton",
+        "Topsfield"
+      ],
+      "notes": "7\u201312",
+      "address": "20 Endicott Rd, Boxford, MA 01921"
+    },
+    {
+      "district": "Mendon-Upton",
+      "members": [
+        "Mendon",
+        "Upton"
+      ],
+      "address": "150 North Ave, Mendon, MA 01756"
+    },
+    {
+      "district": "Mohawk Trail",
+      "members": [
+        "Ashfield",
+        "Buckland",
+        "Colrain",
+        "Hawley",
+        "Heath",
+        "Plainfield",
+        "Shelburne"
+      ],
+      "address": "24 Ashfield Rd, Shelburne Falls, MA 01370"
+    },
+    {
+      "district": "Monomoy",
+      "members": [
+        "Chatham",
+        "Harwich"
+      ],
+      "address": "425 Crowell Rd, Chatham, MA 02633"
+    },
+    {
+      "district": "Mount Greylock",
+      "members": [
+        "Lanesborough",
+        "Williamstown"
+      ],
+      "address": "1781 Cold Spring Rd, Williamstown, MA 01267"
+    },
+    {
+      "district": "Narragansett",
+      "members": [
+        "Phillipston",
+        "Templeton"
+      ],
+      "address": "462 Baldwinville Rd, Baldwinville, MA 01436"
+    },
+    {
+      "district": "Nashoba",
+      "members": [
+        "Bolton",
+        "Lancaster",
+        "Stow"
+      ],
+      "address": "50 Mechanic Street, Bolton, MA 01740"
+    },
+    {
+      "district": "Nauset",
+      "members": [
+        "Brewster",
+        "Eastham",
+        "Orleans",
+        "Wellfleet"
+      ],
+      "notes": "6\u201312",
+      "address": "78 Eldredge Pkwy, Orleans, MA 02653"
+    },
+    {
+      "district": "New Salem-Wendell",
+      "members": [
+        "New Salem",
+        "Wendell"
+      ],
+      "notes": "PK\u20136",
+      "address": "PO Box 7, Erving, MA 01344"
+    },
+    {
+      "district": "North Middlesex",
+      "members": [
+        "Ashby",
+        "Pepperell",
+        "Townsend"
+      ],
+      "address": "66 Brookline Street, Towsend, MA 01469"
+    },
+    {
+      "district": "Northborough-Southborough",
+      "members": [
+        "Northborough",
+        "Southborough"
+      ],
+      "notes": "9\u201312",
+      "address": "79 Bartlett St, Northborough, MA 01532"
+    },
+    {
+      "district": "Old Rochester",
+      "members": [
+        "Marion",
+        "Mattapoisett",
+        "Rochester"
+      ],
+      "notes": "7\u201312",
+      "address": "135 Marion Rd, Mattapoisett, MA 02739"
+    },
+    {
+      "district": "Pentucket",
+      "members": [
+        "Groveland",
+        "Merrimac",
+        "West Newbury"
+      ],
+      "address": "22 Main Street, West Newbury, MA 01985"
+    },
+    {
+      "district": "Pioneer Valley",
+      "members": [
+        "Bernardston",
+        "Leyden",
+        "Northfield",
+        "Warwick"
+      ],
+      "address": "97 F. Sumner Turner Road, Northfield, MA 01360"
+    },
+    {
+      "district": "Quabbin",
+      "members": [
+        "Barre",
+        "Hardwick",
+        "Hubbardston",
+        "New Braintree",
+        "Oakham"
+      ],
+      "address": "872 South Street, Barre, MA 01005"
+    },
+    {
+      "district": "Quaboag",
+      "members": [
+        "Warren",
+        "West Brookfield"
+      ],
+      "address": "284 Old West Brookfield Road PO Box 1538, Warren, MA 01083"
+    },
+    {
+      "district": "Ralph C. Mahar",
+      "members": [
+        "New Salem",
+        "Orange",
+        "Petersham",
+        "Wendell"
+      ],
+      "notes": "7\u201312",
+      "address": "507 South Main Street, Orange, MA 01364"
+    },
+    {
+      "district": "Silver Lake",
+      "members": [
+        "Halifax",
+        "Kingston",
+        "Plympton"
+      ],
+      "notes": "PK & 7\u201312",
+      "address": "250 Pembroke Street, Kingston, MA 02364"
+    },
+    {
+      "district": "Somerset-Berkley",
+      "members": [
+        "Berkley",
+        "Somerset"
+      ],
+      "notes": "9\u201312",
+      "address": "625 County St, Somerset, MA 02726"
+    },
+    {
+      "district": "Southern Berkshire",
+      "members": [
+        "Alford",
+        "Egremont",
+        "Monterey",
+        "New Marlborough",
+        "Sheffield"
+      ],
+      "address": "PO BOX 339, Sheffield, MA 01257"
+    },
+    {
+      "district": "Southwick-Tolland-Granville",
+      "members": [
+        "Granville",
+        "Southwick",
+        "Tolland"
+      ],
+      "address": "86 Powder Mill Road, Southwick, MA 01077"
+    },
+    {
+      "district": "Spencer-East Brookfield",
+      "members": [
+        "East Brookfield",
+        "Spencer"
+      ],
+      "address": "306 Main St, Spencer, MA 01562"
+    },
+    {
+      "district": "Tantasqua",
+      "members": [
+        "Brimfield",
+        "Brookfield",
+        "Holland",
+        "Sturbridge",
+        "Wales"
+      ],
+      "notes": "7\u201312",
+      "address": "320A Brookfield Rd, Fiskdale, MA 01518"
+    },
+    {
+      "district": "Triton",
+      "members": [
+        "Newbury",
+        "Rowley",
+        "Salisbury"
+      ],
+      "address": "112 Elm Street, Byfield, MA 01922"
+    },
+    {
+      "district": "Up-Island",
+      "members": [
+        "Aquinnah",
+        "Chilmark",
+        "West Tisbury"
+      ],
+      "notes": "PK\u20138",
+      "address": "4 Pine Street, Vineyard Haven, MA 02568"
+    },
+    {
+      "district": "Wachusett",
+      "members": [
+        "Holden",
+        "Paxton",
+        "Princeton",
+        "Rutland",
+        "Sterling"
+      ],
+      "address": "1745 Main Street c/o Jefferson School, Jefferson, MA 01522"
+    },
+    {
+      "district": "Whitman-Hanson",
+      "members": [
+        "Hanson",
+        "Whitman"
+      ],
+      "address": "610 Franklin Street, Whitman, MA 02382"
+    }
+  ],
+  "regional_vocational": [
+    {
+      "district": "Assabet Valley",
+      "members": [
+        "Berlin",
+        "Hudson",
+        "Marlborough",
+        "Maynard",
+        "Northborough",
+        "Southborough",
+        "Westborough"
+      ],
+      "address": "215 Fitchburg St, Marlborough, MA 01752"
+    },
+    {
+      "district": "Blue Hills",
+      "members": [
+        "Avon",
+        "Braintree",
+        "Canton",
+        "Dedham",
+        "Holbrook",
+        "Milton",
+        "Norwood",
+        "Randolph",
+        "Westwood"
+      ],
+      "address": "800 Randolph St, Canton, MA 02021"
+    },
+    {
+      "district": "Bristol-Plymouth",
+      "members": [
+        "Berkley",
+        "Bridgewater",
+        "Dighton",
+        "Middleborough",
+        "Raynham",
+        "Rehoboth",
+        "Taunton"
+      ],
+      "address": "207 Hart St, Taunton, MA 02780"
+    },
+    {
+      "district": "Franklin County Technical",
+      "members": [
+        "Bernardston",
+        "Buckland",
+        "Colrain",
+        "Conway",
+        "Deerfield",
+        "Erving",
+        "Gill",
+        "Greenfield",
+        "Heath",
+        "Leyden",
+        "Montague",
+        "New Salem",
+        "Northfield",
+        "Orange",
+        "Shelburne",
+        "Sunderland",
+        "Warwick",
+        "Wendell",
+        "Whately"
+      ],
+      "address": "82 Industrial Blvd, Turners Falls, MA 01376"
+    },
+    {
+      "district": "Greater Fall River",
+      "members": [
+        "Fall River",
+        "Somerset",
+        "Swansea",
+        "Westport"
+      ],
+      "address": "251 Stonehaven Rd, Fall River, MA 02723"
+    },
+    {
+      "district": "Greater Lawrence",
+      "members": [
+        "Andover",
+        "Lawrence",
+        "Methuen",
+        "North Andover"
+      ],
+      "address": "57 River Rd, Andover, MA 01810"
+    },
+    {
+      "district": "Greater Lowell",
+      "members": [
+        "Dracut",
+        "Dunstable",
+        "Lowell",
+        "Tyngsborough"
+      ],
+      "address": "250 Pawtucket Blvd, Tyngsborough, MA 01879"
+    },
+    {
+      "district": "Greater New Bedford",
+      "members": [
+        "Dartmouth",
+        "Fairhaven",
+        "New Bedford"
+      ],
+      "address": "1121 Ashley Blvd, New Bedford, MA 02745"
+    },
+    {
+      "district": "Minuteman",
+      "members": [
+        "Acton",
+        "Arlington",
+        "Belmont",
+        "Bolton",
+        "Concord",
+        "Dover",
+        "Lancaster",
+        "Lexington",
+        "Needham",
+        "Stow"
+      ],
+      "address": "758 Marrett Rd, Lexington, MA 02421"
+    },
+    {
+      "district": "Montachusett",
+      "members": [
+        "Ashburnham",
+        "Ashby",
+        "Athol",
+        "Barre",
+        "Fitchburg",
+        "Gardner",
+        "Harvard",
+        "Holden",
+        "Hubbardston",
+        "Lunenburg",
+        "Petersham",
+        "Phillipston",
+        "Princeton",
+        "Royalston",
+        "Sterling",
+        "Templeton",
+        "Westminster",
+        "Winchendon"
+      ],
+      "address": "1050 Westminster St, Fitchburg, MA 01420"
+    },
+    {
+      "district": "Northeast Metro",
+      "members": [
+        "Chelsea",
+        "Malden",
+        "Melrose",
+        "North Reading",
+        "Reading",
+        "Revere",
+        "Saugus",
+        "Stoneham",
+        "Wakefield",
+        "Winchester",
+        "Winthrop",
+        "Woburn"
+      ],
+      "address": "100 Hemlock Rd, Wakefield, MA 01880"
+    },
+    {
+      "district": "Old Colony",
+      "members": [
+        "Acushnet",
+        "Carver",
+        "Lakeville",
+        "Mattapoisett",
+        "Rochester"
+      ],
+      "address": "476 North Ave, Rochester, MA 02770"
+    },
+    {
+      "district": "Pathfinder",
+      "members": [
+        "Belchertown",
+        "Granby",
+        "Hardwick",
+        "Monson",
+        "New Braintree",
+        "Oakham",
+        "Palmer",
+        "Ware",
+        "Warren"
+      ],
+      "address": "240 Sykes St, Palmer, MA 01069"
+    },
+    {
+      "district": "Shawsheen Valley",
+      "members": [
+        "Bedford",
+        "Billerica",
+        "Burlington",
+        "Tewksbury",
+        "Wilmington"
+      ],
+      "address": "100 Cook St, Billerica, MA 01821"
+    },
+    {
+      "district": "South Middlesex (Keefe Tech)",
+      "members": [
+        "Ashland",
+        "Framingham",
+        "Holliston",
+        "Hopkinton",
+        "Natick"
+      ],
+      "address": "750 Winter St, Framingham, MA 01702"
+    },
+    {
+      "district": "South Shore",
+      "members": [
+        "Abington",
+        "Cohasset",
+        "Hanover",
+        "Hanson",
+        "Norwell",
+        "Rockland",
+        "Scituate",
+        "Whitman"
+      ],
+      "address": "476 Webster St, Hanover, MA 02339"
+    },
+    {
+      "district": "Southeastern Regional",
+      "members": [
+        "Brockton",
+        "East Bridgewater",
+        "Easton",
+        "Foxborough",
+        "Mansfield",
+        "Norton",
+        "Sharon",
+        "Stoughton",
+        "West Bridgewater"
+      ],
+      "address": "250 Foundry St, South Easton, MA 02375"
+    },
+    {
+      "district": "Southern Worcester County (Bay Path)",
+      "members": [
+        "Auburn",
+        "Charlton",
+        "Dudley",
+        "North Brookfield",
+        "Oxford",
+        "Paxton",
+        "Rutland",
+        "Southbridge",
+        "Spencer",
+        "Webster"
+      ],
+      "address": "57 Old Muggett Hill Rd, Charlton, MA 01507"
+    },
+    {
+      "district": "Tri-County",
+      "members": [
+        "Franklin",
+        "Medfield",
+        "Medway",
+        "Millis",
+        "Norfolk",
+        "North Attleborough",
+        "Plainville",
+        "Seekonk",
+        "Sherborn",
+        "Walpole",
+        "Wrentham"
+      ],
+      "address": "147 Pond St, Franklin, MA 02038"
+    },
+    {
+      "district": "Upper Cape Cod",
+      "members": [
+        "Bourne",
+        "Falmouth",
+        "Marion",
+        "Sandwich",
+        "Wareham"
+      ],
+      "address": "220 Sandwich Rd, Bourne, MA 02532"
+    },
+    {
+      "district": "Whittier",
+      "members": [
+        "Amesbury",
+        "Georgetown",
+        "Groveland",
+        "Haverhill",
+        "Ipswich",
+        "Merrimac",
+        "Newbury",
+        "Newburyport",
+        "Rowley",
+        "Salisbury",
+        "West Newbury"
+      ],
+      "address": "115 Amesbury Line Rd, Haverhill, MA 01830"
+    }
+  ],
+  "county_agricultural": [
+    {
+      "district": "Bristol County Agricultural HS",
+      "members": [
+        "Acushnet",
+        "Attleboro",
+        "Berkley",
+        "Dartmouth",
+        "Dighton",
+        "Easton",
+        "Fairhaven",
+        "Fall River",
+        "Freetown",
+        "Mansfield",
+        "New Bedford",
+        "North Attleborough",
+        "Norton",
+        "Raynham",
+        "Rehoboth",
+        "Seekonk",
+        "Somerset",
+        "Swansea",
+        "Taunton",
+        "Westport"
+      ],
+      "address": "135 Center St, Dighton, MA 02715"
+    },
+    {
+      "district": "Norfolk County Agricultural HS",
+      "members": [
+        "Avon",
+        "Bellingham",
+        "Braintree",
+        "Brookline",
+        "Canton",
+        "Cohasset",
+        "Dedham",
+        "Dover",
+        "Foxborough",
+        "Franklin",
+        "Holbrook",
+        "Medfield",
+        "Medway",
+        "Millis",
+        "Milton",
+        "Needham",
+        "Norfolk",
+        "Norwood",
+        "Plainville",
+        "Quincy",
+        "Randolph",
+        "Sharon",
+        "Stoughton",
+        "Walpole",
+        "Wellesley",
+        "Westwood",
+        "Weymouth",
+        "Wrentham"
+      ],
+      "address": "400 Main St, Walpole, MA 02081"
+    },
+    {
+      "district": "Essex North Shore Agricultural & Technical",
+      "members": [
+        "Beverly",
+        "Boxford",
+        "Danvers",
+        "Essex",
+        "Gloucester",
+        "Hamilton",
+        "Lynnfield",
+        "Manchester-by-the-Sea",
+        "Marblehead",
+        "Middleton",
+        "Nahant",
+        "Peabody",
+        "Rockport",
+        "Salem",
+        "Swampscott",
+        "Topsfield",
+        "Wenham"
+      ],
+      "address": "565 Maple St, Danvers, MA 01923"
+    }
+  ],
+  "other_districts": [
+    {
+      "district": "Abington",
+      "address": "1071 Washington St., Abington, MA 02351",
+      "members": [
+        "Abington"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Acushnet",
+      "address": "708 Middle Road Suite 1, Acushnet, MA 02743",
+      "members": [
+        "Acushnet"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Agawam",
+      "address": "1305 Springfield St Suite 1, Feeding Hills, MA 01030",
+      "members": [
+        "Agawam"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Amesbury",
+      "address": "5 Highland Street, Amesbury, MA 01913",
+      "members": [
+        "Amesbury"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Amherst",
+      "address": "170 Chestnut Street, Amherst, MA 01002",
+      "members": [
+        "Amherst"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Andover",
+      "address": "30 Whittier Court, Andover, MA 01810",
+      "members": [
+        "Andover"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Arlington",
+      "address": "869 Massachusetts Avenue, Arlington, MA 02476",
+      "members": [
+        "Arlington"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Ashland",
+      "address": "87 West Union Street, Ashland, MA 01721",
+      "members": [
+        "Ashland"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Assabet Valley Regional Vocational Technical",
+      "address": "215 Fitchburg Street, Marlborough, MA 01752",
+      "members": [
+        "Assabet Valley Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Attleboro",
+      "address": "1 Blue Pride Way, Attleboro, MA 02703",
+      "members": [
+        "Attleboro"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Auburn",
+      "address": "5 West Street, Auburn, MA 01501",
+      "members": [
+        "Auburn"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Avon",
+      "address": "1 Patrick Clark Drive, Avon, MA 02322",
+      "members": [
+        "Avon"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Ayer Shirley School District",
+      "address": "115 Washington Street, Ayer, MA 01432",
+      "members": [
+        "Ayer Shirley School District"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Barnstable",
+      "address": "P O Box 955, Hyannis, MA 02601",
+      "members": [
+        "Barnstable"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Bedford",
+      "address": "97 McMahon Road, Bedford, MA 01730",
+      "members": [
+        "Bedford"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Belchertown",
+      "address": "PO Box 841, Belchertown, MA 01007",
+      "members": [
+        "Belchertown"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Bellingham",
+      "address": "4 Mechanic Street, Bellingham, MA 02019",
+      "members": [
+        "Bellingham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Belmont",
+      "address": "644 Pleasant Street, Belmont, MA 02478",
+      "members": [
+        "Belmont"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Berkley",
+      "address": "21 North Main Street, Berkley, MA 02779",
+      "members": [
+        "Berkley"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Beverly",
+      "address": "70 Balch St., Beverly, MA 01915",
+      "members": [
+        "Beverly"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Billerica",
+      "address": "365 Boston Rd, Billerica, MA 01821",
+      "members": [
+        "Billerica"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Blackstone Valley Regional Vocational Technical",
+      "address": "65 Pleasant Street, Upton, MA 01568",
+      "members": [
+        "Blackstone Valley Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Blackstone-Millville",
+      "address": "175 Lincoln Street, Blackstone, MA 01504",
+      "members": [
+        "Blackstone-Millville"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Blue Hills Regional Vocational Technical",
+      "address": "800 Randolph Street, Canton, MA 02021",
+      "members": [
+        "Blue Hills Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Boston",
+      "address": "2300 Washington Street, Roxbury, MA 02119",
+      "members": [
+        "Boston"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Bourne",
+      "address": "36 Sandwich Rd, Bourne, MA 02532",
+      "members": [
+        "Bourne"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Boxford",
+      "address": "28 Middleton Road, Boxford, MA 01921",
+      "members": [
+        "Boxford"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Braintree",
+      "address": "348 Pond Street, Braintree, MA 02184",
+      "members": [
+        "Braintree"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Brewster",
+      "address": "78 Eldredge Pkwy, Orleans, MA 02653",
+      "members": [
+        "Brewster"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Bridgewater-Raynham",
+      "address": "166 Mt. Prospect Street, Bridgewater, MA 02324",
+      "members": [
+        "Bridgewater-Raynham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Brimfield",
+      "address": "320A Brookfield Rd, Fiskdale, MA 01518",
+      "members": [
+        "Brimfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Bristol County Agricultural",
+      "address": "135 Center Street, Dighton, MA 02715",
+      "members": [
+        "Bristol County Agricultural"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Bristol-Plymouth Regional Vocational Technical",
+      "address": "207 Hart Street, Taunton, MA 02780",
+      "members": [
+        "Bristol-Plymouth Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Brockton",
+      "address": "43 Crescent Street, Brockton, MA 02301",
+      "members": [
+        "Brockton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Brookfield",
+      "address": "320 Brookfield Rd, Fiskdale, MA 01518",
+      "members": [
+        "Brookfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Brookline",
+      "address": "333 Washington Street, Brookline, MA 02445",
+      "members": [
+        "Brookline"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Burlington",
+      "address": "123 Cambridge Street, Burlington, MA 01803",
+      "members": [
+        "Burlington"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Cambridge",
+      "address": "135 Berkshire Street, Cambridge, MA 02141",
+      "members": [
+        "Cambridge"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Canton",
+      "address": "960 Washington Street, Canton, MA 02021",
+      "members": [
+        "Canton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Cape Cod Regional Vocational Technical",
+      "address": "351 Pleasant Lake Avenue, Harwich, MA 02645",
+      "members": [
+        "Cape Cod Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Carlisle",
+      "address": "83 School Street, Carlisle, MA 01741",
+      "members": [
+        "Carlisle"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Carver",
+      "address": "3 Carver Square Blvd., Carver, MA 02330",
+      "members": [
+        "Carver"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Chelmsford",
+      "address": "230 North Road, Chelmsford, MA 01824",
+      "members": [
+        "Chelmsford"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Chelsea",
+      "address": "500 Broadway Room 216, Chelsea, MA 02150",
+      "members": [
+        "Chelsea"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Chicopee",
+      "address": "134 Dulong Circle, Chicopee, MA 01022",
+      "members": [
+        "Chicopee"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Clarksburg",
+      "address": "777 West Crossroad, Clarksburg, MA 01247",
+      "members": [
+        "Clarksburg"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Clinton",
+      "address": "150 School Street, Clinton, MA 01510",
+      "members": [
+        "Clinton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Cohasset",
+      "address": "143 Pond Street, Cohasset, MA 02025",
+      "members": [
+        "Cohasset"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Concord",
+      "address": "120 Meriam Rd, Concord, MA 01742",
+      "members": [
+        "Concord"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Conway",
+      "address": "113 North Main Street, Office C101, South Deerfield, MA 01373",
+      "members": [
+        "Conway"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Danvers",
+      "address": "64 Cabot Road, Danvers, MA 01923",
+      "members": [
+        "Danvers"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Dartmouth",
+      "address": "8 Bush Street, Dartmouth, MA 02748",
+      "members": [
+        "Dartmouth"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Dedham",
+      "address": "100 Whiting Avenue, Dedham, MA 02026",
+      "members": [
+        "Dedham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Deerfield",
+      "address": "113 North Main Street, Office C101, South Deerfield, MA 01373",
+      "members": [
+        "Deerfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Douglas",
+      "address": "21 Davis Street, Douglas, MA 01516",
+      "members": [
+        "Douglas"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Dover",
+      "address": "157 Farm Street, Dover, MA 02030",
+      "members": [
+        "Dover"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Dracut",
+      "address": "2063 Lakeview Avenue, Dracut, MA 01826",
+      "members": [
+        "Dracut"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Duxbury",
+      "address": "93 Chandler Street, Duxbury, MA 02332",
+      "members": [
+        "Duxbury"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "East Bridgewater",
+      "address": "143 Plymouth Street, East Bridgewater, MA 02333",
+      "members": [
+        "East Bridgewater"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "East Longmeadow",
+      "address": "180 Maple Street, East Longmeadow, MA 01028",
+      "members": [
+        "East Longmeadow"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Eastham",
+      "address": "78 Eldredge Pkwy, Orleans, MA 02653",
+      "members": [
+        "Eastham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Easthampton",
+      "address": "50 Payson Avenue Second Floor, Easthampton, MA 01027",
+      "members": [
+        "Easthampton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Easton",
+      "address": "48 Spooner Street, North Easton, MA 02356",
+      "members": [
+        "Easton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Edgartown",
+      "address": "4 Pine Street, Vineyard Haven, MA 02568",
+      "members": [
+        "Edgartown"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Erving",
+      "address": "PO Box 7, Erving, MA 01344",
+      "members": [
+        "Erving"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Essex North Shore Agricultural and Technical School District",
+      "address": "565 Maple Street P.O. Box 346, Hathorne, MA 01937",
+      "members": [
+        "Essex North Shore Agricultural and Technical School District"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Everett",
+      "address": "121 Vine Street, Everett, MA 02149",
+      "members": [
+        "Everett"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Fairhaven",
+      "address": "128 Washington Street, Fairhaven, MA 02719",
+      "members": [
+        "Fairhaven"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Fall River",
+      "address": "417 Rock Street, Fall River, MA 02720",
+      "members": [
+        "Fall River"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Falmouth",
+      "address": "340 Teaticket Hwy, East Falmouth, MA 02536",
+      "members": [
+        "Falmouth"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Farmington River Reg",
+      "address": "555 N Main Street, Otis, MA 01253",
+      "members": [
+        "Farmington River Reg"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Fitchburg",
+      "address": "376 South Street, Fitchburg, MA 01420",
+      "members": [
+        "Fitchburg"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Florida",
+      "address": "56 North County Rd, Florida, MA 01247",
+      "members": [
+        "Florida"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Foxborough",
+      "address": "60 South Street C/O Igo Administration Building, Foxborough, MA 02035",
+      "members": [
+        "Foxborough"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Framingham",
+      "address": "19 Flagg Drive, Framingham, MA 01702",
+      "members": [
+        "Framingham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Franklin",
+      "address": "355 East Central Street Suite 3, Franklin, MA 02038",
+      "members": [
+        "Franklin"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Franklin County Regional Vocational Technical",
+      "address": "82 Industrial Blvd, Turners Falls, MA 01376",
+      "members": [
+        "Franklin County Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Gardner",
+      "address": "160 Elm Street, Gardner, MA 01440",
+      "members": [
+        "Gardner"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Georgetown",
+      "address": "51 North Street, Georgetown, MA 01833",
+      "members": [
+        "Georgetown"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Gloucester",
+      "address": "2 Blackburn Drive, Gloucester, MA 01930",
+      "members": [
+        "Gloucester"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Gosnold",
+      "address": "263 Hill & Plain Road, East Falmouth, MA 02536",
+      "members": [
+        "Gosnold"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Grafton",
+      "address": "30 Providence Rd, Grafton, MA 01519",
+      "members": [
+        "Grafton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Granby",
+      "address": "387 East State Street, Granby, MA 01033",
+      "members": [
+        "Granby"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Greater Fall River Regional Vocational Technical",
+      "address": "251 Stonehaven Rd, Fall River, MA 02723",
+      "members": [
+        "Greater Fall River Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Greater Lawrence Regional Vocational Technical",
+      "address": "57 River Rd, Andover, MA 01810",
+      "members": [
+        "Greater Lawrence Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Greater Lowell Regional Vocational Technical",
+      "address": "250 Pawtucket Blvd, Tyngsborough, MA 01879",
+      "members": [
+        "Greater Lowell Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Greater New Bedford Regional Vocational Technical",
+      "address": "1121 Ashley Blvd, New Bedford, MA 02745",
+      "members": [
+        "Greater New Bedford Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Greenfield",
+      "address": "195 Federal Street, Suite 100, Greenfield, MA 01301",
+      "members": [
+        "Greenfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Hadley",
+      "address": "125 Russell Street, Hadley, MA 01035",
+      "members": [
+        "Hadley"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Halifax",
+      "address": "250 Pembroke Street, Kingston, MA 02364",
+      "members": [
+        "Halifax"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Hancock",
+      "address": "3080 HANCOCK ROAD, HANCOCK, MA 01237",
+      "members": [
+        "Hancock"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Hanover",
+      "address": "188 Broadway Street, Hanover, MA 02339",
+      "members": [
+        "Hanover"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Harvard",
+      "address": "27A Massachusetts Avenue, Harvard, MA 01451",
+      "members": [
+        "Harvard"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Hatfield",
+      "address": "34 School Street, Hatfield, MA 01038",
+      "members": [
+        "Hatfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Haverhill",
+      "address": "4 Summer Street, Haverhill, MA 01830",
+      "members": [
+        "Haverhill"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Hingham",
+      "address": "220 Central Street, Hingham, MA 02043",
+      "members": [
+        "Hingham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Holbrook",
+      "address": "245 So. Franklin Street, Holbrook, MA 02343",
+      "members": [
+        "Holbrook"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Holland",
+      "address": "320 Brookfield Rd, Fiskdale, MA 01518",
+      "members": [
+        "Holland"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Holliston",
+      "address": "370 Hollis Street, Holliston, MA 01746",
+      "members": [
+        "Holliston"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Holyoke",
+      "address": "57 Suffolk Street, Holyoke, MA 01040",
+      "members": [
+        "Holyoke"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Hopedale",
+      "address": "25 Adin Street, Hopedale, MA 01747",
+      "members": [
+        "Hopedale"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Hopkinton",
+      "address": "89 Hayden Rowe Street, Hopkinton, MA 01748",
+      "members": [
+        "Hopkinton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Hudson",
+      "address": "155 Apsley Street, Hudson, MA 01749",
+      "members": [
+        "Hudson"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Hull",
+      "address": "18 Harborview Road, Hull, MA 02045",
+      "members": [
+        "Hull"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Institutional Schools",
+      "address": "135 Santilli Highway 3rd Floor, Everett, MA 02149",
+      "members": [
+        "Institutional Schools"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Ipswich",
+      "address": "1 Lord Square, Ipswich, MA 01938",
+      "members": [
+        "Ipswich"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Kingston",
+      "address": "250 Pembroke Street, Kingston, MA 02364",
+      "members": [
+        "Kingston"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Lawrence",
+      "address": "237 Essex Street, Lawrence, MA 01840",
+      "members": [
+        "Lawrence"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Lee",
+      "address": "300A Greylock St, Lee, MA 01238",
+      "members": [
+        "Lee"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Leicester",
+      "address": "3 Washburn Square 3rd Floor, Leicester, MA 01524",
+      "members": [
+        "Leicester"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Lenox",
+      "address": "6 Walker Street, Lenox, MA 01240",
+      "members": [
+        "Lenox"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Leominster",
+      "address": "24 Church Street, Leominster, MA 01453",
+      "members": [
+        "Leominster"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Leverett",
+      "address": "PO Box 7, Erving, MA 01344",
+      "members": [
+        "Leverett"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Lexington",
+      "address": "146 Maple Street, Lexington, MA 02420",
+      "members": [
+        "Lexington"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Lincoln",
+      "address": "1 Ballfield Road, Lincoln, MA 01773",
+      "members": [
+        "Lincoln"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Littleton",
+      "address": "PO Box 1486, Littleton, MA 01460",
+      "members": [
+        "Littleton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Longmeadow",
+      "address": "535 Bliss Road, Longmeadow, MA 01106",
+      "members": [
+        "Longmeadow"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Lowell",
+      "address": "155 Merrimack Street, Lowell, MA 01852",
+      "members": [
+        "Lowell"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Ludlow",
+      "address": "205 Fuller Street, Ludlow, MA 01056",
+      "members": [
+        "Ludlow"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Lunenburg",
+      "address": "129 Northfield Rd, Lunenburg, MA 01462",
+      "members": [
+        "Lunenburg"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Lynn",
+      "address": "195 Market Street, Lynn, MA 01901",
+      "members": [
+        "Lynn"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Lynnfield",
+      "address": "525 Salem Street, Lynnfield, MA 01940",
+      "members": [
+        "Lynnfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Ma Academy for Math and Science",
+      "address": "85 Prescott Street, Worcester, MA 01605",
+      "members": [
+        "Ma Academy for Math and Science"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Malden",
+      "address": "110 Pleasant St, Malden, MA 02148",
+      "members": [
+        "Malden"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Manchester Essex Regional",
+      "address": "PO BOX 1407, Manchester, MA 01944",
+      "members": [
+        "Manchester Essex Regional"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Mansfield",
+      "address": "2 Park Row, Mansfield, MA 02048",
+      "members": [
+        "Mansfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Marblehead",
+      "address": "9 Widger Road, Marblehead, MA 01945",
+      "members": [
+        "Marblehead"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Marion",
+      "address": "135 Marion Rd, Mattapoisett, MA 02739",
+      "members": [
+        "Marion"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Marlborough",
+      "address": "25 Union Street, Marlborough, MA 01752",
+      "members": [
+        "Marlborough"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Marshfield",
+      "address": "76 South River Street, Marshfield, MA 02050",
+      "members": [
+        "Marshfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Martha's Vineyard",
+      "address": "4 Pine Street, Vineyard Haven, MA 02568",
+      "members": [
+        "Martha's Vineyard"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Mashpee",
+      "address": "150-A Old Barnstable Road, Mashpee, MA 02649",
+      "members": [
+        "Mashpee"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Mattapoisett",
+      "address": "135 Marion Rd, Mattapoisett, MA 02739",
+      "members": [
+        "Mattapoisett"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Maynard",
+      "address": "3-R Tiger Drive, Maynard, MA 01754",
+      "members": [
+        "Maynard"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Medfield",
+      "address": "459 Main St 3rd Fl, Medfield, MA 02052",
+      "members": [
+        "Medfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Medford",
+      "address": "489 Winthrop Street, Medford, MA 02155",
+      "members": [
+        "Medford"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Medway",
+      "address": "45 Holliston Street, Medway, MA 02053",
+      "members": [
+        "Medway"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Melrose",
+      "address": "360 Lynn Fells Pkwy, Melrose, MA 02176",
+      "members": [
+        "Melrose"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Methuen",
+      "address": "9 Branch Street, Methuen, MA 01844",
+      "members": [
+        "Methuen"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Middleborough",
+      "address": "30 Forest Street, Middleborough, MA 02346",
+      "members": [
+        "Middleborough"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Middleton",
+      "address": "28 Middleton Road, Boxford, MA 01921",
+      "members": [
+        "Middleton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Milford",
+      "address": "31 West Fountain Street, Milford, MA 01757",
+      "members": [
+        "Milford"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Millbury",
+      "address": "12 Martin Street, Millbury, MA 01527",
+      "members": [
+        "Millbury"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Millis",
+      "address": "245 Plain Street Central Office, Millis, MA 02054",
+      "members": [
+        "Millis"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Milton",
+      "address": "25 Gile Road, Milton, MA 02186",
+      "members": [
+        "Milton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Minuteman Regional Vocational Technical",
+      "address": "758 Marrett Rd, Lexington, MA 02421",
+      "members": [
+        "Minuteman Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Monson",
+      "address": "P O Box 159, Monson, MA 01057",
+      "members": [
+        "Monson"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Montachusett Regional Vocational Technical",
+      "address": "1050 Westminster Street, Fitchburg, MA 01420",
+      "members": [
+        "Montachusett Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Nahant",
+      "address": "290 Castle Road, Nahant, MA 01908",
+      "members": [
+        "Nahant"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Nantucket",
+      "address": "10 Surfside Road, Nantucket, MA 02554",
+      "members": [
+        "Nantucket"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Nashoba Valley Regional Vocational Technical",
+      "address": "100 Littleton Road, Westford, MA 01886",
+      "members": [
+        "Nashoba Valley Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Natick",
+      "address": "13 East Central Street, Natick, MA 01760",
+      "members": [
+        "Natick"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Needham",
+      "address": "1330 Highland Avenue, Needham, MA 02492",
+      "members": [
+        "Needham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "New Bedford",
+      "address": "455 County Street C/O Paul Rodrigues Administration Bldg., New Bedford, MA 02740",
+      "members": [
+        "New Bedford"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Newburyport",
+      "address": "70 Low Street, Newburyport, MA 01950",
+      "members": [
+        "Newburyport"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Newton",
+      "address": "100 Walnut Street, Newtonville, MA 02460",
+      "members": [
+        "Newton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Norfolk",
+      "address": "70 Boardman Street, Norfolk, MA 02056",
+      "members": [
+        "Norfolk"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Norfolk County Agricultural",
+      "address": "400 Main Street, Walpole, MA 02081",
+      "members": [
+        "Norfolk County Agricultural"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "North Adams",
+      "address": "10 Main Street Second Floor, North Adams, MA 01247",
+      "members": [
+        "North Adams"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "North Andover",
+      "address": "566 Main Street, North Andover, MA 01845",
+      "members": [
+        "North Andover"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "North Attleborough",
+      "address": "6 Morse Street, North Attleborough, MA 02760",
+      "members": [
+        "North Attleborough"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "North Brookfield",
+      "address": "10 New School Drive, North Brookfield, MA 01535",
+      "members": [
+        "North Brookfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "North Reading",
+      "address": "189 Park Street, North Reading, MA 01864",
+      "members": [
+        "North Reading"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Northampton",
+      "address": "212 Main Street, Northampton, MA 01060",
+      "members": [
+        "Northampton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Northampton-Smith Vocational Agricultural",
+      "address": "80 Locust Street, Northampton, MA 01060",
+      "members": [
+        "Northampton-Smith Vocational Agricultural"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Northboro-Southboro",
+      "address": "53 Parkerville Road, Southborough, MA 01772",
+      "members": [
+        "Northboro-Southboro"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Northborough",
+      "address": "53 Parkerville Road, Southborough, MA 01772",
+      "members": [
+        "Northborough"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Northbridge",
+      "address": "87 Linwood Avenue, Whitinsville, MA 01588",
+      "members": [
+        "Northbridge"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Northeast Metropolitan Regional Vocational Technical",
+      "address": "100 Hemlock Rd, Wakefield, MA 01880",
+      "members": [
+        "Northeast Metropolitan Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Northern Berkshire Regional Vocational Technical",
+      "address": "70 Hodges Cross Rd, North Adams, MA 01247",
+      "members": [
+        "Northern Berkshire Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Norton",
+      "address": "64 West Main Street, Norton, MA 02766",
+      "members": [
+        "Norton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Norwell",
+      "address": "322 Main Street, Norwell, MA 02061",
+      "members": [
+        "Norwell"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Norwood",
+      "address": "275 Prospect Street PO BOX 67, Norwood, MA 02062",
+      "members": [
+        "Norwood"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Oak Bluffs",
+      "address": "4 Pine Street, Vineyard Haven, MA 02568",
+      "members": [
+        "Oak Bluffs"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Old Colony Regional Vocational Technical",
+      "address": "476 North Avenue, Rochester, MA 02770",
+      "members": [
+        "Old Colony Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Orange",
+      "address": "507 S. Main Street P.O. Box 680, Orange, MA 01364",
+      "members": [
+        "Orange"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Orleans",
+      "address": "78 Eldredge Pkwy, Orleans, MA 02653",
+      "members": [
+        "Orleans"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Oxford",
+      "address": "4 Maple Road, Oxford, MA 01540",
+      "members": [
+        "Oxford"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Palmer",
+      "address": "4107 Main Street, Palmer, MA 01069",
+      "members": [
+        "Palmer"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Pathfinder Regional Vocational Technical",
+      "address": "240 Sykes Street, Palmer, MA 01069",
+      "members": [
+        "Pathfinder Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Peabody",
+      "address": "27 Lowell Street, Peabody, MA 01960",
+      "members": [
+        "Peabody"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Pelham",
+      "address": "170 Chestnut Street Business Office, Amherst, MA 01002",
+      "members": [
+        "Pelham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Pembroke",
+      "address": "72 Pilgrim Road Office of the Superintendent, Pembroke, MA 02359",
+      "members": [
+        "Pembroke"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Petersham",
+      "address": "P O Box 148, Petersham, MA 01366",
+      "members": [
+        "Petersham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Pittsfield",
+      "address": "269 First Street, Pittsfield, MA 01201",
+      "members": [
+        "Pittsfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Plainville",
+      "address": "68 Messenger Street, Plainville, MA 02762",
+      "members": [
+        "Plainville"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Plymouth",
+      "address": "11 Lincoln Street, Plymouth, MA 02360",
+      "members": [
+        "Plymouth"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Plympton",
+      "address": "250 Pembroke Street, Kingston, MA 02364",
+      "members": [
+        "Plympton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Provincetown",
+      "address": "Provincetown Schools, Provincetown, MA 02657",
+      "members": [
+        "Provincetown"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Quincy",
+      "address": "34 Coddington Street, Quincy, MA 02169",
+      "members": [
+        "Quincy"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Randolph",
+      "address": "40 Highland Avenue, Randolph, MA 02368",
+      "members": [
+        "Randolph"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Reading",
+      "address": "82 Oakland Road, Reading, MA 01867",
+      "members": [
+        "Reading"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Revere",
+      "address": "101 School Street, Revere, MA 02151",
+      "members": [
+        "Revere"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Richmond",
+      "address": "1831 State Road, Richmond, MA 01254",
+      "members": [
+        "Richmond"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Rochester",
+      "address": "135 Marion Rd, Mattapoisett, MA 02739",
+      "members": [
+        "Rochester"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Rockland",
+      "address": "34 MacKinlay Way, Rockland, MA 02370",
+      "members": [
+        "Rockland"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Rockport",
+      "address": "24 Jerdens Lane, Rockport, MA 01966",
+      "members": [
+        "Rockport"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Rowe",
+      "address": "86 Pond Road, Rowe, MA 01367",
+      "members": [
+        "Rowe"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Salem",
+      "address": "29 Highland Avenue, Salem, MA 01970",
+      "members": [
+        "Salem"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Sandwich",
+      "address": "270 Quaker Meeting House Road, East Sandwich, MA 02537",
+      "members": [
+        "Sandwich"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Saugus",
+      "address": "25 Dow Street, Saugus, MA 01906",
+      "members": [
+        "Saugus"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Savoy",
+      "address": "26 Chapel Road, Savoy, MA 01256",
+      "members": [
+        "Savoy"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Scituate",
+      "address": "606 C J Cushing Hwy, Scituate, MA 02066",
+      "members": [
+        "Scituate"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Seekonk",
+      "address": "25 Water Lane, Seekonk, MA 02771",
+      "members": [
+        "Seekonk"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Sharon",
+      "address": "75 Mountain Street, Sharon, MA 02067",
+      "members": [
+        "Sharon"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Shawsheen Valley Regional Vocational Technical",
+      "address": "100 Cook Street, Billerica, MA 01821",
+      "members": [
+        "Shawsheen Valley Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Sherborn",
+      "address": "157 Farm Street, Dover, MA 02030",
+      "members": [
+        "Sherborn"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Shrewsbury",
+      "address": "100 Maple Avenue, Shrewsbury, MA 01545",
+      "members": [
+        "Shrewsbury"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Shutesbury",
+      "address": "PO Box 7, Erving, MA 01344",
+      "members": [
+        "Shutesbury"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Somerset",
+      "address": "580 Whetstone Hill Road, Somerset, MA 02726",
+      "members": [
+        "Somerset"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Somerset Berkley Regional School District",
+      "address": "580 Whetstone Hill, Somerset, MA 02726",
+      "members": [
+        "Somerset Berkley Regional School District"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Somerville",
+      "address": "167 Holland Street, Somerville, MA 02144",
+      "members": [
+        "Somerville"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "South Hadley",
+      "address": "116 Main Street, South Hadley, MA 01075",
+      "members": [
+        "South Hadley"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "South Middlesex Regional Vocational Technical",
+      "address": "750 Winter Street, Framingham, MA 01702",
+      "members": [
+        "South Middlesex Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "South Shore Regional Vocational Technical",
+      "address": "476 Webster Street, Hanover, MA 02339",
+      "members": [
+        "South Shore Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Southampton",
+      "address": "19 Stage Rd, Westhampton, MA 01027",
+      "members": [
+        "Southampton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Southborough",
+      "address": "53 Parkerville Road, Southborough, MA 01772",
+      "members": [
+        "Southborough"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Southbridge",
+      "address": "25 Cole Ave, Southbridge, MA 01550",
+      "members": [
+        "Southbridge"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Southeastern Regional Vocational Technical",
+      "address": "250 Foundry Street, South Easton, MA 02375",
+      "members": [
+        "Southeastern Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Southern Worcester County Regional Vocational School District",
+      "address": "57 Old Muggett Hill Road, Charlton, MA 01507",
+      "members": [
+        "Southern Worcester County Regional Vocational School District"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Spencer-E Brookfield",
+      "address": "306 Main Street, Spencer, MA 01562",
+      "members": [
+        "Spencer-E Brookfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Springfield",
+      "address": "1550 Main Street, Springfield, MA 01103",
+      "members": [
+        "Springfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Stoneham",
+      "address": "149 Franklin Street, Stoneham, MA 02180",
+      "members": [
+        "Stoneham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Stoughton",
+      "address": "31 Pierce Street, Stoughton, MA 02072",
+      "members": [
+        "Stoughton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Sturbridge",
+      "address": "320 Brookfield Rd, Fiskdale, MA 01518",
+      "members": [
+        "Sturbridge"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Sudbury",
+      "address": "40 Fairbank Road, Sudbury, MA 01776",
+      "members": [
+        "Sudbury"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Sunderland",
+      "address": "113 North Main Street, Office C101, South Deerfield, MA 01373",
+      "members": [
+        "Sunderland"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Sutton",
+      "address": "383 Boston Rd, Sutton, MA 01590",
+      "members": [
+        "Sutton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Swampscott",
+      "address": "207 Forest Avenue, Swampscott, MA 01907",
+      "members": [
+        "Swampscott"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Swansea",
+      "address": "1 Gardners Neck Road, Swansea, MA 02777",
+      "members": [
+        "Swansea"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "TEC Connections Academy Commonwealth Virtual School District",
+      "address": "141 Mansion Drive, East Walpole, MA 02032",
+      "members": [
+        "TEC Connections Academy Commonwealth Virtual School District"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Taunton",
+      "address": "215 Harris Street, Taunton, MA 02780",
+      "members": [
+        "Taunton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Tewksbury",
+      "address": "139 Pleasant Street, Tewksbury, MA 01876",
+      "members": [
+        "Tewksbury"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Tisbury",
+      "address": "4 Pine Street, Vineyard Haven, MA 02568",
+      "members": [
+        "Tisbury"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Topsfield",
+      "address": "28 Middleton Road, Boxford, MA 01921",
+      "members": [
+        "Topsfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Tri-County Regional Vocational Technical",
+      "address": "147 Pond Street, Franklin, MA 02038",
+      "members": [
+        "Tri-County Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Truro",
+      "address": "P O Box 2029, Truro, MA 02666",
+      "members": [
+        "Truro"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Tyngsborough",
+      "address": "50 Norris Rd, Tyngsborough, MA 01879",
+      "members": [
+        "Tyngsborough"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Upper Cape Cod Regional Vocational Technical",
+      "address": "220 Sandwich Rd, Bourne, MA 02532",
+      "members": [
+        "Upper Cape Cod Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Uxbridge",
+      "address": "9 North Main Street, Uxbridge, MA 01569",
+      "members": [
+        "Uxbridge"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Wakefield",
+      "address": "60 Farm Street, Wakefield, MA 01880",
+      "members": [
+        "Wakefield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Wales",
+      "address": "320 Brookfield Rd, Fiskdale, MA 01518",
+      "members": [
+        "Wales"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Walpole",
+      "address": "135 School Street, Walpole, MA 02081",
+      "members": [
+        "Walpole"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Waltham",
+      "address": "617 Lexington Street, Waltham, MA 02452",
+      "members": [
+        "Waltham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Ware",
+      "address": "P O Box 240, Ware, MA 01082",
+      "members": [
+        "Ware"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Wareham",
+      "address": "Central Office, 4 Viking Drive, Door 22, Wareham, MA 02571",
+      "members": [
+        "Wareham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Warwick",
+      "address": "41 Winchester Rd, Warwick, MA 01378",
+      "members": [
+        "Warwick"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Watertown",
+      "address": "30 Common Street, Watertown, MA 02472",
+      "members": [
+        "Watertown"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Wayland",
+      "address": "41 Cochituate Rd, Wayland, MA 01778",
+      "members": [
+        "Wayland"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Webster",
+      "address": "77 Poland Street, Webster, MA 01570",
+      "members": [
+        "Webster"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Wellesley",
+      "address": "40 Kingsbury Street, Wellesley, MA 02481",
+      "members": [
+        "Wellesley"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Wellfleet",
+      "address": "78 Eldredge Pkwy, Orleans, MA 02653",
+      "members": [
+        "Wellfleet"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "West Boylston",
+      "address": "125 Crescent Street, West Boylston, MA 01583",
+      "members": [
+        "West Boylston"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "West Bridgewater",
+      "address": "2 Spring Street, West Bridgewater, MA 02379",
+      "members": [
+        "West Bridgewater"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "West Springfield",
+      "address": "11 Central Street, West Springfield, MA 01089",
+      "members": [
+        "West Springfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Westborough",
+      "address": "45 West Main Street, Westborough, MA 01581",
+      "members": [
+        "Westborough"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Westfield",
+      "address": "94 North Elm Street Suite 101, Westfield, MA 01085",
+      "members": [
+        "Westfield"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Westford",
+      "address": "23 Depot Street, Westford, MA 01886",
+      "members": [
+        "Westford"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Westhampton",
+      "address": "19 Stage Rd, Westhampton, MA 01027",
+      "members": [
+        "Westhampton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Weston",
+      "address": "89 Wellesley Street, Weston, MA 02493",
+      "members": [
+        "Weston"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Westport",
+      "address": "17 Main Rd, Westport, MA 02790",
+      "members": [
+        "Westport"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Westwood",
+      "address": "220 Nahatan Street, Westwood, MA 02090",
+      "members": [
+        "Westwood"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Weymouth",
+      "address": "89 Middle Street, Weymouth, MA 02189",
+      "members": [
+        "Weymouth"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Whately",
+      "address": "113 North Main Street, Office C101, South Deerfield, MA 01373",
+      "members": [
+        "Whately"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Whittier Regional Vocational Technical",
+      "address": "115 Amesbury Line Rd, Haverhill, MA 01830",
+      "members": [
+        "Whittier Regional Vocational Technical"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Williamsburg",
+      "address": "19 Stage Rd, Westhampton, MA 01027",
+      "members": [
+        "Williamsburg"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Wilmington",
+      "address": "161 Church Street, Wilmington, MA 01887",
+      "members": [
+        "Wilmington"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Winchendon",
+      "address": "175 Grove Street, Winchendon, MA 01475",
+      "members": [
+        "Winchendon"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Winchester",
+      "address": "80 Skillings Rd, Winchester, MA 01890",
+      "members": [
+        "Winchester"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Winthrop",
+      "address": "1 Metcalf Square, Winthrop, MA 02152",
+      "members": [
+        "Winthrop"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Woburn",
+      "address": "55 Locust Street, Woburn, MA 01801",
+      "members": [
+        "Woburn"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Worcester",
+      "address": "20 Irving Street, Worcester, MA 01609",
+      "members": [
+        "Worcester"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Worthington",
+      "address": "147 Huntington Road, Worthington, MA 01098",
+      "members": [
+        "Worthington"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Wrentham",
+      "address": "120 Taunton Street, Wrentham, MA 02093",
+      "members": [
+        "Wrentham"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    }
+  ]
+}

@@ -7,15 +7,18 @@ A web application for looking up details about Massachusetts teachers contracts.
 ```
 school/
 ├── backend/                      # Python FastAPI backend
-│   ├── main.py                   # API entry point with Lambda handler
+│   ├── main.py                   # API entry point with Lambda handler and CORS
 │   ├── database.py               # DynamoDB client configuration
-│   ├── models.py                 # SQLAlchemy models (legacy)
 │   ├── schemas.py                # Pydantic request/response schemas
 │   ├── services/                 # Business logic layer
-│   │   ├── district_service.py  # SQLAlchemy district service (legacy)
-│   │   └── dynamodb_district_service.py  # DynamoDB district operations
+│   │   ├── district_service.py          # SQLAlchemy district service (legacy)
+│   │   └── dynamodb_district_service.py # DynamoDB district operations
+│   ├── import_districts.py       # Import districts from JSON to DynamoDB
 │   ├── init_dynamodb_sample_data.py  # Sample data loader
-│   └── requirements.txt          # Python dependencies
+│   ├── models.py                 # SQLAlchemy models (legacy, unused)
+│   ├── init_sample_data.py       # Legacy sample data (unused)
+│   ├── requirements.txt          # Python dependencies
+│   └── .env.example              # Environment template
 │
 ├── frontend/                     # React frontend (Vite)
 │   ├── src/
@@ -27,16 +30,27 @@ school/
 │   │   ├── App.jsx               # Main app component
 │   │   └── main.jsx              # Entry point
 │   ├── .env.example              # Environment template
-│   ├── .env.production           # Production API config
-│   └── package.json              # Node dependencies
+│   ├── .env.production           # Production API config (deprecated - use deploy.sh)
+│   ├── package.json              # Node dependencies
+│   └── vite.config.js            # Vite configuration
 │
 ├── infrastructure/               # AWS deployment (Terraform)
-│   └── terraform/                # Infrastructure as Code
-│       ├── main.tf               # Main resources (Lambda, API Gateway, DynamoDB, S3, CloudFront)
-│       ├── variables.tf          # Input variables
-│       ├── outputs.tf            # Output values
-│       ├── terraform.tfvars      # Configuration values (gitignored)
-│       └── terraform.tfvars.example
+│   ├── terraform/                # Infrastructure as Code
+│   │   ├── main.tf               # Main resources (S3, CloudFront, DynamoDB, IAM, Lambda, API Gateway)
+│   │   ├── placeholder_lambda.tf # Placeholder Lambda package for initial deployment
+│   │   ├── frontend_config.tf    # Runtime config file for frontend
+│   │   ├── frontend_build.tf.example  # Optional: Build frontend with Terraform
+│   │   ├── variables.tf          # Input variables
+│   │   ├── outputs.tf            # Output values
+│   │   ├── terraform.tfvars      # Configuration values (gitignored)
+│   │   └── terraform.tfvars.example  # Configuration template
+│   └── scripts/                  # Legacy deployment scripts
+│       ├── deploy-backend-tf.sh
+│       └── deploy-frontend-tf.sh
+│
+├── data/                         # District data files
+│   ├── districts.json            # Massachusetts school districts with addresses
+│   └── all_districts.json        # Complete districts dataset
 │
 ├── docs/                         # Project documentation
 │   ├── README.md                 # Documentation index
@@ -47,8 +61,9 @@ school/
 │   ├── CUSTOM_DOMAIN_SETUP.md    # CloudFront SSL setup
 │   └── DYNAMODB_SETUP.md         # Database schema and usage
 │
-├── deploy.sh                     # Full deployment script
-├── deploy-simple.sh              # Simplified deployment with Terraform
+├── deploy.sh                     # Main deployment script (deploys backend + frontend)
+├── deploy-simple.sh              # Legacy simplified deployment
+├── LICENSE                       # MIT License
 └── README.md                     # This file
 ```
 
@@ -76,18 +91,43 @@ Website available at `http://localhost:5173`
 
 ### AWS Deployment
 
-See [infrastructure/README.md](infrastructure/README.md) for deployment to AWS.
-
-Quick version:
+**Step 1: Initialize Terraform**
 ```bash
 cd infrastructure/terraform
 terraform init
-terraform apply
-
-cd ../scripts
-./deploy-backend-tf.sh
-./deploy-frontend-tf.sh
 ```
+
+**Step 2: Configure variables**
+```bash
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your values
+```
+
+**Step 3: Deploy infrastructure**
+```bash
+terraform apply
+```
+
+**Step 4: Deploy application code**
+```bash
+cd ../../
+./deploy.sh
+```
+
+The deploy script will:
+- Package and upload Lambda backend code
+- Build frontend with correct API endpoint from Terraform
+- Upload frontend to S3
+- Invalidate CloudFront cache
+
+**Step 5: Import district data (optional)**
+```bash
+cd backend
+source venv/bin/activate
+python import_districts.py --file ../data/districts.json
+```
+
+See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for detailed deployment instructions.
 
 ## Technology Stack
 

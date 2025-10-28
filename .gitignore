@@ -58,7 +58,8 @@ Thumbs.db
 *.tfvars
 !*.tfvars.example
 .terraform/
-.terraform.lock.hcl
+infrastructure/terraform/placeholder/
+!infrastructure/terraform/placeholder_lambda.tf
 
 # Deployment artifacts
 *.zip

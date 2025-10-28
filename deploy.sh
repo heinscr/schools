@@ -32,13 +32,17 @@ LAMBDA_ROLE_ARN=$(terraform output -raw lambda_role_arn)
 AWS_REGION=$(terraform output -raw region)
 DYNAMODB_TABLE=$(terraform output -raw dynamodb_districts_table_name)
 CLOUDFRONT_ID=$(terraform output -raw cloudfront_distribution_id)
+CLOUDFRONT_DOMAIN=$(terraform output -raw cloudfront_domain)
 API_GATEWAY_ID=$(terraform output -raw api_gateway_id)
+API_ENDPOINT=$(terraform output -raw api_endpoint)
 
 echo -e "${GREEN}✓ Configuration loaded${NC}"
 echo "  S3 Bucket: $S3_BUCKET"
 echo "  Lambda Function: $LAMBDA_FUNCTION_NAME"
 echo "  Region: $AWS_REGION"
 echo "  DynamoDB Table: $DYNAMODB_TABLE"
+echo "  CloudFront Domain: $CLOUDFRONT_DOMAIN"
+echo "  API Endpoint: $API_ENDPOINT"
 echo ""
 
 cd ../..
@@ -73,7 +77,13 @@ echo -e "${GREEN}✓ Lambda package uploaded${NC}"
 
 # Check if Lambda function exists
 if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION > /dev/null 2>&1; then
-    echo "Updating existing Lambda function..."
+    echo "Updating existing Lambda function code..."
+
+    # Wait for any pending updates to complete first
+    echo "Checking if Lambda is ready..."
+    aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
+
+    # Update function code
     aws lambda update-function-code \
         --function-name $LAMBDA_FUNCTION_NAME \
         --s3-bucket $S3_BUCKET \
@@ -81,12 +91,19 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
         --region $AWS_REGION \
         --output json > /dev/null
 
+    echo "Waiting for code update to complete..."
+    aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
+
     # Update environment variables
+    echo "Updating Lambda configuration..."
     aws lambda update-function-configuration \
         --function-name $LAMBDA_FUNCTION_NAME \
-        --environment "Variables={AWS_REGION=$AWS_REGION,DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE}" \
+        --environment "Variables={DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN}" \
         --region $AWS_REGION \
         --output json > /dev/null
+
+    echo "Waiting for configuration update to complete..."
+    aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
 else
     echo "Creating new Lambda function..."
     aws lambda create-function \
@@ -95,18 +112,17 @@ else
         --role $LAMBDA_ROLE_ARN \
         --handler main.handler \
         --code S3Bucket=$S3_BUCKET,S3Key=backend/lambda-deployment.zip \
-        --environment "Variables={AWS_REGION=$AWS_REGION,DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE}" \
+        --environment "Variables={DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN}" \
         --timeout 30 \
         --memory-size 512 \
         --region $AWS_REGION \
         --output json > /dev/null
+
+    echo "Waiting for Lambda to be ready..."
+    aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
 fi
 
 echo -e "${GREEN}✓ Lambda function deployed${NC}"
-
-# Wait for Lambda to be ready
-echo "Waiting for Lambda to be ready..."
-aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
 
 cd ..
 
@@ -114,9 +130,9 @@ cd ..
 echo -e "\n${YELLOW}=== Deploying Frontend ===${NC}"
 cd frontend
 
-# Build production bundle
-echo "Building frontend..."
-npm run build
+# Build production bundle with API endpoint from Terraform
+echo "Building frontend with API endpoint: $API_ENDPOINT"
+VITE_API_URL=$API_ENDPOINT npm run build
 
 echo -e "${GREEN}✓ Frontend built${NC}"
 

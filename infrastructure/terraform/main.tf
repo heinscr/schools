@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.0"
+    }
   }
 
   # Optional: Uncomment to use S3 backend for state
@@ -305,6 +309,7 @@ resource "aws_lambda_function" "api" {
   environment {
     variables = {
       DYNAMODB_DISTRICTS_TABLE = aws_dynamodb_table.districts.name
+      CLOUDFRONT_DOMAIN        = aws_cloudfront_distribution.frontend.domain_name
     }
   }
 
@@ -318,8 +323,16 @@ resource "aws_lambda_function" "api" {
   # Ensure the Lambda code exists in S3 before creating
   depends_on = [
     aws_iam_role_policy_attachment.lambda_basic,
-    aws_iam_role_policy.lambda_dynamodb
+    aws_iam_role_policy.lambda_dynamodb,
+    aws_s3_object.lambda_placeholder
   ]
+
+  # Ignore changes to source code hash since deploy.sh will update the code
+  lifecycle {
+    ignore_changes = [
+      source_code_hash
+    ]
+  }
 }
 
 # API Gateway Resources
