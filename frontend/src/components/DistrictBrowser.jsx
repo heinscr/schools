@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import DistrictMap from './DistrictMap';
 import './DistrictBrowser.css';
 
 function DistrictBrowser() {
@@ -160,25 +161,28 @@ function DistrictBrowser() {
           )}
         </div>
 
-        <div className="district-detail">
-          {selectedDistrict ? (
-            <div className="detail-content">
-              <h2>District Information</h2>
-              <div className="json-display">
-                <pre>{JSON.stringify(selectedDistrict, null, 2)}</pre>
+        <div className="district-detail-and-map">
+          <div className="map-section">
+            <DistrictMap
+              address={selectedDistrict?.main_address}
+              districtName={selectedDistrict?.name}
+            />
+          </div>
+
+          <div className="district-detail">
+            {selectedDistrict ? (
+              <div className="detail-content">
+                <h2>District Information</h2>
+                <div className="json-display">
+                  <pre>{JSON.stringify(selectedDistrict, null, 2)}</pre>
+                </div>
               </div>
-              <button
-                onClick={() => setSelectedDistrict(null)}
-                className="btn btn-secondary"
-              >
-                Close
-              </button>
-            </div>
-          ) : (
-            <div className="detail-placeholder">
-              <p>Select a district to view details</p>
-            </div>
-          )}
+            ) : (
+              <div className="detail-placeholder">
+                <p>Select a district to view details</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

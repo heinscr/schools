@@ -176,6 +176,10 @@ async def delete_district(
 # @app.get("/api/contracts")
 # @app.get("/api/contracts/{contract_id}")
 
-# Lambda handler
-from mangum import Mangum
-handler = Mangum(app)
+# Lambda handler (only needed for AWS deployment)
+try:
+    from mangum import Mangum
+    handler = Mangum(app)
+except ImportError:
+    # Mangum not installed - fine for local development
+    pass

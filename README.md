@@ -23,12 +23,16 @@ school/
 ├── frontend/                     # React frontend (Vite)
 │   ├── src/
 │   │   ├── components/           # React components
-│   │   │   ├── DistrictBrowser.jsx
-│   │   │   └── DistrictBrowser.css
+│   │   │   ├── DistrictBrowser.jsx   # Main district browser with search
+│   │   │   ├── DistrictBrowser.css   # Browser styles
+│   │   │   ├── DistrictMap.jsx       # Interactive Leaflet map
+│   │   │   └── DistrictMap.css       # Map styles
 │   │   ├── services/             # API integration
 │   │   │   └── api.js
 │   │   ├── App.jsx               # Main app component
-│   │   └── main.jsx              # Entry point
+│   │   ├── App.css               # App styles
+│   │   ├── main.jsx              # Entry point
+│   │   └── index.css             # Global styles
 │   ├── .env.example              # Environment template
 │   ├── .env.production           # Production API config (deprecated - use deploy.sh)
 │   ├── package.json              # Node dependencies
@@ -143,6 +147,8 @@ See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for detailed deployment
 ### Frontend
 - **React 18** - UI library
 - **Vite 4.x** - Build tool and dev server
+- **Leaflet.js** - Interactive maps
+- **OpenStreetMap** - Free map tiles and geocoding
 - **Modern JavaScript** (ES6+)
 - **CSS** - Vanilla CSS with responsive design
 
@@ -158,10 +164,13 @@ See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for detailed deployment
 ## Features
 
 ### Currently Implemented ✅
-- **District Browser** - Browse all Massachusetts school districts
+- **District Browser** - Browse all Massachusetts school districts (356 districts)
+- **Interactive Map** - View district locations on OpenStreetMap (powered by Leaflet.js)
+- **Smart Geocoding** - Automatic address-to-coordinates conversion with fallback
 - **Search by District** - Filter by district name
 - **Search by Town** - Find districts by town name
 - **District Details** - View detailed information in JSON format
+- **Full-Screen Layout** - Responsive design that fills the entire viewport
 - **DynamoDB Backend** - Serverless NoSQL database
 - **Live in AWS** - Fully deployed and accessible
 
@@ -191,10 +200,12 @@ See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for detailed deployment
 - Sample data: `backend/init_dynamodb_sample_data.py`
 
 ### Frontend Development
-- Main component: `frontend/src/components/DistrictBrowser.jsx`
+- District browser: `frontend/src/components/DistrictBrowser.jsx`
+- Interactive map: `frontend/src/components/DistrictMap.jsx`
 - API service: `frontend/src/services/api.js`
 - Styling: Component-scoped CSS files
 - Build: Vite with production optimizations
+- Map: Leaflet.js + OpenStreetMap (no API key required)
 
 ### Infrastructure Management
 ```bash
@@ -217,4 +228,4 @@ When running locally, FastAPI auto-generates interactive API docs:
 
 ## License
 
-TBD
+MIT License - See [LICENSE](LICENSE) file for details

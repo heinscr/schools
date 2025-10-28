@@ -1,9 +1,11 @@
 .app {
   min-height: 100vh;
   background: #f8f9fa;
+  width: 100%;
 }
 
 #root {
   margin: 0;
   padding: 0;
+  width: 100%;
 }

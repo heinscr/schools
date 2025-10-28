@@ -1,7 +1,7 @@
 .district-browser {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 100%;
+  margin: 0;
+  padding: 20px 40px;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
@@ -110,8 +110,8 @@
 /* Content Area */
 .content-area {
   display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 20px;
+  grid-template-columns: 450px 1fr;
+  gap: 30px;
   min-height: 500px;
 }
 
@@ -122,7 +122,7 @@
   padding: 20px;
   background: white;
   overflow-y: auto;
-  max-height: 70vh;
+  max-height: calc(100vh - 280px);
 }
 
 .district-list h2 {
@@ -171,6 +171,21 @@
   color: #666;
 }
 
+/* Right Side - Map and Detail */
+.district-detail-and-map {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.map-section {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  overflow: hidden;
+  height: 500px;
+}
+
 /* District Detail */
 .district-detail {
   border: 2px solid #e0e0e0;
@@ -178,7 +193,7 @@
   padding: 20px;
   background: white;
   overflow-y: auto;
-  max-height: 70vh;
+  max-height: 400px;
 }
 
 .detail-content h2 {
@@ -247,8 +262,16 @@
     max-height: 400px;
   }
 
+  .district-detail-and-map {
+    order: 2;
+  }
+
+  .map-section {
+    height: 350px;
+  }
+
   .district-detail {
-    max-height: 500px;
+    max-height: 400px;
   }
 
   .search-controls {
