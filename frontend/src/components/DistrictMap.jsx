@@ -186,12 +186,13 @@ const DistrictMap = ({ address, districtName, selectedDistrict }) => {
             </div>
           `).openPopup();
 
-          // Pan and zoom to marker
-          mapInstanceRef.current.setView(latLng, 12, {
-            animate: true,
-            duration: 0.5,
-          });
-
+          // Only pan/zoom to marker if no boundary is highlighted
+          if (!geoJsonLayerRef.current) {
+            mapInstanceRef.current.setView(latLng, 12, {
+              animate: true,
+              duration: 0.5,
+            });
+          }
           markerRef.current = marker;
         } else {
           console.warn('Geocoding failed: No results found for', address);
