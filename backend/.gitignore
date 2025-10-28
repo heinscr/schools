@@ -23,15 +23,27 @@ wheels/
 .installed.cfg
 *.egg
 
+# Lambda deployment artifacts
+package/
+lambda-deployment.zip
+*.zip
+
 # Environment
 .env
+.env.local
+.env.production
 
 # Database
 *.db
 *.sqlite
+*.db-journal
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# Logs
+*.log
+logs/

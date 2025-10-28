@@ -289,5 +289,127 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
   })
 }
 
-# Note: Lambda function itself is created by deployment script
-# This is because the function code changes frequently and shouldn't be in Terraform
+# Lambda Function
+resource "aws_lambda_function" "api" {
+  function_name = local.function_name
+  role          = aws_iam_role.lambda.arn
+  handler       = "main.handler"
+  runtime       = var.lambda_runtime
+  timeout       = var.lambda_timeout
+  memory_size   = var.lambda_memory
+
+  # Code must be uploaded via S3 by deployment script
+  s3_bucket = aws_s3_bucket.main.id
+  s3_key    = "backend/lambda-deployment.zip"
+
+  environment {
+    variables = {
+      DYNAMODB_DISTRICTS_TABLE = aws_dynamodb_table.districts.name
+    }
+  }
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.project_name}-api-lambda"
+    }
+  )
+
+  # Ensure the Lambda code exists in S3 before creating
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_basic,
+    aws_iam_role_policy.lambda_dynamodb
+  ]
+}
+
+# API Gateway Resources
+resource "aws_api_gateway_resource" "proxy" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_rest_api.main.root_resource_id
+  path_part   = "{proxy+}"
+}
+
+# API Gateway Method - ANY for proxy
+resource "aws_api_gateway_method" "proxy" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.proxy.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+# API Gateway Integration with Lambda
+resource "aws_api_gateway_integration" "lambda" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.proxy.id
+  http_method = aws_api_gateway_method.proxy.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.api.invoke_arn
+}
+
+# API Gateway Method - Root
+resource "aws_api_gateway_method" "proxy_root" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_rest_api.main.root_resource_id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+# API Gateway Integration - Root
+resource "aws_api_gateway_integration" "lambda_root" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_rest_api.main.root_resource_id
+  http_method = aws_api_gateway_method.proxy_root.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.api.invoke_arn
+}
+
+# API Gateway Deployment
+resource "aws_api_gateway_deployment" "main" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.proxy.id,
+      aws_api_gateway_method.proxy.id,
+      aws_api_gateway_integration.lambda.id,
+      aws_api_gateway_method.proxy_root.id,
+      aws_api_gateway_integration.lambda_root.id,
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    aws_api_gateway_integration.lambda,
+    aws_api_gateway_integration.lambda_root
+  ]
+}
+
+# API Gateway Stage
+resource "aws_api_gateway_stage" "prod" {
+  deployment_id = aws_api_gateway_deployment.main.id
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  stage_name    = "prod"
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.project_name}-api-stage-prod"
+    }
+  )
+}
+
+# Lambda Permission for API Gateway
+resource "aws_lambda_permission" "api_gateway" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.api.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.main.execution_arn}/*/*"
+}

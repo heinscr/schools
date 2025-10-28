@@ -1,0 +1,275 @@
+.district-browser {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.browser-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.browser-header h1 {
+  margin: 0 0 10px 0;
+  color: #1a1a1a;
+  font-size: 2.5rem;
+}
+
+.browser-header p {
+  margin: 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Search Section */
+.search-section {
+  margin-bottom: 30px;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+}
+
+.search-controls {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.filter-select {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #1a1a1a;
+  cursor: pointer;
+  min-width: 150px;
+  appearance: auto;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+}
+
+.filter-select option {
+  color: #1a1a1a;
+  background: white;
+  padding: 10px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #4a90e2;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #357abd;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+/* Content Area */
+.content-area {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 20px;
+  min-height: 500px;
+}
+
+/* District List */
+.district-list {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  background: white;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+.district-list h2 {
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+  color: #1a1a1a;
+}
+
+.district-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.district-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.district-item:hover {
+  background: #f5f5f5;
+  border-color: #4a90e2;
+  transform: translateX(4px);
+}
+
+.district-item.active {
+  background: #e3f2fd;
+  border-color: #4a90e2;
+  border-width: 2px;
+}
+
+.district-name {
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+
+.district-towns {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* District Detail */
+.district-detail {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  background: white;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+.detail-content h2 {
+  margin: 0 0 20px 0;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+}
+
+.json-display {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.json-display pre {
+  margin: 0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.detail-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  font-size: 1.1rem;
+}
+
+/* Messages */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  background: #fee;
+  border: 2px solid #fcc;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+  color: #c33;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+  .content-area {
+    grid-template-columns: 1fr;
+  }
+
+  .district-list {
+    max-height: 400px;
+  }
+
+  .district-detail {
+    max-height: 500px;
+  }
+
+  .search-controls {
+    flex-direction: column;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .browser-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .browser-header p {
+    font-size: 0.95rem;
+  }
+
+  .district-browser {
+    padding: 15px;
+  }
+}

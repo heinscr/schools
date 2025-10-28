@@ -67,7 +67,12 @@ output "api_gateway_root_resource_id" {
 
 output "api_endpoint" {
   description = "API Gateway endpoint URL"
-  value       = "https://${aws_api_gateway_rest_api.main.id}.execute-api.${var.aws_region}.amazonaws.com/prod"
+  value       = aws_api_gateway_stage.prod.invoke_url
+}
+
+output "lambda_function_arn" {
+  description = "Lambda function ARN"
+  value       = aws_lambda_function.api.arn
 }
 
 output "lambda_role_arn" {

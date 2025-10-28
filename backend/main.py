@@ -20,7 +20,12 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # React dev servers
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://d3hl4i100v66fx.cloudfront.net",
+        "https://school.crackpow.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -160,3 +165,7 @@ async def delete_district(
 # TODO: Add contract lookup endpoints
 # @app.get("/api/contracts")
 # @app.get("/api/contracts/{contract_id}")
+
+# Lambda handler
+from mangum import Mangum
+handler = Mangum(app)

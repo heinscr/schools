@@ -20,15 +20,22 @@ yarn-error.log*
 dist/
 build/
 
+# Lambda deployment
+backend/package/
+backend/lambda-deployment.zip
+backend/*.zip
+
 # Environment files
 .env
 .env.local
 .env.*.local
 .env.production
+!.env.example
 
 # Database
 *.db
 *.sqlite
+*.db-journal
 
 # IDE
 .vscode/
@@ -44,3 +51,14 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!*.tfvars.example
+.terraform/
+.terraform.lock.hcl
+
+# Deployment artifacts
+*.zip

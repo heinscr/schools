@@ -43,10 +43,10 @@ class DistrictUpdate(BaseModel):
 
 class DistrictResponse(DistrictBase):
     """Schema for district response"""
-    id: int
+    id: str  # Changed from int to str for DynamoDB UUIDs
     towns: List[str] = Field(default_factory=list, description="List of town names")
-    created_at: datetime
-    updated_at: datetime
+    created_at: str  # Changed from datetime to str for ISO format strings
+    updated_at: str  # Changed from datetime to str for ISO format strings
 
     class Config:
         from_attributes = True
