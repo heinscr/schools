@@ -84,17 +84,34 @@ def import_districts(json_filepath: str, dry_run: bool = False):
             )
 
             if dry_run:
-                print(f"  [DRY RUN] Would import: {name}")
+                print(f"  [DRY RUN] Would import/update: {name}")
                 print(f"    Address: {address or 'N/A'}")
                 print(f"    Towns: {', '.join(members) if members else 'N/A'}")
                 stats['success'] += 1
             else:
                 try:
-                    result = DynamoDBDistrictService.create_district(districts_table, district_create)
-                    print(f"  ✓ Imported: {name} (ID: {result['id']})")
+                    # Check if district exists by name (case-insensitive)
+                    existing, _ = DynamoDBDistrictService.get_districts(
+                        districts_table, name=name, limit=1, offset=0
+                    )
+                    if existing:
+                        # Update existing
+                        district_id = existing[0]['id']
+                        from schemas import DistrictUpdate
+                        update_data = DistrictUpdate(
+                            name=name,
+                            main_address=address if address else None,
+                            towns=members if members else []
+                        )
+                        DynamoDBDistrictService.update_district(districts_table, district_id, update_data)
+                        print(f"  ✓ Updated: {name} (ID: {district_id})")
+                    else:
+                        # Create new
+                        result = DynamoDBDistrictService.create_district(districts_table, district_create)
+                        print(f"  ✓ Imported: {name} (ID: {result['id']})")
                     stats['success'] += 1
                 except Exception as e:
-                    print(f"  ✗ Failed to import {name}: {str(e)}")
+                    print(f"  ✗ Failed to import/update {name}: {str(e)}")
                     stats['failed'] += 1
 
     # Print summary
