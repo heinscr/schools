@@ -69,3 +69,5 @@ frontend/public/geojson.json
 scripts/municipalities_not_in_districts.py
 scripts/towns_not_in_districts.py
 scripts/towns_in_multiple_districts.py
+backend/import_problem_districts.py
+data/problem_districts.json

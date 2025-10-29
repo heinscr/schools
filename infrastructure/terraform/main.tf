@@ -245,7 +245,7 @@ resource "aws_dynamodb_table" "districts" {
     name            = "GSI_TOWN"
     hash_key        = "GSI_TOWN_PK"
     range_key       = "GSI_TOWN_SK"
-    projection_type = "KEYS_ONLY"
+    projection_type = "ALL"
   }
 
   # Enable point-in-time recovery

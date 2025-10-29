@@ -151,7 +151,7 @@ class DynamoDBDistrictService:
     def _scan_by_name(table, name: str, limit: int, offset: int) -> Tuple[List[dict], int]:
         """Scan districts by name"""
         response = table.scan(
-            FilterExpression=Attr('entity_type').eq('district') & Attr('name_lower').contains(name.lower())
+            FilterExpression=Attr('entity_type').eq('district') & Attr('name_lower').eq(name.lower())
         )
 
         districts = [DynamoDBDistrictService._item_to_dict(item) for item in response.get('Items', [])]
