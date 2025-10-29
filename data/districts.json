@@ -135,7 +135,8 @@
       "district": "Farmington River",
       "members": [
         "Otis",
-        "Sandisfield"
+        "Sandisfield",
+        "Tyringham"
       ],
       "notes": "PK–6",
       "address": "555 North Main Rd, Otis, MA 01253"
@@ -315,6 +316,7 @@
       "district": "Mount Greylock",
       "members": [
         "Lanesborough",
+        "New Ashford",
         "Williamstown"
       ],
       "address": "1781 Cold Spring Rd, Williamstown, MA 01267"
@@ -1093,6 +1095,16 @@
       "notes": "Municipal (single-town) district."
     },
     {
+      "district": "Blackstone-Millville",
+      "address": "175 Lincoln Street, Blackstone, MA 01504",
+      "members": [
+        "Blackstone",
+        "Millville"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
       "district": "Boston",
       "address": "2300 Washington Street, Roxbury, MA 02119",
       "members": [
@@ -1474,7 +1486,8 @@
       "district": "Florida",
       "address": "56 North County Rd, Florida, MA 01247",
       "members": [
-        "Florida"
+        "Florida",
+        "Monroe"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."
@@ -1744,7 +1757,8 @@
       "district": "Lee",
       "address": "300A Greylock St, Lee, MA 01238",
       "members": [
-        "Lee"
+        "Lee",
+        "Tyringham"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."

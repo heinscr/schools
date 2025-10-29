@@ -66,3 +66,5 @@ infrastructure/terraform/placeholder/
 data/ma_municipalities.geojson
 data/extract_town_geojson.py
 frontend/public/geojson.json
+scripts/municipalities_not_in_districts.py
+scripts/towns_not_in_districts.py
