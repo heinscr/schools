@@ -220,32 +220,32 @@ resource "aws_dynamodb_table" "districts" {
   hash_key       = "PK"
   range_key      = "SK"
 
-  attribute {
+  attribute { 
     name = "PK"
     type = "S"
-  }
-
-  attribute {
+   }
+  
+  attribute { 
     name = "SK"
-    type = "S"
+    type = "S" 
   }
 
   attribute {
-    name = "GSI1PK"
-    type = "S"
+    name = "GSI_TOWN_PK"
+    type = "S" 
   }
-
+  
   attribute {
-    name = "GSI1SK"
-    type = "S"
+    name = "GSI_TOWN_SK"
+    type = "S" 
   }
 
   # Global Secondary Index for town searches
   global_secondary_index {
-    name            = "GSI1"
-    hash_key        = "GSI1PK"
-    range_key       = "GSI1SK"
-    projection_type = "ALL"
+    name            = "GSI_TOWN"
+    hash_key        = "GSI_TOWN_PK"
+    range_key       = "GSI_TOWN_SK"
+    projection_type = "KEYS_ONLY"
   }
 
   # Enable point-in-time recovery

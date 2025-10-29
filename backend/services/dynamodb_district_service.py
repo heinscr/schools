@@ -44,8 +44,8 @@ class DynamoDBDistrictService:
             item = {
                 'PK': f'DISTRICT#{district_id}',
                 'SK': f'TOWN#{town.upper()}',
-                'GSI1PK': f'TOWN#{town.upper()}',
-                'GSI1SK': f'DISTRICT#{district_name.upper()}',
+                'GSI_TOWN_PK': f'TOWN#{town.upper()}',
+                'GSI_TOWN_SK': f'DISTRICT#{district_name.upper()}',
                 'district_id': district_id,
                 'district_name': district_name,
                 'town_name': town,
@@ -109,7 +109,7 @@ class DynamoDBDistrictService:
         """
         try:
             if town:
-                # Use GSI1 to query by town
+                # Use GSI_TOWN to query by town
                 return DynamoDBDistrictService._query_by_town(table, town, limit, offset)
             elif name:
                 # Scan with filter on name
@@ -122,10 +122,10 @@ class DynamoDBDistrictService:
 
     @staticmethod
     def _query_by_town(table, town: str, limit: int, offset: int) -> Tuple[List[dict], int]:
-        """Query districts by town using GSI1"""
+        """Query districts by town using GSI_TOWN"""
         response = table.query(
-            IndexName='GSI1',
-            KeyConditionExpression=Key('GSI1PK').eq(f'TOWN#{town.upper()}')
+            IndexName='GSI_TOWN',
+            KeyConditionExpression=Key('GSI_TOWN_PK').eq(f'TOWN#{town.upper()}')
         )
 
         # Get unique district IDs
@@ -286,8 +286,8 @@ class DynamoDBDistrictService:
 
             # Search by town using GSI
             town_results = table.query(
-                IndexName='GSI1',
-                KeyConditionExpression=Key('GSI1PK').eq(f'TOWN#{query_text.upper()}')
+                IndexName='GSI_TOWN',
+                KeyConditionExpression=Key('GSI_TOWN_PK').eq(f'TOWN#{query_text.upper()}')
             )
 
             # Combine results

@@ -66,15 +66,15 @@ def init_db():
             AttributeDefinitions=[
                 {'AttributeName': 'PK', 'AttributeType': 'S'},
                 {'AttributeName': 'SK', 'AttributeType': 'S'},
-                {'AttributeName': 'GSI1PK', 'AttributeType': 'S'},
-                {'AttributeName': 'GSI1SK', 'AttributeType': 'S'}
+                {'AttributeName': 'GSI_TOWN_PK', 'AttributeType': 'S'},
+                {'AttributeName': 'GSI_TOWN_SK', 'AttributeType': 'S'}
             ],
             GlobalSecondaryIndexes=[
                 {
-                    'IndexName': 'GSI1',
+                    'IndexName': 'GSI_TOWN',
                     'KeySchema': [
-                        {'AttributeName': 'GSI1PK', 'KeyType': 'HASH'},
-                        {'AttributeName': 'GSI1SK', 'KeyType': 'RANGE'}
+                        {'AttributeName': 'GSI_TOWN_PK', 'KeyType': 'HASH'},
+                        {'AttributeName': 'GSI_TOWN_SK', 'KeyType': 'RANGE'}
                     ],
                     'Projection': {'ProjectionType': 'ALL'},
                     'ProvisionedThroughput': {

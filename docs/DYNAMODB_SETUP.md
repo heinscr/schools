@@ -14,9 +14,9 @@ The application uses a single-table design with the following schema:
 - `PK` (String, Partition Key): `DISTRICT#{district_id}`
 - `SK` (String, Sort Key): `METADATA` or `TOWN#{town_name}`
 
-**Global Secondary Index (GSI1):**
-- `GSI1PK` (String, Partition Key): `TOWN#{town_name}`
-- `GSI1SK` (String, Sort Key): `DISTRICT#{district_name}`
+**Global Secondary Index (GSI_TOWN):**
+- `GSI_TOWN_PK` (String, Partition Key): `TOWN#{town_name}`
+- `GSI_TOWN_SK` (String, Sort Key): `DISTRICT#{district_name}`
 
 **Attributes:**
 - `district_id`: Unique UUID for the district
@@ -32,7 +32,7 @@ The application uses a single-table design with the following schema:
 
 1. **Get district by ID**: Query PK=`DISTRICT#{id}` and SK=`METADATA`
 2. **Search districts by name**: Scan with filter on `name_lower`
-3. **Search districts by town**: Query GSI1 with GSI1PK=`TOWN#{town}`
+3. **Search districts by town**: Query GSI_TOWN with GSI_TOWN_PK=`TOWN#{town}`
 4. **List all districts**: Scan with filter on `entity_type=district`
 
 ## Local Development
