@@ -7,6 +7,9 @@ class ApiService {
    * @param {Object} params - Query parameters (name, town, limit, offset)
    * @returns {Promise<Object>} - Response with districts data
    */
+  // Simple in-memory cache for town-based queries
+  _districtsByTownCache = {};
+
   async getDistricts(params = {}) {
     const queryParams = new URLSearchParams();
 
@@ -15,13 +18,28 @@ class ApiService {
     if (params.limit) queryParams.append('limit', params.limit);
     if (params.offset) queryParams.append('offset', params.offset);
 
-    const url = `${API_BASE_URL}/api/districts${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    // Cache only for town queries (no limit/offset)
+    if (params.town && !params.name && !params.limit && !params.offset) {
+      const townKey = params.town.trim().toLowerCase();
+      if (this._districtsByTownCache[townKey]) {
+        return { data: this._districtsByTownCache[townKey] };
+      }
+      const url = `${API_BASE_URL}/api/districts?town=${encodeURIComponent(params.town)}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch districts: ${response.statusText}`);
+      }
+      const result = await response.json();
+      this._districtsByTownCache[townKey] = result.data;
+      return result;
+    }
 
+    // Default: no caching
+    const url = `${API_BASE_URL}/api/districts${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch districts: ${response.statusText}`);
     }
-
     return response.json();
   }
 

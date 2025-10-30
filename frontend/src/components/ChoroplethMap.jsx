@@ -1,12 +1,39 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
+import api from '../services/api';
 import './ChoroplethMap.css';
 
 const ChoroplethMap = ({ selectedDistrict }) => {
+  // Debounce timer for hover
+  const hoverTimerRef = useRef(null);
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
   const [geojson, setGeojson] = useState(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [hoverDistricts, setHoverDistricts] = useState([]);
+  const activeHoverTownRef = useRef(null);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.clientWidth,
+          height: containerRef.current.clientHeight || 750
+        });
+      }
+    };
+
+    // Set initial size
+    handleResize();
+
+    // Add resize listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Load GeoJSON/TopoJSON data
   useEffect(() => {
@@ -103,17 +130,44 @@ const ChoroplethMap = ({ selectedDistrict }) => {
         const props = d.properties;
         const townName = props.TOWN || props.NAME || props.TOWN_NAME || 'Unknown';
 
+        // Track the currently hovered town
+        activeHoverTownRef.current = townName;
+
         // Highlight on hover
         d3.select(this)
           .attr('stroke-width', 2)
           .attr('stroke', '#333');
 
-        // Show tooltip
-        tooltip
-          .style('opacity', 1)
-          .style('left', `${event.pageX + 10}px`)
-          .style('top', `${event.pageY - 10}px`)
-          .html(`<strong>${townName}</strong>`);
+        // Debounce: clear previous timer
+        if (hoverTimerRef.current) {
+          clearTimeout(hoverTimerRef.current);
+        }
+        // Start new timer
+        hoverTimerRef.current = setTimeout(async () => {
+          // Fetch districts for this town (cached)
+          let districts = [];
+          try {
+            const response = await api.getDistricts({ town: townName });
+            districts = response.data.map(d => d.name).sort((a, b) => a.localeCompare(b));
+          } catch (err) {
+            districts = [];
+          }
+          // Only update UI if still hovering this town
+          if (activeHoverTownRef.current === townName) {
+            setHoverDistricts(districts);
+            // Show tooltip as bullet list
+            tooltip
+              .style('opacity', 1)
+              .style('left', `${event.pageX + 10}px`)
+              .style('top', `${event.pageY - 10}px`)
+              .html(
+                `<strong>${townName}</strong><br/>` +
+                (districts.length > 0
+                  ? `<strong><ul style='margin: 4px 0 0 12px; padding: 0;'>${districts.map(d => `<li>${d}</li>`).join('')}</ul></strong>`
+                  : `<strong><span>No districts found</span></strong>`)
+              );
+          }
+        }, 50); // 50ms debounce
       })
       .on('mousemove', function(event) {
         tooltip
