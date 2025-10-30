@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import DistrictMap from './DistrictMap';
+import ChoroplethMap from './ChoroplethMap';
 import './DistrictBrowser.css';
 
 function DistrictBrowser() {
@@ -165,9 +165,7 @@ function DistrictBrowser() {
 
         <div className="district-detail-and-map">
           <div className="map-section">
-            <DistrictMap
-              address={selectedDistrict?.main_address}
-              districtName={selectedDistrict?.name}
+            <ChoroplethMap
               selectedDistrict={selectedDistrict}
             />
           </div>

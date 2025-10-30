@@ -5,10 +5,10 @@ React-based frontend for browsing Massachusetts school district information and 
 ## Features
 
 - **District Browser**: Browse all Massachusetts school districts (356 districts)
-- **Interactive Map**: View district locations on an interactive map powered by Leaflet.js
+- **Choropleth Map**: Interactive D3-based map showing all Massachusetts towns with district highlighting
 - **Search & Filter**: Search by district name, town name, or both
 - **District Details**: View detailed district information in JSON format
-- **Smart Geocoding**: Automatic fallback from full address to city name for reliable mapping
+- **Visual District Highlighting**: Towns belonging to selected districts highlighted in purple
 - **Full-Screen Layout**: Optimized design that fills the entire viewport
 - **Responsive Design**: Works on desktop and mobile devices
 
@@ -66,15 +66,16 @@ frontend/
 │   ├── components/
 │   │   ├── DistrictBrowser.jsx    # Main district browsing component
 │   │   ├── DistrictBrowser.css    # Browser component styles
-│   │   ├── DistrictMap.jsx        # Interactive Leaflet map component
-│   │   └── DistrictMap.css        # Map component styles
+│   │   ├── ChoroplethMap.jsx      # D3-based choropleth map component
+│   │   └── ChoroplethMap.css      # Map component styles
 │   ├── services/
 │   │   └── api.js                 # API service for backend communication
 │   ├── App.jsx                    # Main app component
 │   ├── App.css                    # Global app styles
 │   ├── main.jsx                   # App entry point
 │   └── index.css                  # Global CSS
-├── public/                        # Static assets
+├── public/
+│   └── geojson.json               # TopoJSON data for Massachusetts towns
 ├── .env.example                   # Environment variables template
 └── package.json                   # Dependencies and scripts
 ```
@@ -87,18 +88,18 @@ The main component that provides:
 - List view of all districts (left panel)
 - Search functionality (by name, town, or both)
 - Click-to-view district details
-- Interactive map display (top right)
+- Choropleth map display (top right)
 - JSON display of selected district data (bottom right)
 
-### DistrictMap
+### ChoroplethMap
 
-Interactive map component using Leaflet.js:
-- **Free and Open**: Uses OpenStreetMap (no API key required)
-- **Single Marker**: Shows one district location at a time
-- **Auto-Pan & Zoom**: Smoothly animates to selected district
-- **Info Popup**: Displays district name and address
-- **Smart Geocoding**: Falls back to city name if full address not found
-- **Massachusetts-Centered**: Initial view shows entire state
+Interactive choropleth map component using D3.js:
+- **All Towns Visible**: Displays all 351 Massachusetts towns as polygons
+- **District Highlighting**: Selected district's towns highlighted in purple (#7a0177)
+- **Hover Tooltips**: Town names appear on hover
+- **TopoJSON Support**: Efficiently loads compressed geographic data
+- **Responsive**: Automatically scales to container size
+- **Datawrapper-Inspired**: Clean, modern visualization style
 
 ### API Service
 
@@ -119,9 +120,9 @@ The `api.js` service provides methods for:
 ### View District Details
 
 1. Click on any district in the list
-2. Map pans and zooms to district location with a marker
+2. All towns belonging to the district are highlighted in purple on the map
 3. Full district information displays on the right in JSON format
-4. Click another district to move the marker to new location
+4. Hover over any town to see its name in a tooltip
 
 ## Environment Variables
 
@@ -131,8 +132,8 @@ The `api.js` service provides methods for:
 
 - **React 18**: UI library with hooks (useState, useEffect, useRef)
 - **Vite**: Build tool and development server with HMR
-- **Leaflet.js**: Interactive maps library
-- **OpenStreetMap**: Free map tiles and Nominatim geocoding
+- **D3.js**: Data visualization library for rendering SVG maps
+- **TopoJSON**: Efficient geographic data format (converts to GeoJSON)
 - **CSS**: Vanilla CSS with responsive design and grid layout
 - **Fetch API**: HTTP requests to backend
 
@@ -156,100 +157,98 @@ The `api.js` service provides methods for:
 
 ### Map Not Loading
 
-- Check browser console for Leaflet errors
-- Ensure `leaflet` package is installed: `npm install leaflet`
-- Verify Leaflet CSS is imported in `DistrictMap.jsx`
-- Check for ad blockers blocking OpenStreetMap tiles
+- Check browser console for D3 or TopoJSON errors
+- Ensure `d3` and `topojson-client` packages are installed
+- Verify `/geojson.json` file exists in `public/` directory
+- Check that GeoJSON data is loading properly in Network tab
 
-### Geocoding Issues
+### Geographic Data Issues
 
-- Some new street addresses may not be in OpenStreetMap yet
-- Component automatically falls back to city-level geocoding
-- Check browser console for "trying city fallback" messages
-- Nominatim has a 1 request/second rate limit (shouldn't affect normal usage)
+- The map uses TopoJSON format for efficient data storage
+- Data is automatically converted to GeoJSON for rendering
+- Town names use the `TOWN` property in the data
+- Check console for "Converting TopoJSON" messages on load
 
 ## Map Feature Details
 
 ### How the Map Works
 
-The interactive map uses **Leaflet.js** with **OpenStreetMap** tiles - completely free with no API key required!
+The choropleth map uses **D3.js** to render all Massachusetts towns as SVG polygons, creating a clean geographic visualization inspired by Datawrapper.
 
 **Technology Stack:**
-- **Leaflet**: Open-source JavaScript library for interactive maps
-- **OpenStreetMap**: Free, crowdsourced map data
-- **Nominatim**: Free geocoding service (address → coordinates)
+- **D3.js**: Data visualization library for creating SVG-based maps
+- **TopoJSON**: Compressed geographic data format (2.2MB vs 7.3MB GeoJSON)
+- **topojson-client**: Library to convert TopoJSON to GeoJSON for rendering
+- **geoIdentity**: D3 projection that treats coordinates as 2D cartesian coordinates
 
 **Workflow:**
-1. User clicks a district in the list
-2. District's `main_address` is geocoded via Nominatim API
-3. If full address not found, automatically falls back to city name
-4. Map smoothly pans and zooms to location (zoom level 12)
-5. Marker appears with popup showing district name and address
-6. When another district is clicked, old marker is removed
+1. TopoJSON file loads from `/geojson.json` (contains all MA towns)
+2. Data is converted to GeoJSON format
+3. All 351 towns render as SVG paths with gray fill
+4. When user selects a district, matching towns change to purple
+5. Hover tooltips show individual town names
+6. Map automatically scales to fit viewport with minimal padding
 
-### Nominatim Usage Policy
+### Data Format
 
-- **Free for fair use** - No API key needed
-- **Rate limit**: 1 request per second
-- **Attribution**: Must credit OpenStreetMap contributors
-- **Heavy usage**: For >100k requests/day, host your own Nominatim instance
-
-For this application, usage is minimal (only geocodes when user clicks a district), so well within free tier.
+The geographic data is stored in **TopoJSON format** which:
+- Compresses data by ~70% compared to GeoJSON
+- Shares arc topology between adjacent polygons
+- Wrapped in a `content` object with metadata
+- Contains `TOWN` property for each feature
 
 ### Customization Options
 
-**Change Map Tiles:**
+**Change Colors:**
 
-Edit `DistrictMap.jsx` to use different tile providers:
-
-```javascript
-// Default: OpenStreetMap
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-
-// CartoDB Positron (light theme)
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png')
-
-// CartoDB Dark Matter
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png')
-```
-
-**Adjust Initial View:**
+Edit `ChoroplethMap.jsx` to customize the color scheme:
 
 ```javascript
-const MA_CENTER = [42.4072, -71.3824];  // [latitude, longitude]
-const map = L.map(mapRef.current).setView(MA_CENTER, 8); // zoom level
+// Unselected towns (default: light gray)
+.attr('fill', '#e7e7e7')
+
+// Selected district towns (default: Datawrapper purple)
+.attr('fill', '#7a0177')
+
+// Town borders
+.attr('stroke', '#ffffff')
+.attr('stroke-width', 0.5)
 ```
 
-**Custom Marker Icon:**
+**Adjust Map Padding:**
 
 ```javascript
-const customIcon = L.icon({
-  iconUrl: '/path/to/icon.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-const marker = L.marker(latLng, { icon: customIcon });
+// More zoomed out (larger padding)
+const projection = d3.geoIdentity()
+  .fitSize([width - 40, height - 40], geojson);
+
+// More zoomed in (smaller padding)
+const projection = d3.geoIdentity()
+  .fitSize([width - 5, height - 5], geojson);
 ```
 
-### Why Not Google Maps?
+**Change Map Height:**
 
-| Solution | Cost | API Key | Free Tier |
-|----------|------|---------|-----------|
-| **Leaflet + OSM** | Free | No | Unlimited |
-| Google Maps | $7/1k loads | Yes | $200/month credit |
-| Mapbox | $0.50/1k loads | Yes | 50k loads/month |
-| HERE Maps | $1/1k loads | Yes | Limited free tier |
+Edit `DistrictBrowser.css`:
 
-**Leaflet + OpenStreetMap** was chosen for:
-- Zero cost (truly free, not just free tier)
-- No API key management
-- No usage tracking or billing
-- Community-driven open data
-- Excellent documentation
+```css
+.map-section {
+  height: 750px;  /* Adjust this value */
+}
+```
+
+### Why D3 Instead of Leaflet?
+
+**D3.js Choropleth** was chosen over Leaflet for:
+- **Better for regional data**: Shows all towns simultaneously vs individual markers
+- **Cleaner aesthetics**: SVG polygons with custom styling (Datawrapper-style)
+- **No external dependencies**: No map tiles needed, fully self-contained
+- **District visualization**: Perfect for showing multi-town districts
+- **Performance**: Single SVG render vs hundreds of map tiles
 
 ### Resources
 
-- [Leaflet Documentation](https://leafletjs.com/)
-- [OpenStreetMap](https://www.openstreetmap.org/)
-- [Nominatim Usage Policy](https://operations.osmfoundation.org/policies/nominatim/)
-- [Leaflet Tile Providers](https://leaflet-extras.github.io/leaflet-providers/preview/)
+- [D3.js Documentation](https://d3js.org/)
+- [D3 Geographic Projections](https://github.com/d3/d3-geo)
+- [TopoJSON Specification](https://github.com/topojson/topojson-specification)
+- [Datawrapper](https://www.datawrapper.de/) - Inspiration for map style
