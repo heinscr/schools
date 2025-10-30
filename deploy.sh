@@ -163,10 +163,14 @@ cd ..
 echo -e "\n${YELLOW}=== Configuring API Gateway ===${NC}"
 
 # Check if API Gateway is configured
-INTEGRATION_EXISTS=$(aws apigateway get-integrations \
+INTEGRATION_COUNT=$(aws apigateway get-integrations \
     --api-id $API_GATEWAY_ID \
     --region $AWS_REGION \
     2>/dev/null | grep -c "integrationId" || echo "0")
+
+# Remove any whitespace/newlines and ensure it's a valid integer
+INTEGRATION_EXISTS=$(echo "$INTEGRATION_COUNT" | tr -d '\n\r' | grep -o '[0-9]*' | head -1)
+INTEGRATION_EXISTS=${INTEGRATION_EXISTS:-0}
 
 if [ "$INTEGRATION_EXISTS" -eq "0" ]; then
     echo -e "${YELLOW}Note: API Gateway needs manual configuration. See docs/DEPLOYMENT_GUIDE.md${NC}"
