@@ -6,6 +6,7 @@ import './DistrictBrowser.css';
 function DistrictBrowser() {
   const [districts, setDistricts] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [clickedTown, setClickedTown] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,6 +61,7 @@ function DistrictBrowser() {
   const handleDistrictClick = async (district) => {
     try {
       setError(null);
+      setClickedTown(null); // Clear clicked town when district is selected
       // Fetch full district details
       const fullDistrict = await api.getDistrict(district.id);
       setSelectedDistrict(fullDistrict);
@@ -71,7 +73,25 @@ function DistrictBrowser() {
   const handleClearSearch = () => {
     setSearchQuery('');
     setSelectedDistrict(null); // Clear highlight on clear
+    setClickedTown(null); // Clear clicked town
     loadDistricts();
+  };
+
+  const handleTownClick = async (townName) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setSearchQuery(townName);
+      setFilterType('town');
+      setSelectedDistrict(null); // Clear district selection
+      setClickedTown(townName); // Set clicked town for map coloring
+      const response = await api.getDistricts({ town: townName, limit: 100 });
+      setDistricts(response.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -167,6 +187,8 @@ function DistrictBrowser() {
           <div className="map-section">
             <ChoroplethMap
               selectedDistrict={selectedDistrict}
+              clickedTown={clickedTown}
+              onTownClick={handleTownClick}
             />
           </div>
 

@@ -4,7 +4,7 @@ import * as topojson from 'topojson-client';
 import api from '../services/api';
 import './ChoroplethMap.css';
 
-const ChoroplethMap = ({ selectedDistrict }) => {
+const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
   // Debounce timer for hover
   const hoverTimerRef = useRef(null);
   const containerRef = useRef(null);
@@ -33,6 +33,18 @@ const ChoroplethMap = ({ selectedDistrict }) => {
 
     // Cleanup
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Hide tooltip when mouse leaves the map container
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const handleMouseLeave = () => {
+      d3.select(tooltipRef.current).style('opacity', 0);
+      activeHoverTownRef.current = null;
+    };
+    container.addEventListener('mouseleave', handleMouseLeave);
+    return () => container.removeEventListener('mouseleave', handleMouseLeave);
   }, []);
 
   // Load GeoJSON/TopoJSON data
@@ -108,6 +120,9 @@ const ChoroplethMap = ({ selectedDistrict }) => {
       towns.forEach(t => selectedTowns.add(t.trim().toLowerCase()));
     }
 
+    // Normalize clicked town name
+    const normalizedClickedTown = clickedTown ? clickedTown.trim().toLowerCase() : null;
+
     // Create tooltip
     const tooltip = d3.select(tooltipRef.current);
 
@@ -123,6 +138,13 @@ const ChoroplethMap = ({ selectedDistrict }) => {
       .attr('fill', d => {
         const props = d.properties;
         const townName = (props.TOWN || props.NAME || props.TOWN_NAME || '').trim().toLowerCase();
+
+        // Clicked town takes precedence with orange/amber color
+        if (normalizedClickedTown && townName === normalizedClickedTown) {
+          return '#ff7f00'; // Orange color for clicked town
+        }
+
+        // Then check if part of selected district (purple)
         const isSelected = selectedTowns.has(townName);
         return isSelected ? '#7a0177' : '#e7e7e7';
       })
@@ -182,18 +204,21 @@ const ChoroplethMap = ({ selectedDistrict }) => {
 
         // Hide tooltip
         tooltip.style('opacity', 0);
+      })
+      .on('click', function(event, d) {
+        if (onTownClick) {
+          event.stopPropagation();
+          const props = d.properties;
+          const townName = props.TOWN || props.NAME || props.TOWN_NAME || 'Unknown';
+          onTownClick(townName);
+        }
       });
 
-  }, [geojson, selectedDistrict]);
+  }, [geojson, selectedDistrict, clickedTown, onTownClick]);
 
   return (
     <div ref={containerRef} className="choropleth-container">
       <div ref={tooltipRef} className="choropleth-tooltip"></div>
-      {!selectedDistrict && (
-        <div className="choropleth-overlay">
-          <p>Select a district to view its towns on the map</p>
-        </div>
-      )}
     </div>
   );
 };
