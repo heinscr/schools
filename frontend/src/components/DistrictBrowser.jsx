@@ -10,20 +10,25 @@ function DistrictBrowser() {
   const [districtCycleIndex, setDistrictCycleIndex] = useState(0);
   const [lastClickedTown, setLastClickedTown] = useState(null);
   const [districtsForTown, setDistrictsForTown] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all', 'name', 'town'
 
-  useEffect(() => {
-    loadDistricts();
-  }, []);
+  // Do not auto-load districts on mount
 
-  const loadDistricts = async () => {
+  const loadDistricts = async (query, type) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.getDistricts({ limit: 100 });
+      let response;
+      if (type === 'all') {
+        response = await api.searchDistricts(query, { limit: 100 });
+      } else if (type === 'name') {
+        response = await api.getDistricts({ name: query, limit: 100 });
+      } else if (type === 'town') {
+        response = await api.getDistricts({ town: query, limit: 100 });
+      }
       setDistricts(response.data);
     } catch (err) {
       setError(err.message);
@@ -36,29 +41,10 @@ function DistrictBrowser() {
     e.preventDefault();
     setSelectedDistrict(null); // Clear highlight on new search
     if (!searchQuery.trim()) {
-      loadDistricts();
+      setDistricts([]); // Clear districts if search is blank
       return;
     }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      let response;
-      if (filterType === 'all') {
-        response = await api.searchDistricts(searchQuery, { limit: 100 });
-      } else if (filterType === 'name') {
-        response = await api.getDistricts({ name: searchQuery, limit: 100 });
-      } else if (filterType === 'town') {
-        response = await api.getDistricts({ town: searchQuery, limit: 100 });
-      }
-
-      setDistricts(response.data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    await loadDistricts(searchQuery, filterType);
   };
 
   const handleDistrictClick = async (district) => {
@@ -77,7 +63,7 @@ function DistrictBrowser() {
     setSearchQuery('');
     setSelectedDistrict(null); // Clear highlight on clear
     setClickedTown(null); // Clear clicked town
-    loadDistricts();
+    setDistricts([]); // Clear districts list
   };
 
   const handleTownClick = async (townName) => {
