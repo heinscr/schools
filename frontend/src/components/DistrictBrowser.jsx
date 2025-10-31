@@ -243,7 +243,11 @@ function DistrictBrowser() {
                       {district.name}
                     </div>
                     <div className="district-towns">
-                      {district.towns.join(', ')}
+                      {district.towns.map((town, idx) => (
+                        <span key={town} className="district-town-span">
+                          {town}{idx < district.towns.length - 1 ? ', ' : ''}
+                        </span>
+                      ))}
                     </div>
                   </li>
                 );
