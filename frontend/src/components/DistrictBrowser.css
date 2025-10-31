@@ -1,3 +1,12 @@
+.district-type-icon {
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+.district-type-count {
+  color: #666;
+  font-size: 0.95em;
+  margin-left: 2px;
+}
 /* District Type Filters */
 .district-type-filters {
   display: flex;
@@ -7,22 +16,30 @@
   margin-left: 16px;
   max-width: 350px;
 }
-.district-type-label {
+.district-type-toggle {
   display: flex;
   align-items: center;
-  font-size: 1rem;
+  font-size: 0.97rem;
   color: #1a1a1a;
-  min-width: 150px;
+  width: 160px;
+  justify-content: center;
   margin-bottom: 4px;
-}
-.district-type-label {
-  display: flex;
-  align-items: center;
-  font-size: 1rem;
-  color: #1a1a1a;
-}
-.district-type-label input[type="checkbox"] {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
   margin-right: 6px;
+}
+.district-type-toggle.active {
+  background: #e3f2fd;
+  border-color: #4a90e2;
+  color: #1565c0;
+}
+.district-type-toggle:focus {
+  outline: none;
+  border-color: #4a90e2;
 }
 .district-browser {
   max-width: 100%;
@@ -148,7 +165,8 @@
   padding: 20px;
   background: white;
   overflow-y: auto;
-  max-height: calc(100vh - 280px);
+  max-height: 750px;
+  height: 750px;
 }
 
 .district-list h2 {

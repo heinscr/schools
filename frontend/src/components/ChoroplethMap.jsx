@@ -4,7 +4,7 @@ import * as topojson from 'topojson-client';
 import api from '../services/api';
 import './ChoroplethMap.css';
 
-const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
+const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTypeOptions }) => {
   // Zoom state: 1x to 4x, increments of 0.25
   const [zoom, setZoom] = useState(1);
   // Pan state: x/y offset in SVG coordinates
@@ -241,22 +241,22 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
           let districts = [];
           try {
             const response = await api.getDistricts({ town: townName });
-            districts = response.data.map(d => d.name).sort((a, b) => a.localeCompare(b));
+            districts = response.data.map(d => ({ name: d.name, type: d.district_type })).sort((a, b) => a.name.localeCompare(b.name));
           } catch (err) {
             districts = [];
           }
           // Only update UI if still hovering this town
           if (activeHoverTownRef.current === townName) {
-            setHoverDistricts(districts);
+            setHoverDistricts(districts.map(d => d.name));
             // Determine which item to bold
             let boldTown = false;
             let boldDistrict = null;
             if (clickedTown && townName === clickedTown) {
               boldTown = true;
-            } else if (selectedDistrict && districts.includes(selectedDistrict.name)) {
+            } else if (selectedDistrict && districts.some(d => d.name === selectedDistrict.name)) {
               boldDistrict = selectedDistrict.name;
             }
-            // Show tooltip as bullet list
+            // Show tooltip as bullet list with icons
             tooltip
               .style('opacity', 1)
               .style('left', `${event.pageX + 10}px`)
@@ -267,7 +267,12 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
                   : `${townName}`
                 ) + '<br/>' +
                 (districts.length > 0
-                  ? `<ul style='margin: 4px 0 0 12px; padding: 0;'>${districts.map(d => boldDistrict === d ? `<li><strong>${d}</strong></li>` : `<li>${d}</li>`).join('')}</ul>`
+                  ? `<ul style='margin: 4px 0 0 12px; padding: 0;'>${districts.map(d => {
+                      const typeOpt = districtTypeOptions?.find(opt => opt.value === d.type);
+                      const icon = typeOpt?.icon || '';
+                      const label = boldDistrict === d.name ? `<strong>${d.name}</strong>` : d.name;
+                      return `<li>${icon ? `<span style='font-size:1.1em;vertical-align:middle;margin-right:4px;'>${icon}</span>` : ''}${label}</li>`;
+                    }).join('')}</ul>`
                   : `<span>No districts found</span>`)
               );
           }

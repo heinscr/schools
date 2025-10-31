@@ -6,10 +6,10 @@ import './DistrictBrowser.css';
 function DistrictBrowser() {
   // District type filters
   const districtTypeOptions = [
-    { value: 'municipal', label: 'Municipal' },
-    { value: 'regional_academic', label: 'Regional' },
-    { value: 'regional_vocational', label: 'Vocational' },
-    { value: 'county_agricultural', label: 'Agricultural' },
+    { value: 'municipal', label: 'Municipal', icon: '🏛️' },
+    { value: 'regional_academic', label: 'Regional', icon: '🏫' },
+    { value: 'regional_vocational', label: 'Vocational', icon: '🛠️' },
+    { value: 'county_agricultural', label: 'Agricultural', icon: '🌾' },
   ];
   const [selectedTypes, setSelectedTypes] = useState(districtTypeOptions.map(opt => opt.value));
 
@@ -25,6 +25,12 @@ function DistrictBrowser() {
   const [districts, setDistricts] = useState([]);
   // Filter districts by selected types
   const filteredDistricts = districts.filter(d => selectedTypes.includes(d.district_type));
+
+  // Get total count for each type
+  const typeCounts = districtTypeOptions.reduce((acc, opt) => {
+    acc[opt.value] = districts.filter(d => d.district_type === opt.value).length;
+    return acc;
+  }, {});
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [clickedTown, setClickedTown] = useState(null);
   const [districtCycleIndex, setDistrictCycleIndex] = useState(0);
@@ -198,18 +204,20 @@ function DistrictBrowser() {
       <div className="content-area">
         <div className="district-list">
           <h2>
-            Districts ({filteredDistricts.length})
+            Districts ({districts.length})
           </h2>
           <div className="district-type-filters">
             {districtTypeOptions.map(opt => (
-              <label key={opt.value} className="district-type-label">
-                <input
-                  type="checkbox"
-                  checked={selectedTypes.includes(opt.value)}
-                  onChange={() => handleTypeChange(opt.value)}
-                />
-                <span>{opt.label}</span>
-              </label>
+              <button
+                key={opt.value}
+                type="button"
+                className={`district-type-toggle${selectedTypes.includes(opt.value) ? ' active' : ''}`}
+                onClick={() => handleTypeChange(opt.value)}
+                aria-pressed={selectedTypes.includes(opt.value)}
+              >
+                <span className="district-type-icon" style={{marginRight: '6px'}}>{opt.icon}</span>
+                {opt.label} <span className="district-type-count">({typeCounts[opt.value] ?? 0})</span>
+              </button>
             ))}
           </div>
 
@@ -221,20 +229,26 @@ function DistrictBrowser() {
             </div>
           ) : (
             <ul className="district-items">
-              {filteredDistricts.map((district) => (
-                <li
-                  key={district.id}
-                  onClick={() => handleDistrictClick(district)}
-                  className={`district-item ${
-                    selectedDistrict?.id === district.id ? 'active' : ''
-                  }`}
-                >
-                  <div className="district-name">{district.name}</div>
-                  <div className="district-towns">
-                    {district.towns.join(', ')}
-                  </div>
-                </li>
-              ))}
+              {filteredDistricts.map((district) => {
+                const typeOpt = districtTypeOptions.find(opt => opt.value === district.district_type);
+                return (
+                  <li
+                    key={district.id}
+                    onClick={() => handleDistrictClick(district)}
+                    className={`district-item ${
+                      selectedDistrict?.id === district.id ? 'active' : ''
+                    }`}
+                  >
+                    <div className="district-name">
+                      <span className="district-type-icon" style={{marginRight: '6px'}}>{typeOpt?.icon}</span>
+                      {district.name}
+                    </div>
+                    <div className="district-towns">
+                      {district.towns.join(', ')}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
@@ -245,6 +259,7 @@ function DistrictBrowser() {
               selectedDistrict={selectedDistrict}
               clickedTown={clickedTown}
               onTownClick={handleTownClick}
+              districtTypeOptions={districtTypeOptions}
             />
           </div>
 
