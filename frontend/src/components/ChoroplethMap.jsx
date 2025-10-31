@@ -20,18 +20,12 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
       if (containerRef.current) {
         setDimensions({
           width: containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight || 750
+          height: containerRef.current.clientHeight
         });
       }
     };
-
-    // Set initial size
     handleResize();
-
-    // Add resize listener
     window.addEventListener('resize', handleResize);
-
-    // Cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -89,8 +83,8 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
 
     // Get container dimensions
     const container = containerRef.current;
-    const width = container.clientWidth;
-    const height = container.clientHeight || 500;
+    const width = dimensions.width || container.clientWidth;
+    const height = dimensions.height || container.clientHeight;
 
     // Clear previous render
     d3.select(container).select('svg').remove();
@@ -98,8 +92,10 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
     // Create SVG
     const svg = d3.select(container)
       .append('svg')
-      .attr('width', width)
-      .attr('height', height)
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr('class', 'choropleth-svg');
 
     // Use geoIdentity projection for proper display of local GeoJSON data
