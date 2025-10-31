@@ -250,8 +250,6 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
             // Show tooltip as bullet list with icons
             tooltip
               .style('opacity', 1)
-              .style('left', `${event.pageX + 10}px`)
-              .style('top', `${event.pageY - 10}px`)
               .html(
                 (boldTown
                   ? `<span class="town-highlight">${townName}</span>`
@@ -266,13 +264,62 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
                     }).join('')}</ul>`
                   : `<span>No districts found</span>`)
               );
+            // Position tooltip inside map window
+            setTimeout(() => {
+              const tooltipNode = tooltipRef.current;
+              const containerNode = containerRef.current;
+              if (!tooltipNode || !containerNode) return;
+              const tooltipRect = tooltipNode.getBoundingClientRect();
+              const containerRect = containerNode.getBoundingClientRect();
+              let left = event.pageX + 10;
+              let top = event.pageY - 10;
+              // Right edge
+              if (left + tooltipRect.width > containerRect.right) {
+                left = event.pageX - tooltipRect.width - 10;
+              }
+              // Bottom edge
+              if (top + tooltipRect.height > containerRect.bottom) {
+                top = event.pageY - tooltipRect.height - 10;
+              }
+              // Left edge
+              if (left < containerRect.left) {
+                left = containerRect.left + 10;
+              }
+              // Top edge
+              if (top < containerRect.top) {
+                top = containerRect.top + 10;
+              }
+              tooltip.style('left', `${left}px`).style('top', `${top}px`);
+            }, 0);
           }
         }, 50); // 50ms debounce
       })
       .on('mousemove', function(event) {
-        tooltip
-          .style('left', `${event.pageX + 10}px`)
-          .style('top', `${event.pageY - 10}px`);
+        // Position tooltip inside map window
+        const tooltipNode = tooltipRef.current;
+        const containerNode = containerRef.current;
+        if (!tooltipNode || !containerNode) return;
+        const tooltipRect = tooltipNode.getBoundingClientRect();
+        const containerRect = containerNode.getBoundingClientRect();
+        let left = event.pageX + 10;
+        let top = event.pageY - 10;
+        // Right edge
+        if (left + tooltipRect.width > containerRect.right) {
+          left = event.pageX - tooltipRect.width - 10;
+        }
+        // Bottom edge
+        if (top + tooltipRect.height > containerRect.bottom) {
+          top = event.pageY - tooltipRect.height - 10;
+        }
+        // Left edge
+        if (left < containerRect.left) {
+          left = containerRect.left + 10;
+        }
+        // Top edge
+        if (top < containerRect.top) {
+          top = containerRect.top + 10;
+        }
+        tooltip.style('left', `${left}px`).style('top', `${top}px`);
       })
       .on('mouseout', function() {
         // Remove highlight
