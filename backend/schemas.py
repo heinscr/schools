@@ -32,6 +32,7 @@ class DistrictBase(BaseModel):
 class DistrictCreate(DistrictBase):
     """Schema for creating a district"""
     towns: List[str] = Field(default_factory=list, description="List of town names")
+    district_type: str = Field(..., description="Type of district (e.g. municipal, regional_academic, etc.)")
 
 
 class DistrictUpdate(BaseModel):
@@ -39,12 +40,14 @@ class DistrictUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     main_address: Optional[str] = Field(None, max_length=500)
     towns: Optional[List[str]] = Field(None, description="List of town names")
+    district_type: Optional[str] = Field(None, description="Type of district (e.g. municipal, regional_academic, etc.)")
 
 
 class DistrictResponse(DistrictBase):
     """Schema for district response"""
     id: str  # Changed from int to str for DynamoDB UUIDs
     towns: List[str] = Field(default_factory=list, description="List of town names")
+    district_type: str = Field(..., description="Type of district (e.g. municipal, regional_academic, etc.)")
     created_at: str  # Changed from datetime to str for ISO format strings
     updated_at: str  # Changed from datetime to str for ISO format strings
 
