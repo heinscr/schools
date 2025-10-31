@@ -256,7 +256,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
                   : `${townName}`
                 ) + '<br/>' +
                 (districts.length > 0
-                  ? `<ul style='margin: 4px 0 0 12px; padding: 0;'>${districts.map(d => {
+                  ? `<ul style='margin: 4px 0 0 12px; padding: 0; list-style: none;'>${districts.map(d => {
                       const typeOpt = districtTypeOptions?.find(opt => opt.value === d.type);
                       const icon = typeOpt?.icon || '';
                       const label = boldDistrict === d.name ? `<strong>${d.name}</strong>` : d.name;

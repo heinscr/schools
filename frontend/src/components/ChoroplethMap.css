@@ -35,7 +35,8 @@
   font-size: 14px;
   line-height: 1.4;
   z-index: 1000;
-  max-width: 300px;
+  width: 300px;
+  min-width: 300px;
   color: #333;
   font-weight: 400;
 }
