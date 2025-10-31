@@ -4,7 +4,27 @@ import ChoroplethMap from './ChoroplethMap';
 import './DistrictBrowser.css';
 
 function DistrictBrowser() {
+  // District type filters
+  const districtTypeOptions = [
+    { value: 'municipal', label: 'Municipal' },
+    { value: 'regional_academic', label: 'Regional' },
+    { value: 'regional_vocational', label: 'Vocational' },
+    { value: 'county_agricultural', label: 'Agricultural' },
+  ];
+  const [selectedTypes, setSelectedTypes] = useState(districtTypeOptions.map(opt => opt.value));
+
+  // Handle checkbox change
+  const handleTypeChange = (type) => {
+    setSelectedTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
   const [districts, setDistricts] = useState([]);
+  // Filter districts by selected types
+  const filteredDistricts = districts.filter(d => selectedTypes.includes(d.district_type));
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [clickedTown, setClickedTown] = useState(null);
   const [districtCycleIndex, setDistrictCycleIndex] = useState(0);
@@ -165,6 +185,19 @@ function DistrictBrowser() {
                 Clear
               </button>
             )}
+
+            <div className="district-type-filters">
+              {districtTypeOptions.map(opt => (
+                <label key={opt.value} className="district-type-label">
+                  <input
+                    type="checkbox"
+                    checked={selectedTypes.includes(opt.value)}
+                    onChange={() => handleTypeChange(opt.value)}
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </form>
       </div>
@@ -178,18 +211,18 @@ function DistrictBrowser() {
       <div className="content-area">
         <div className="district-list">
           <h2>
-            Districts ({districts.length})
+            Districts ({filteredDistricts.length})
           </h2>
 
           {loading ? (
             <div className="loading">Loading districts...</div>
-          ) : districts.length === 0 ? (
+          ) : filteredDistricts.length === 0 ? (
             <div className="no-results">
               No districts found. {searchQuery && 'Try a different search term.'}
             </div>
           ) : (
             <ul className="district-items">
-              {districts.map((district) => (
+              {filteredDistricts.map((district) => (
                 <li
                   key={district.id}
                   onClick={() => handleDistrictClick(district)}
