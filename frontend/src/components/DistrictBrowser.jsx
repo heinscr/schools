@@ -148,7 +148,6 @@ function DistrictBrowser() {
     <div className="district-browser">
       <header className="browser-header">
         <h1>Massachusetts School Districts</h1>
-        <p>Search and browse teacher contract information by school district</p>
       </header>
 
       <div className="search-section">
