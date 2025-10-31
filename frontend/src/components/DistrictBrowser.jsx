@@ -7,6 +7,9 @@ function DistrictBrowser() {
   const [districts, setDistricts] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [clickedTown, setClickedTown] = useState(null);
+  const [districtCycleIndex, setDistrictCycleIndex] = useState(0);
+  const [lastClickedTown, setLastClickedTown] = useState(null);
+  const [districtsForTown, setDistrictsForTown] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,19 +81,54 @@ function DistrictBrowser() {
   };
 
   const handleTownClick = async (townName) => {
-    try {
-      setLoading(true);
-      setError(null);
+    // Normalize town name for cache lookup
+    const townKey = townName.trim().toLowerCase();
+    // If new town, reset cycle and fetch districts
+    if (lastClickedTown !== townKey) {
+      setLastClickedTown(townKey);
+      setDistrictCycleIndex(0);
+      setSelectedDistrict(null);
+      setClickedTown(townName);
       setSearchQuery(townName);
       setFilterType('town');
-      setSelectedDistrict(null); // Clear district selection
-      setClickedTown(townName); // Set clicked town for map coloring
-      const response = await api.getDistricts({ town: townName, limit: 100 });
-      setDistricts(response.data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      setLoading(true);
+      setError(null);
+      try {
+        // Use cache if available
+        let districtsList = api._districtsByTownCache[townKey];
+        if (!districtsList) {
+          const response = await api.getDistricts({ town: townName });
+          districtsList = response.data;
+        }
+        // Sort districts alphabetically by name to match tooltip
+        districtsList = districtsList.slice().sort((a, b) => a.name.localeCompare(b.name));
+        setDistrictsForTown(districtsList);
+        setDistricts(districtsList);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+    // If same town, cycle through districts
+    if (districtsForTown.length > 0) {
+      // Always cycle in sorted order
+      const sortedDistricts = districtsForTown.slice().sort((a, b) => a.name.localeCompare(b.name));
+      let nextIndex = districtCycleIndex + 1;
+      if (nextIndex > sortedDistricts.length) {
+        nextIndex = 0;
+      }
+      setDistrictCycleIndex(nextIndex);
+      if (nextIndex === 0) {
+        // Highlight town only (orange)
+        setSelectedDistrict(null);
+        setClickedTown(townName);
+      } else {
+        // Highlight the next district
+        setSelectedDistrict(sortedDistricts[nextIndex - 1]);
+        setClickedTown(null);
+      }
     }
   };
 

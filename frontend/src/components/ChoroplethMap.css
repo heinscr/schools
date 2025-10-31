@@ -21,6 +21,7 @@
   cursor: pointer;
 }
 
+
 .choropleth-tooltip {
   position: fixed;
   padding: 12px 16px;
@@ -35,11 +36,28 @@
   line-height: 1.4;
   z-index: 1000;
   max-width: 300px;
+  color: #333;
+  font-weight: 400;
 }
 
+
+
 .choropleth-tooltip strong {
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #7a0177;
+  font-size: 1.08em;
+  background: #f3e6f7;
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.choropleth-tooltip .town-highlight {
+  font-weight: 700;
+  color: #ff7f00;
+  font-size: 1.08em;
+  background: #fff3e0;
+  border-radius: 3px;
+  padding: 1px 4px;
 }
 
 .choropleth-overlay {

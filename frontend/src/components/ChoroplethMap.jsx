@@ -173,16 +173,27 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
           // Only update UI if still hovering this town
           if (activeHoverTownRef.current === townName) {
             setHoverDistricts(districts);
+            // Determine which item to bold
+            let boldTown = false;
+            let boldDistrict = null;
+            if (clickedTown && townName === clickedTown) {
+              boldTown = true;
+            } else if (selectedDistrict && districts.includes(selectedDistrict.name)) {
+              boldDistrict = selectedDistrict.name;
+            }
             // Show tooltip as bullet list
             tooltip
               .style('opacity', 1)
               .style('left', `${event.pageX + 10}px`)
               .style('top', `${event.pageY - 10}px`)
               .html(
-                `<strong>${townName}</strong><br/>` +
+                (boldTown
+                  ? `<span class="town-highlight">${townName}</span>`
+                  : `${townName}`
+                ) + '<br/>' +
                 (districts.length > 0
-                  ? `<strong><ul style='margin: 4px 0 0 12px; padding: 0;'>${districts.map(d => `<li>${d}</li>`).join('')}</ul></strong>`
-                  : `<strong><span>No districts found</span></strong>`)
+                  ? `<ul style='margin: 4px 0 0 12px; padding: 0;'>${districts.map(d => boldDistrict === d ? `<li><strong>${d}</strong></li>` : `<li>${d}</li>`).join('')}</ul>`
+                  : `<span>No districts found</span>`)
               );
           }
         }, 50); // 50ms debounce
