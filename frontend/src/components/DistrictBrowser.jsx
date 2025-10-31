@@ -185,19 +185,6 @@ function DistrictBrowser() {
                 Clear
               </button>
             )}
-
-            <div className="district-type-filters">
-              {districtTypeOptions.map(opt => (
-                <label key={opt.value} className="district-type-label">
-                  <input
-                    type="checkbox"
-                    checked={selectedTypes.includes(opt.value)}
-                    onChange={() => handleTypeChange(opt.value)}
-                  />
-                  <span>{opt.label}</span>
-                </label>
-              ))}
-            </div>
           </div>
         </form>
       </div>
@@ -213,6 +200,18 @@ function DistrictBrowser() {
           <h2>
             Districts ({filteredDistricts.length})
           </h2>
+          <div className="district-type-filters">
+            {districtTypeOptions.map(opt => (
+              <label key={opt.value} className="district-type-label">
+                <input
+                  type="checkbox"
+                  checked={selectedTypes.includes(opt.value)}
+                  onChange={() => handleTypeChange(opt.value)}
+                />
+                <span>{opt.label}</span>
+              </label>
+            ))}
+          </div>
 
           {loading ? (
             <div className="loading">Loading districts...</div>

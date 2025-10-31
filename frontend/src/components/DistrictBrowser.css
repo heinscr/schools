@@ -1,9 +1,19 @@
 /* District Type Filters */
 .district-type-filters {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   margin-left: 16px;
+  max-width: 350px;
+}
+.district-type-label {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: #1a1a1a;
+  min-width: 150px;
+  margin-bottom: 4px;
 }
 .district-type-label {
   display: flex;
