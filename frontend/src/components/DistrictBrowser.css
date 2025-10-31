@@ -391,6 +391,38 @@
   }
 }
 
+@media (max-width: 768px) {
+  .district-type-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    margin-left: 0;
+    max-width: 100%;
+    padding-bottom: 8px;
+  }
+
+  .district-type-toggle {
+    width: auto;
+    min-width: 60px;
+    flex-shrink: 0;
+    margin-right: 0;
+    padding: 8px 12px;
+  }
+
+  /* Hide label text on mobile, keep icon and count */
+  .district-type-label {
+    display: none;
+  }
+
+  .district-type-icon {
+    margin-right: 4px !important;
+  }
+
+  .district-type-count {
+    font-size: 0.9em;
+  }
+}
+
 @media (max-width: 640px) {
   .browser-header h1 {
     font-size: 1.8rem;

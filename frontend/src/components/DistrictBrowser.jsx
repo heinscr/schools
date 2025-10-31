@@ -215,7 +215,7 @@ function DistrictBrowser() {
                 aria-pressed={selectedTypes.includes(opt.value)}
               >
                 <span className="district-type-icon" style={{marginRight: '6px'}}>{opt.icon}</span>
-                {opt.label} <span className="district-type-count">({typeCounts[opt.value] ?? 0})</span>
+                <span className="district-type-label">{opt.label}</span> <span className="district-type-count">({typeCounts[opt.value] ?? 0})</span>
               </button>
             ))}
           </div>

@@ -5,6 +5,9 @@ import api from '../services/api';
 import './ChoroplethMap.css';
 
 const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTypeOptions }) => {
+  // Detect mobile devices
+  const [isMobile, setIsMobile] = useState(false);
+
   // Zoom state: 1x to 4x, increments of 0.25
   const [zoom, setZoom] = useState(1);
   // Pan state: x/y offset in SVG coordinates
@@ -19,6 +22,16 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [hoverDistricts, setHoverDistricts] = useState([]);
   const activeHoverTownRef = useRef(null);
+
+  // Detect mobile on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Handle window resize
   useEffect(() => {
@@ -116,60 +129,38 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
       .attr('viewBox', `${panX} ${panY} ${zoomedWidth} ${zoomedHeight}`)
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr('class', 'choropleth-svg');
-    // Add drag/pan handlers to SVG
-    svg
-      .style('cursor', 'grab')
-      .on('mousedown', function(event) {
-        dragRef.current.dragging = true;
-        dragRef.current.startX = event.clientX;
-        dragRef.current.startY = event.clientY;
-        dragRef.current.origX = panRef.current.x;
-        dragRef.current.origY = panRef.current.y;
-        d3.select(this).style('cursor', 'grabbing');
-      })
-      .on('mousemove', function(event) {
-        if (dragRef.current.dragging) {
-          const dx = event.clientX - dragRef.current.startX;
-          const dy = event.clientY - dragRef.current.startY;
-          // Move by dx/dy scaled to SVG units
-          setPan({
-            x: dragRef.current.origX - dx * (zoom),
-            y: dragRef.current.origY - dy * (zoom)
-          });
-        }
-      })
-      .on('mouseup', function() {
-        dragRef.current.dragging = false;
-        d3.select(this).style('cursor', 'grab');
-      })
-      .on('mouseleave', function() {
-        dragRef.current.dragging = false;
-        d3.select(this).style('cursor', 'grab');
-      })
-      .on('touchstart', function(event) {
-        if (event.touches && event.touches.length === 1) {
-          const touch = event.touches[0];
+    // Add drag/pan handlers to SVG (disabled on mobile)
+    if (!isMobile) {
+      svg
+        .style('cursor', 'grab')
+        .on('mousedown', function(event) {
           dragRef.current.dragging = true;
-          dragRef.current.startX = touch.clientX;
-          dragRef.current.startY = touch.clientY;
+          dragRef.current.startX = event.clientX;
+          dragRef.current.startY = event.clientY;
           dragRef.current.origX = panRef.current.x;
           dragRef.current.origY = panRef.current.y;
-        }
-      })
-      .on('touchmove', function(event) {
-        if (dragRef.current.dragging && event.touches && event.touches.length === 1) {
-          const touch = event.touches[0];
-          const dx = touch.clientX - dragRef.current.startX;
-          const dy = touch.clientY - dragRef.current.startY;
-          setPan({
-            x: dragRef.current.origX - dx * (zoom),
-            y: dragRef.current.origY - dy * (zoom)
-          });
-        }
-      })
-      .on('touchend', function() {
-        dragRef.current.dragging = false;
-      });
+          d3.select(this).style('cursor', 'grabbing');
+        })
+        .on('mousemove', function(event) {
+          if (dragRef.current.dragging) {
+            const dx = event.clientX - dragRef.current.startX;
+            const dy = event.clientY - dragRef.current.startY;
+            // Move by dx/dy scaled to SVG units
+            setPan({
+              x: dragRef.current.origX - dx * (zoom),
+              y: dragRef.current.origY - dy * (zoom)
+            });
+          }
+        })
+        .on('mouseup', function() {
+          dragRef.current.dragging = false;
+          d3.select(this).style('cursor', 'grab');
+        })
+        .on('mouseleave', function() {
+          dragRef.current.dragging = false;
+          d3.select(this).style('cursor', 'grab');
+        });
+    }
 
     // Use geoIdentity projection for proper display of local GeoJSON data
     // Always fit to the base size (not zoomed size)
@@ -293,7 +284,8 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         tooltip.style('opacity', 0);
       })
       .on('click', function(event, d) {
-        if (onTownClick) {
+        // Disable clicks on mobile
+        if (onTownClick && !isMobile) {
           event.stopPropagation();
           const props = d.properties;
           const townName = props.TOWN || props.NAME || props.TOWN_NAME || 'Unknown';
@@ -301,7 +293,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         }
       });
 
-  }, [geojson, selectedDistrict, clickedTown, onTownClick, zoom, dimensions, pan]);
+  }, [geojson, selectedDistrict, clickedTown, onTownClick, zoom, dimensions, pan, isMobile]);
 
   // Zoom controls
   const handleZoomIn = () => {
@@ -324,8 +316,9 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
 
   return (
     <div ref={containerRef} className="choropleth-container" style={{ position: 'relative' }}>
-      <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+      {!isMobile && (
+        <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
           <button
             onClick={handleZoomIn}
             disabled={zoom >= 4}
@@ -409,6 +402,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
           Zoom: {zoom.toFixed(2)}x
         </span>
       </div>
+      )}
       <div ref={tooltipRef} className="choropleth-tooltip"></div>
     </div>
   );
