@@ -5,6 +5,12 @@ import api from '../services/api';
 import './ChoroplethMap.css';
 
 const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
+  // Zoom state: 1x to 4x, increments of 0.25
+  const [zoom, setZoom] = useState(1);
+  // Pan state: x/y offset in SVG coordinates
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const panRef = useRef(pan);
+  const dragRef = useRef({ dragging: false, startX: 0, startY: 0, origX: 0, origY: 0 });
   // Debounce timer for hover
   const hoverTimerRef = useRef(null);
   const containerRef = useRef(null);
@@ -69,7 +75,12 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
       .catch((err) => console.error('Error loading GeoJSON:', err));
   }, []);
 
-  // Render map
+  // Update panRef when pan changes
+  useEffect(() => { panRef.current = pan; }, [pan]);
+
+  // Remove initialPan/reset logic
+
+  // Main render effect
   useEffect(() => {
     if (!geojson || !containerRef.current) {
       console.log('Not rendering - geojson:', !!geojson, 'features:', geojson?.features?.length);
@@ -86,22 +97,86 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
     const width = dimensions.width || container.clientWidth;
     const height = dimensions.height || container.clientHeight;
 
-    // Clear previous render
-    d3.select(container).select('svg').remove();
+    // Clear previous render - remove ALL svgs
+    d3.select(container).selectAll('svg').remove();
+
+  // Calculate zoomed size (zoom > 1 makes map larger by reducing viewBox size)
+  const zoomedWidth = (width - 10) / zoom;
+  const zoomedHeight = (height - 10) / zoom;
+
+    // Calculate pan offset
+    const panX = pan.x;
+    const panY = pan.y;
 
     // Create SVG
     const svg = d3.select(container)
       .append('svg')
       .attr('width', '100%')
       .attr('height', '100%')
-      .attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('viewBox', `${panX} ${panY} ${zoomedWidth} ${zoomedHeight}`)
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr('class', 'choropleth-svg');
+    // Add drag/pan handlers to SVG
+    svg
+      .style('cursor', 'grab')
+      .on('mousedown', function(event) {
+        dragRef.current.dragging = true;
+        dragRef.current.startX = event.clientX;
+        dragRef.current.startY = event.clientY;
+        dragRef.current.origX = panRef.current.x;
+        dragRef.current.origY = panRef.current.y;
+        d3.select(this).style('cursor', 'grabbing');
+      })
+      .on('mousemove', function(event) {
+        if (dragRef.current.dragging) {
+          const dx = event.clientX - dragRef.current.startX;
+          const dy = event.clientY - dragRef.current.startY;
+          // Move by dx/dy scaled to SVG units
+          setPan({
+            x: dragRef.current.origX - dx * (zoom),
+            y: dragRef.current.origY - dy * (zoom)
+          });
+        }
+      })
+      .on('mouseup', function() {
+        dragRef.current.dragging = false;
+        d3.select(this).style('cursor', 'grab');
+      })
+      .on('mouseleave', function() {
+        dragRef.current.dragging = false;
+        d3.select(this).style('cursor', 'grab');
+      })
+      .on('touchstart', function(event) {
+        if (event.touches && event.touches.length === 1) {
+          const touch = event.touches[0];
+          dragRef.current.dragging = true;
+          dragRef.current.startX = touch.clientX;
+          dragRef.current.startY = touch.clientY;
+          dragRef.current.origX = panRef.current.x;
+          dragRef.current.origY = panRef.current.y;
+        }
+      })
+      .on('touchmove', function(event) {
+        if (dragRef.current.dragging && event.touches && event.touches.length === 1) {
+          const touch = event.touches[0];
+          const dx = touch.clientX - dragRef.current.startX;
+          const dy = touch.clientY - dragRef.current.startY;
+          setPan({
+            x: dragRef.current.origX - dx * (zoom),
+            y: dragRef.current.origY - dy * (zoom)
+          });
+        }
+      })
+      .on('touchend', function() {
+        dragRef.current.dragging = false;
+      });
 
     // Use geoIdentity projection for proper display of local GeoJSON data
-    // Minimal padding to zoom in more on the state
+    // Always fit to the base size (not zoomed size)
+    const baseWidth = width - 10;
+    const baseHeight = height - 10;
     const projection = d3.geoIdentity()
-      .fitSize([width - 10, height - 10], geojson);
+      .fitSize([baseWidth, baseHeight], geojson);
 
     // Adjust translate to center with minimal padding
     const [tx, ty] = projection.translate();
@@ -221,10 +296,114 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick }) => {
         }
       });
 
-  }, [geojson, selectedDistrict, clickedTown, onTownClick]);
+  }, [geojson, selectedDistrict, clickedTown, onTownClick, zoom, dimensions, pan]);
+
+  // Zoom controls
+  const handleZoomIn = () => {
+    setZoom(z => Math.min(4, Math.round((z + 0.25) * 100) / 100));
+  };
+  const handleZoomOut = () => {
+    setZoom(z => {
+      const newZoom = Math.max(1, Math.round((z - 0.25) * 100) / 100);
+      // Reset pan when zooming back to 1x
+      if (newZoom === 1) {
+        setPan({ x: 0, y: 0 });
+      }
+      return newZoom;
+    });
+  };
+  const handleReset = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
 
   return (
-    <div ref={containerRef} className="choropleth-container">
+    <div ref={containerRef} className="choropleth-container" style={{ position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+          <button
+            onClick={handleZoomIn}
+            disabled={zoom >= 4}
+            style={{
+              fontSize: '1.5em',
+              fontWeight: 'bold',
+              width: 40,
+              height: 40,
+              borderRadius: 8,
+              border: '2px solid #000',
+              background: zoom < 4 ? '#fffbe6' : '#f3f3f3',
+              color: '#000',
+              cursor: zoom < 4 ? 'pointer' : 'not-allowed',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              transition: 'background 0.2s, color 0.2s',
+              outline: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+            }}
+            aria-label="Zoom in"
+            title="Zoom in"
+          >
+            <span style={{ pointerEvents: 'none', display: 'block', width: '100%', textAlign: 'center', lineHeight: '1' }}>+</span>
+          </button>
+          <button
+            onClick={handleZoomOut}
+            disabled={zoom <= 1}
+            style={{
+              fontSize: '1.5em',
+              fontWeight: 'bold',
+              width: 40,
+              height: 40,
+              borderRadius: 8,
+              border: '2px solid #000',
+              background: zoom > 1 ? '#fffbe6' : '#f3f3f3',
+              color: '#000',
+              cursor: zoom > 1 ? 'pointer' : 'not-allowed',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              transition: 'background 0.2s, color 0.2s',
+              outline: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+            }}
+            aria-label="Zoom out"
+            title="Zoom out"
+          >
+            <span style={{ pointerEvents: 'none', display: 'block', width: '100%', textAlign: 'center', lineHeight: '1' }}>−</span>
+          </button>
+          <button
+            onClick={handleReset}
+            disabled={zoom === 1 && pan.x === 0 && pan.y === 0}
+            style={{
+              fontSize: '1.2em',
+              fontWeight: 'bold',
+              width: 40,
+              height: 40,
+              borderRadius: 8,
+              border: '2px solid #000',
+              background: (zoom !== 1 || pan.x !== 0 || pan.y !== 0) ? '#fffbe6' : '#f3f3f3',
+              color: '#000',
+              cursor: (zoom !== 1 || pan.x !== 0 || pan.y !== 0) ? 'pointer' : 'not-allowed',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              transition: 'background 0.2s, color 0.2s',
+              outline: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+            }}
+            aria-label="Reset zoom and pan"
+            title="Reset zoom and pan"
+          >
+            <span style={{ pointerEvents: 'none', display: 'block', width: '100%', textAlign: 'center' }}>⟲</span>
+          </button>
+        </div>
+        <span style={{ fontSize: '0.9em', textAlign: 'center', color: '#333', fontWeight: 500 }}>
+          Zoom: {zoom.toFixed(2)}x
+        </span>
+      </div>
       <div ref={tooltipRef} className="choropleth-tooltip"></div>
     </div>
   );
