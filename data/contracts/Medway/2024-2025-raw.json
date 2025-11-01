@@ -1,0 +1,2562 @@
+[
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 1,
+    "education": "B",
+    "credits": 0,
+    "salary": 53202.03
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 1,
+    "education": "B",
+    "credits": 15,
+    "salary": 55426.84
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 1,
+    "education": "B",
+    "credits": 30,
+    "salary": 57099.23
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 1,
+    "education": "M",
+    "credits": 0,
+    "salary": 58207.6
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 1,
+    "education": "M",
+    "credits": 15,
+    "salary": 59879.99
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 1,
+    "education": "M",
+    "credits": 30,
+    "salary": 60987.12
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 1,
+    "education": "M",
+    "credits": 45,
+    "salary": 62660.71
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 1,
+    "education": "M",
+    "credits": 60,
+    "salary": 64337.75
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 2,
+    "education": "B",
+    "credits": 0,
+    "salary": 55978.12
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 2,
+    "education": "B",
+    "credits": 15,
+    "salary": 58207.6
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 2,
+    "education": "B",
+    "credits": 30,
+    "salary": 59879.99
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 2,
+    "education": "M",
+    "credits": 0,
+    "salary": 60437.06
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 2,
+    "education": "M",
+    "credits": 15,
+    "salary": 62110.61
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 2,
+    "education": "M",
+    "credits": 30,
+    "salary": 63779.52
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 2,
+    "education": "M",
+    "credits": 45,
+    "salary": 65444.95
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 2,
+    "education": "M",
+    "credits": 60,
+    "salary": 67111.54
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 3,
+    "education": "B",
+    "credits": 0,
+    "salary": 58757.7
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 3,
+    "education": "B",
+    "credits": 15,
+    "salary": 60989.49
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 3,
+    "education": "B",
+    "credits": 30,
+    "salary": 62661.89
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 3,
+    "education": "M",
+    "credits": 0,
+    "salary": 63221.26
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 3,
+    "education": "M",
+    "credits": 15,
+    "salary": 64889.03
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 3,
+    "education": "M",
+    "credits": 30,
+    "salary": 66556.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 3,
+    "education": "M",
+    "credits": 45,
+    "salary": 68225.7
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 3,
+    "education": "M",
+    "credits": 60,
+    "salary": 69888.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 4,
+    "education": "B",
+    "credits": 0,
+    "salary": 60989.49
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 4,
+    "education": "B",
+    "credits": 15,
+    "salary": 63221.26
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 4,
+    "education": "B",
+    "credits": 30,
+    "salary": 64889.03
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 4,
+    "education": "M",
+    "credits": 0,
+    "salary": 65444.95
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 4,
+    "education": "M",
+    "credits": 15,
+    "salary": 67112.68
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 4,
+    "education": "M",
+    "credits": 30,
+    "salary": 68779.29
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 4,
+    "education": "M",
+    "credits": 45,
+    "salary": 70447.04
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 4,
+    "education": "M",
+    "credits": 60,
+    "salary": 72122.92
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 5,
+    "education": "B",
+    "credits": 0,
+    "salary": 64336.6
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 5,
+    "education": "B",
+    "credits": 15,
+    "salary": 66556.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 5,
+    "education": "B",
+    "credits": 30,
+    "salary": 68224.53
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 5,
+    "education": "M",
+    "credits": 0,
+    "salary": 69336.37
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 5,
+    "education": "M",
+    "credits": 15,
+    "salary": 71011.07
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 5,
+    "education": "M",
+    "credits": 30,
+    "salary": 72674.17
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 5,
+    "education": "M",
+    "credits": 45,
+    "salary": 74353.52
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 5,
+    "education": "M",
+    "credits": 60,
+    "salary": 76014.3
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 6,
+    "education": "B",
+    "credits": 0,
+    "salary": 67112.68
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 6,
+    "education": "B",
+    "credits": 15,
+    "salary": 69336.37
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 6,
+    "education": "B",
+    "credits": 30,
+    "salary": 71011.07
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 6,
+    "education": "M",
+    "credits": 0,
+    "salary": 72122.92
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 6,
+    "education": "M",
+    "credits": 15,
+    "salary": 73791.82
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 6,
+    "education": "M",
+    "credits": 30,
+    "salary": 75460.71
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 6,
+    "education": "M",
+    "credits": 45,
+    "salary": 77128.48
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 6,
+    "education": "M",
+    "credits": 60,
+    "salary": 78797.37
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 7,
+    "education": "B",
+    "credits": 0,
+    "salary": 70447.04
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 7,
+    "education": "B",
+    "credits": 15,
+    "salary": 72674.17
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 7,
+    "education": "B",
+    "credits": 30,
+    "salary": 74353.52
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 7,
+    "education": "M",
+    "credits": 0,
+    "salary": 75460.71
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 7,
+    "education": "M",
+    "credits": 15,
+    "salary": 77683.22
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 7,
+    "education": "M",
+    "credits": 30,
+    "salary": 79356.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 7,
+    "education": "M",
+    "credits": 45,
+    "salary": 81018.74
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 7,
+    "education": "M",
+    "credits": 60,
+    "salary": 82700.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 8,
+    "education": "B",
+    "credits": 0,
+    "salary": 73791.82
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 8,
+    "education": "B",
+    "credits": 15,
+    "salary": 76014.3
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 8,
+    "education": "B",
+    "credits": 30,
+    "salary": 77683.22
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 8,
+    "education": "M",
+    "credits": 0,
+    "salary": 78797.37
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 8,
+    "education": "M",
+    "credits": 15,
+    "salary": 81018.74
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 8,
+    "education": "M",
+    "credits": 30,
+    "salary": 82700.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 8,
+    "education": "M",
+    "credits": 45,
+    "salary": 84361.2
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 8,
+    "education": "M",
+    "credits": 60,
+    "salary": 86027.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 9,
+    "education": "B",
+    "credits": 0,
+    "salary": 77391.82
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 9,
+    "education": "B",
+    "credits": 15,
+    "salary": 76014.3
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 9,
+    "education": "B",
+    "credits": 30,
+    "salary": 77683.22
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 9,
+    "education": "M",
+    "credits": 0,
+    "salary": 78797.37
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 9,
+    "education": "M",
+    "credits": 15,
+    "salary": 81018.74
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 9,
+    "education": "M",
+    "credits": 30,
+    "salary": 82700.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 9,
+    "education": "M",
+    "credits": 45,
+    "salary": 84361.2
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 9,
+    "education": "M",
+    "credits": 60,
+    "salary": 86027.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 10,
+    "education": "B",
+    "credits": 0,
+    "salary": 80463.98
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 10,
+    "education": "B",
+    "credits": 15,
+    "salary": 82700.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 10,
+    "education": "B",
+    "credits": 30,
+    "salary": 84920.59
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 10,
+    "education": "M",
+    "credits": 0,
+    "salary": 86027.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 10,
+    "education": "M",
+    "credits": 15,
+    "salary": 87697.85
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 10,
+    "education": "M",
+    "credits": 30,
+    "salary": 89366.76
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 10,
+    "education": "M",
+    "credits": 45,
+    "salary": 91036.84
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 10,
+    "education": "M",
+    "credits": 60,
+    "salary": 92705.73
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 11,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 11,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 11,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 11,
+    "education": "M",
+    "credits": 0,
+    "salary": 87697.85
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 11,
+    "education": "M",
+    "credits": 15,
+    "salary": 89366.76
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 11,
+    "education": "M",
+    "credits": 30,
+    "salary": 91036.84
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 11,
+    "education": "M",
+    "credits": 45,
+    "salary": 92705.73
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 11,
+    "education": "M",
+    "credits": 60,
+    "salary": 94370.01
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 12,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 12,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 12,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 12,
+    "education": "M",
+    "credits": 0,
+    "salary": 93430.32
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 12,
+    "education": "M",
+    "credits": 15,
+    "salary": 95133.89
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 12,
+    "education": "M",
+    "credits": 30,
+    "salary": 95133.89
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 12,
+    "education": "M",
+    "credits": 45,
+    "salary": 95491.42
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 12,
+    "education": "M",
+    "credits": 60,
+    "salary": 97158.88
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 13,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 13,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 13,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 13,
+    "education": "M",
+    "credits": 0,
+    "salary": 95298.93
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 13,
+    "education": "M",
+    "credits": 15,
+    "salary": 97036.56
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 13,
+    "education": "M",
+    "credits": 30,
+    "salary": 99675.11
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 13,
+    "education": "M",
+    "credits": 45,
+    "salary": 101377.48
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 13,
+    "education": "M",
+    "credits": 60,
+    "salary": 103588.8
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 14,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 14,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 14,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 14,
+    "education": "M",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 14,
+    "education": "M",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 14,
+    "education": "M",
+    "credits": 30,
+    "salary": 101666.81
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 14,
+    "education": "M",
+    "credits": 45,
+    "salary": 103405.02
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_1_91",
+    "step": 14,
+    "education": "M",
+    "credits": 60,
+    "salary": 105660.68
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 1,
+    "education": "B",
+    "credits": 0,
+    "salary": 53734.05
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 1,
+    "education": "B",
+    "credits": 15,
+    "salary": 55981.11
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 1,
+    "education": "B",
+    "credits": 30,
+    "salary": 57670.22
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 1,
+    "education": "M",
+    "credits": 0,
+    "salary": 58789.68
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 1,
+    "education": "M",
+    "credits": 15,
+    "salary": 60478.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 1,
+    "education": "M",
+    "credits": 30,
+    "salary": 61597.04
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 1,
+    "education": "M",
+    "credits": 45,
+    "salary": 63287.32
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 1,
+    "education": "M",
+    "credits": 60,
+    "salary": 64981.13
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 2,
+    "education": "B",
+    "credits": 0,
+    "salary": 56537.9
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 2,
+    "education": "B",
+    "credits": 15,
+    "salary": 58789.68
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 2,
+    "education": "B",
+    "credits": 30,
+    "salary": 60478.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 2,
+    "education": "M",
+    "credits": 0,
+    "salary": 61041.43
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 2,
+    "education": "M",
+    "credits": 15,
+    "salary": 62731.72
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 2,
+    "education": "M",
+    "credits": 30,
+    "salary": 64417.32
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 2,
+    "education": "M",
+    "credits": 45,
+    "salary": 66099.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 2,
+    "education": "M",
+    "credits": 60,
+    "salary": 67826.62
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 3,
+    "education": "B",
+    "credits": 0,
+    "salary": 59345.28
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 3,
+    "education": "B",
+    "credits": 15,
+    "salary": 61599.38
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 3,
+    "education": "B",
+    "credits": 30,
+    "salary": 63288.51
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 3,
+    "education": "M",
+    "credits": 0,
+    "salary": 63853.47
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 3,
+    "education": "M",
+    "credits": 15,
+    "salary": 65537.92
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 3,
+    "education": "M",
+    "credits": 30,
+    "salary": 67222.36
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 3,
+    "education": "M",
+    "credits": 45,
+    "salary": 68907.96
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 3,
+    "education": "M",
+    "credits": 60,
+    "salary": 70587.68
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 4,
+    "education": "B",
+    "credits": 0,
+    "salary": 61599.38
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 4,
+    "education": "B",
+    "credits": 15,
+    "salary": 63853.47
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 4,
+    "education": "B",
+    "credits": 30,
+    "salary": 65537.92
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 4,
+    "education": "M",
+    "credits": 0,
+    "salary": 66099.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 4,
+    "education": "M",
+    "credits": 15,
+    "salary": 67783.81
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 4,
+    "education": "M",
+    "credits": 30,
+    "salary": 69467.08
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 4,
+    "education": "M",
+    "credits": 45,
+    "salary": 71151.51
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 4,
+    "education": "M",
+    "credits": 60,
+    "salary": 72844.15
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 5,
+    "education": "B",
+    "credits": 0,
+    "salary": 64979.97
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 5,
+    "education": "B",
+    "credits": 15,
+    "salary": 67222.36
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 5,
+    "education": "B",
+    "credits": 30,
+    "salary": 68906.78
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 5,
+    "education": "M",
+    "credits": 0,
+    "salary": 70029.73
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 5,
+    "education": "M",
+    "credits": 15,
+    "salary": 71721.18
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 5,
+    "education": "M",
+    "credits": 30,
+    "salary": 73409.01
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 5,
+    "education": "M",
+    "credits": 45,
+    "salary": 75097.06
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 5,
+    "education": "M",
+    "credits": 60,
+    "salary": 76774.44
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 6,
+    "education": "B",
+    "credits": 0,
+    "salary": 67783.81
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 6,
+    "education": "B",
+    "credits": 15,
+    "salary": 70029.73
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 6,
+    "education": "B",
+    "credits": 30,
+    "salary": 71721.18
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 6,
+    "education": "M",
+    "credits": 0,
+    "salary": 72844.15
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 6,
+    "education": "M",
+    "credits": 15,
+    "salary": 74529.74
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 6,
+    "education": "M",
+    "credits": 30,
+    "salary": 76215.32
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 6,
+    "education": "M",
+    "credits": 45,
+    "salary": 77899.76
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 6,
+    "education": "M",
+    "credits": 60,
+    "salary": 79585.34
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 7,
+    "education": "B",
+    "credits": 0,
+    "salary": 71151.51
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 7,
+    "education": "B",
+    "credits": 15,
+    "salary": 73400.91
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 7,
+    "education": "B",
+    "credits": 30,
+    "salary": 75097.06
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 7,
+    "education": "M",
+    "credits": 0,
+    "salary": 76215.32
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 7,
+    "education": "M",
+    "credits": 15,
+    "salary": 78460.05
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 7,
+    "education": "M",
+    "credits": 30,
+    "salary": 80150.36
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 7,
+    "education": "M",
+    "credits": 45,
+    "salary": 81828.93
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 7,
+    "education": "M",
+    "credits": 60,
+    "salary": 83527.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 8,
+    "education": "B",
+    "credits": 0,
+    "salary": 74529.74
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 8,
+    "education": "B",
+    "credits": 15,
+    "salary": 76774.44
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 8,
+    "education": "B",
+    "credits": 30,
+    "salary": 78460.05
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 8,
+    "education": "M",
+    "credits": 0,
+    "salary": 79585.34
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 8,
+    "education": "M",
+    "credits": 15,
+    "salary": 81828.93
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 8,
+    "education": "M",
+    "credits": 30,
+    "salary": 83527.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 8,
+    "education": "M",
+    "credits": 45,
+    "salary": 85204.81
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 8,
+    "education": "M",
+    "credits": 60,
+    "salary": 86808.07
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 9,
+    "education": "B",
+    "credits": 0,
+    "salary": 77899.76
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 9,
+    "education": "B",
+    "credits": 15,
+    "salary": 80150.36
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 9,
+    "education": "B",
+    "credits": 30,
+    "salary": 81828.93
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 9,
+    "education": "M",
+    "credits": 0,
+    "salary": 82961.26
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 9,
+    "education": "M",
+    "credits": 15,
+    "salary": 85204.81
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 9,
+    "education": "M",
+    "credits": 30,
+    "salary": 86888.07
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 9,
+    "education": "M",
+    "credits": 45,
+    "salary": 88574.83
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 9,
+    "education": "M",
+    "credits": 60,
+    "salary": 90260.43
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 10,
+    "education": "B",
+    "credits": 0,
+    "salary": 81268.26
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 10,
+    "education": "B",
+    "credits": 15,
+    "salary": 83527.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 10,
+    "education": "B",
+    "credits": 30,
+    "salary": 85769.8
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 10,
+    "education": "M",
+    "credits": 0,
+    "salary": 86888.07
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 10,
+    "education": "M",
+    "credits": 15,
+    "salary": 88574.83
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 10,
+    "education": "M",
+    "credits": 30,
+    "salary": 90260.43
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 10,
+    "education": "M",
+    "credits": 45,
+    "salary": 91947.21
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 10,
+    "education": "M",
+    "credits": 60,
+    "salary": 93632.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 11,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 11,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 11,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 11,
+    "education": "M",
+    "credits": 0,
+    "salary": 88574.83
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 11,
+    "education": "M",
+    "credits": 15,
+    "salary": 90260.43
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 11,
+    "education": "M",
+    "credits": 30,
+    "salary": 91947.21
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 11,
+    "education": "M",
+    "credits": 45,
+    "salary": 93632.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 11,
+    "education": "M",
+    "credits": 60,
+    "salary": 95313.71
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 13,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 13,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 13,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 13,
+    "education": "M",
+    "credits": 0,
+    "salary": 96251.92
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 13,
+    "education": "M",
+    "credits": 15,
+    "salary": 98006.93
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 13,
+    "education": "M",
+    "credits": 30,
+    "salary": 100671.86
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 13,
+    "education": "M",
+    "credits": 45,
+    "salary": 102391.25
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 13,
+    "education": "M",
+    "credits": 60,
+    "salary": 104624.78
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 14,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 14,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 14,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 14,
+    "education": "M",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 14,
+    "education": "M",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 14,
+    "education": "M",
+    "credits": 30,
+    "salary": 102685.3
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 14,
+    "education": "M",
+    "credits": 45,
+    "salary": 104439.07
+  },
+  {
+    "year": "2024-2025",
+    "period": "days_92_183",
+    "step": 14,
+    "education": "M",
+    "credits": 60,
+    "salary": 106717.29
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 1,
+    "education": "B",
+    "credits": 0,
+    "salary": 54002.72
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 1,
+    "education": "B",
+    "credits": 15,
+    "salary": 56261.02
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 1,
+    "education": "B",
+    "credits": 30,
+    "salary": 57958.57
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 1,
+    "education": "M",
+    "credits": 0,
+    "salary": 59083.63
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 1,
+    "education": "M",
+    "credits": 15,
+    "salary": 60781.18
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 1,
+    "education": "M",
+    "credits": 30,
+    "salary": 61905.03
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 1,
+    "education": "M",
+    "credits": 45,
+    "salary": 63603.76
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 1,
+    "education": "M",
+    "credits": 60,
+    "salary": 65306.04
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 2,
+    "education": "B",
+    "credits": 0,
+    "salary": 56820.59
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 2,
+    "education": "B",
+    "credits": 15,
+    "salary": 59083.63
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 2,
+    "education": "B",
+    "credits": 30,
+    "salary": 60781.18
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 2,
+    "education": "M",
+    "credits": 0,
+    "salary": 61346.64
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 2,
+    "education": "M",
+    "credits": 15,
+    "salary": 63045.38
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 2,
+    "education": "M",
+    "credits": 30,
+    "salary": 64739.41
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 2,
+    "education": "M",
+    "credits": 45,
+    "salary": 66429.09
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 2,
+    "education": "M",
+    "credits": 60,
+    "salary": 68121.57
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 3,
+    "education": "B",
+    "credits": 0,
+    "salary": 59642.01
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 3,
+    "education": "B",
+    "credits": 15,
+    "salary": 61907.38
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 3,
+    "education": "B",
+    "credits": 30,
+    "salary": 63604.95
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 3,
+    "education": "M",
+    "credits": 0,
+    "salary": 64172.74
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 3,
+    "education": "M",
+    "credits": 15,
+    "salary": 65865.61
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 3,
+    "education": "M",
+    "credits": 30,
+    "salary": 67558.47
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 3,
+    "education": "M",
+    "credits": 45,
+    "salary": 69252.5
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 3,
+    "education": "M",
+    "credits": 60,
+    "salary": 70940.62
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 4,
+    "education": "B",
+    "credits": 0,
+    "salary": 61907.38
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 4,
+    "education": "B",
+    "credits": 15,
+    "salary": 64172.74
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 4,
+    "education": "B",
+    "credits": 30,
+    "salary": 65865.61
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 4,
+    "education": "M",
+    "credits": 0,
+    "salary": 66429.9
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 4,
+    "education": "M",
+    "credits": 15,
+    "salary": 68122.73
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 4,
+    "education": "M",
+    "credits": 30,
+    "salary": 69814.42
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 4,
+    "education": "M",
+    "credits": 45,
+    "salary": 71507.27
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 4,
+    "education": "M",
+    "credits": 60,
+    "salary": 73208.37
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 5,
+    "education": "B",
+    "credits": 0,
+    "salary": 65304.87
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 5,
+    "education": "B",
+    "credits": 15,
+    "salary": 67558.47
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 5,
+    "education": "B",
+    "credits": 30,
+    "salary": 69251.31
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 5,
+    "education": "M",
+    "credits": 0,
+    "salary": 70379.88
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 5,
+    "education": "M",
+    "credits": 15,
+    "salary": 72079.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 5,
+    "education": "M",
+    "credits": 30,
+    "salary": 73767.91
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 5,
+    "education": "M",
+    "credits": 45,
+    "salary": 75472.55
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 5,
+    "education": "M",
+    "credits": 60,
+    "salary": 77158.31
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 6,
+    "education": "B",
+    "credits": 0,
+    "salary": 68122.73
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 6,
+    "education": "B",
+    "credits": 15,
+    "salary": 70379.88
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 6,
+    "education": "B",
+    "credits": 30,
+    "salary": 72079.79
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 6,
+    "education": "M",
+    "credits": 0,
+    "salary": 73208.37
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 6,
+    "education": "M",
+    "credits": 15,
+    "salary": 74902.39
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 6,
+    "education": "M",
+    "credits": 30,
+    "salary": 76596.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 6,
+    "education": "M",
+    "credits": 45,
+    "salary": 78289.26
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 6,
+    "education": "M",
+    "credits": 60,
+    "salary": 79983.27
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 7,
+    "education": "B",
+    "credits": 0,
+    "salary": 71507.27
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 7,
+    "education": "B",
+    "credits": 15,
+    "salary": 73767.91
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 7,
+    "education": "B",
+    "credits": 30,
+    "salary": 75472.55
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 7,
+    "education": "M",
+    "credits": 0,
+    "salary": 76596.4
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 7,
+    "education": "M",
+    "credits": 15,
+    "salary": 78852.35
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 7,
+    "education": "M",
+    "credits": 30,
+    "salary": 80551.11
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 7,
+    "education": "M",
+    "credits": 45,
+    "salary": 82328.37
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 7,
+    "education": "M",
+    "credits": 60,
+    "salary": 83945.04
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 8,
+    "education": "B",
+    "credits": 0,
+    "salary": 74902.39
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 8,
+    "education": "B",
+    "credits": 15,
+    "salary": 77158.31
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 8,
+    "education": "B",
+    "credits": 30,
+    "salary": 78852.35
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 8,
+    "education": "M",
+    "credits": 0,
+    "salary": 79983.27
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 8,
+    "education": "M",
+    "credits": 15,
+    "salary": 82238.07
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 8,
+    "education": "M",
+    "credits": 30,
+    "salary": 83945.04
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 8,
+    "education": "M",
+    "credits": 45,
+    "salary": 85630.83
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 8,
+    "education": "M",
+    "credits": 60,
+    "salary": 87322.51
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 9,
+    "education": "B",
+    "credits": 0,
+    "salary": 78289.26
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 9,
+    "education": "B",
+    "credits": 15,
+    "salary": 80551.11
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 9,
+    "education": "B",
+    "credits": 30,
+    "salary": 82238.07
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 9,
+    "education": "M",
+    "credits": 0,
+    "salary": 83376.07
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 9,
+    "education": "M",
+    "credits": 15,
+    "salary": 85630.83
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 9,
+    "education": "M",
+    "credits": 30,
+    "salary": 87322.51
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 9,
+    "education": "M",
+    "credits": 45,
+    "salary": 89017.7
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 9,
+    "education": "M",
+    "credits": 60,
+    "salary": 90711.73
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 10,
+    "education": "B",
+    "credits": 0,
+    "salary": 81674.96
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 10,
+    "education": "B",
+    "credits": 15,
+    "salary": 83945.04
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 10,
+    "education": "B",
+    "credits": 30,
+    "salary": 86198.65
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 10,
+    "education": "M",
+    "credits": 0,
+    "salary": 87322.51
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 10,
+    "education": "M",
+    "credits": 15,
+    "salary": 89017.7
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 10,
+    "education": "M",
+    "credits": 30,
+    "salary": 90771.73
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 10,
+    "education": "M",
+    "credits": 45,
+    "salary": 92406.95
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 10,
+    "education": "M",
+    "credits": 60,
+    "salary": 94100.95
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 11,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 11,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 11,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 11,
+    "education": "M",
+    "credits": 0,
+    "salary": 89017.7
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 11,
+    "education": "M",
+    "credits": 15,
+    "salary": 90711.73
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 11,
+    "education": "M",
+    "credits": 30,
+    "salary": 92406.95
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 11,
+    "education": "M",
+    "credits": 45,
+    "salary": 94100.95
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 11,
+    "education": "M",
+    "credits": 60,
+    "salary": 95790.28
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 12,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 12,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 12,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 12,
+    "education": "M",
+    "credits": 0,
+    "salary": 94836.44
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 12,
+    "education": "M",
+    "credits": 15,
+    "salary": 96565.66
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 12,
+    "education": "M",
+    "credits": 30,
+    "salary": 96565.66
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 12,
+    "education": "M",
+    "credits": 45,
+    "salary": 96928.26
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 12,
+    "education": "M",
+    "credits": 60,
+    "salary": 98621.12
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 13,
+    "education": "B",
+    "credits": 0,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 13,
+    "education": "B",
+    "credits": 15,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 13,
+    "education": "B",
+    "credits": 30,
+    "salary": null
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 13,
+    "education": "M",
+    "credits": 0,
+    "salary": 96733.18
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 13,
+    "education": "M",
+    "credits": 15,
+    "salary": 98496.96
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 13,
+    "education": "M",
+    "credits": 30,
+    "salary": 101175.22
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 13,
+    "education": "M",
+    "credits": 45,
+    "salary": 102903.21
+  },
+  {
+    "year": "2024-2025",
+    "period": "day_183",
+    "step": 13,
+    "education": "M",
+    "credits": 60,
+    "salary": 105147.9
+  }
+]
