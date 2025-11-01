@@ -73,3 +73,4 @@ backend/import_problem_districts.py
 data/problem_districts.json
 data/missing_districts.json
 scripts/excluded_districts.py
+data/charter_districts.json

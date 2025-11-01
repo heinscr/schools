@@ -51,7 +51,8 @@ def import_districts(json_filepath: str, dry_run: bool = False):
         ('regional_academic', 'Regional Academic', 'regional_academic'),
         ('regional_vocational', 'Regional Vocational', 'regional_vocational'),
         ('county_agricultural', 'County Agricultural', 'county_agricultural'),
-        ('other_districts', 'Other Districts', None)
+        ('other_districts', 'Other Districts', None),
+        ('charter', 'Charter', "charter")
     ]
 
     for category_key, category_name, type_value in categories:
