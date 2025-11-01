@@ -14,6 +14,14 @@ function DistrictBrowser() {
   ];
   const [selectedTypes, setSelectedTypes] = useState(districtTypeOptions.map(opt => opt.value));
 
+  const DISTRICT_TYPE_ORDER = {
+  municipal: 0,
+  regional_academic: 1,
+  regional_vocational: 2,
+  county_agricultural: 3,
+  charter: 4,
+};
+
   // Handle checkbox change
   const handleTypeChange = (type) => {
     setSelectedTypes(prev =>
@@ -24,8 +32,16 @@ function DistrictBrowser() {
   };
 
   const [districts, setDistricts] = useState([]);
-  // Filter districts by selected types
-  const filteredDistricts = districts.filter(d => selectedTypes.includes(d.district_type));
+  // Filter districts by selected types and sort by custom type order
+  const filteredDistricts = districts
+    .filter(d => selectedTypes.includes(d.district_type))
+    .slice()
+    .sort((a, b) => {
+      const typeA = DISTRICT_TYPE_ORDER[a.district_type] ?? 99;
+      const typeB = DISTRICT_TYPE_ORDER[b.district_type] ?? 99;
+      if (typeA !== typeB) return typeA - typeB;
+      return a.name.localeCompare(b.name);
+    });
 
   // Get total count for each type
   const typeCounts = districtTypeOptions.reduce((acc, opt) => {
@@ -126,8 +142,13 @@ function DistrictBrowser() {
     }
     // If same town, cycle through districts
     if (districtsForTown.length > 0) {
-      // Always cycle in sorted order
-      const sortedDistricts = districtsForTown.slice().sort((a, b) => a.name.localeCompare(b.name));
+      // Always cycle in custom type order, then by name
+      const sortedDistricts = districtsForTown.slice().sort((a, b) => {
+        const typeA = DISTRICT_TYPE_ORDER[a.district_type] ?? 99;
+        const typeB = DISTRICT_TYPE_ORDER[b.district_type] ?? 99;
+        if (typeA !== typeB) return typeA - typeB;
+        return a.name.localeCompare(b.name);
+      });
       let nextIndex = districtCycleIndex + 1;
       if (nextIndex > sortedDistricts.length) {
         nextIndex = 0;

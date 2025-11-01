@@ -5,6 +5,14 @@ import api from '../services/api';
 import './ChoroplethMap.css';
 
 const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTypeOptions }) => {
+  // Custom sort order for district types
+  const DISTRICT_TYPE_ORDER = {
+    municipal: 0,
+    regional_academic: 1,
+    regional_vocational: 2,
+    county_agricultural: 3,
+    charter: 4,
+  };
   // Detect mobile devices
   const [isMobile, setIsMobile] = useState(false);
 
@@ -232,7 +240,14 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
           let districts = [];
           try {
             const response = await api.getDistricts({ town: townName });
-            districts = response.data.map(d => ({ name: d.name, type: d.district_type })).sort((a, b) => a.name.localeCompare(b.name));
+            districts = response.data.map(d => ({ name: d.name, type: d.district_type }));
+            // Sort by custom type order, then name
+            districts = districts.slice().sort((a, b) => {
+              const typeA = DISTRICT_TYPE_ORDER[a.type] ?? 99;
+              const typeB = DISTRICT_TYPE_ORDER[b.type] ?? 99;
+              if (typeA !== typeB) return typeA - typeB;
+              return a.name.localeCompare(b.name);
+            });
           } catch (err) {
             districts = [];
           }
