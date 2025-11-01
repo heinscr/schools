@@ -396,7 +396,17 @@
     width: 100%;
     box-sizing: border-box;
     max-height: 400px;
-    overflow-x: auto;
+    overflow-x: hidden;
+  }
+
+  .json-display {
+    overflow-x: hidden;
+  }
+
+  .json-display pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .search-controls {
