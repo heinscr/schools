@@ -9,7 +9,8 @@ function DistrictBrowser() {
     { value: 'municipal', label: 'Municipal', icon: '🏛️' },
     { value: 'regional_academic', label: 'Regional', icon: '🏫' },
     { value: 'regional_vocational', label: 'Vocational', icon: '🛠️' },
-    { value: 'county_agricultural', label: 'Agricultural', icon: '🌾' },
+    { value: 'county_agricultural', label: 'Agricultural', icon: '🌾' },  
+    { value: 'charter', label: 'Charter', icon: '📜' }
   ];
   const [selectedTypes, setSelectedTypes] = useState(districtTypeOptions.map(opt => opt.value));
 
