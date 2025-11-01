@@ -564,6 +564,33 @@
       "address": "800 Randolph St, Canton, MA 02021"
     },
     {
+      "district": "Bristol County Agricultural",
+      "address": "135 Center Street, Dighton, MA 02715",
+      "members": [
+        "Acushnet",
+        "Attleboro",
+        "Dartmouth",
+        "Dighton",
+        "Easton",
+        "Fairhaven",
+        "Fall River",
+        "Freetown",
+        "Mansfield",
+        "New Bedford",
+        "North Attleborough",
+        "Norton",
+        "Raynham",
+        "Rehoboth",
+        "Seekonk",
+        "Somerset",
+        "Swansea",
+        "Taunton",
+        "Westport"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
       "district": "Bristol-Plymouth",
       "members": [
         "Berkley",
@@ -575,6 +602,26 @@
         "Taunton"
       ],
       "address": "207 Hart St, Taunton, MA 02780"
+    },
+    {
+      "district": "Cape Cod Regional Vocational Technical",
+      "address": "220 Sandwich Rd, Bourne, MA 02532",
+      "members": [
+        "Mashpee",
+        "Barnstable",
+        "Yarmouth",
+        "Harwich",
+        "Dennis",
+        "Chatham",
+        "Brewster",
+        "Orleans",
+        "Eastham",
+        "Wellfleet",
+        "Truro",
+        "Provincetown"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
     },
     {
       "district": "Franklin County Technical",
@@ -697,6 +744,23 @@
         "Woburn"
       ],
       "address": "100 Hemlock Rd, Wakefield, MA 01880"
+    },
+    {
+      "district": "Northern Berkshire Regional Vocational Technical",
+      "address": "70 Hodges Cross Rd, North Adams, MA 01247",
+      "members": [
+        "North Adams",
+        "Adams",
+        "Williamstown",
+        "Cheshire",
+        "Lanesborough",
+        "Clarksburg",
+        "Florida",
+        "Savoy",
+        "Monroe"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
     },
     {
       "district": "Old Colony",
@@ -920,6 +984,15 @@
         "Wenham"
       ],
       "address": "565 Maple St, Danvers, MA 01923"
+    },
+    {
+      "district": "Northampton-Smith Vocational Agricultural",
+      "address": "80 Locust Street, Northampton, MA 01060",
+      "members": [
+        "Northampton"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
     }
   ],
   "other_districts": [
@@ -1095,6 +1168,27 @@
       "notes": "Municipal (single-town) district."
     },
     {
+      "district": "Blackstone Valley Regional Vocational Technical",
+      "address": "65 Pleasant Street, Upton, MA 01568",
+      "members": [
+        "Bellingham",
+        "Blackstone",
+        "Douglas",
+        "Grafton",
+        "Hopedale",
+        "Mendon",
+        "Milford",
+        "Millbury",
+        "Millville",
+        "Northbridge",
+        "Sutton",
+        "Upton",
+        "Uxbridge"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
       "district": "Blackstone-Millville",
       "address": "175 Lincoln Street, Blackstone, MA 01504",
       "members": [
@@ -1145,6 +1239,16 @@
       "address": "78 Eldredge Pkwy, Orleans, MA 02653",
       "members": [
         "Brewster"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "Bridgewater-Raynham",
+      "address": "166 Mt. Prospect Street, Bridgewater, MA 02324",
+      "members": [
+        "Bridgewater",
+        "Raynham"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."
@@ -2173,6 +2277,15 @@
       "address": "6 Morse Street, North Attleborough, MA 02760",
       "members": [
         "North Attleborough"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
+      "district": "North Brookfield",
+      "address": "10 New School Drive, North Brookfield, MA 01535",
+      "members": [
+        "North Brookfield"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."

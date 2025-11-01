@@ -1116,7 +1116,19 @@
       "district": "Blackstone Valley Regional Vocational Technical",
       "address": "65 Pleasant Street, Upton, MA 01568",
       "members": [
-        "Blackstone Valley Regional Vocational Technical"
+        "Bellingham",
+        "Blackstone",
+        "Douglas",
+        "Grafton",
+        "Hopedale",
+        "Mendon",
+        "Milford",
+        "Millbury",
+        "Millville",
+        "Northbridge",
+        "Sutton",
+        "Upton",
+        "Uxbridge"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."
@@ -1207,7 +1219,25 @@
       "district": "Bristol County Agricultural",
       "address": "135 Center Street, Dighton, MA 02715",
       "members": [
-        "Bristol County Agricultural"
+        "Acushnet",
+        "Attleboro",
+        "Dartmouth",
+        "Dighton",
+        "Easton",
+        "Fairhaven",
+        "Fall River",
+        "Freetown",
+        "Mansfield",
+        "New Bedford",
+        "North Attleborough",
+        "Norton",
+        "Raynham",
+        "Rehoboth",
+        "Seekonk",
+        "Somerset",
+        "Swansea",
+        "Taunton",
+        "Westport"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."
@@ -2407,7 +2437,7 @@
       "district": "Northampton-Smith Vocational Agricultural",
       "address": "80 Locust Street, Northampton, MA 01060",
       "members": [
-        "Northampton-Smith Vocational Agricultural"
+        "Northampton"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."
@@ -2452,7 +2482,14 @@
       "district": "Northern Berkshire Regional Vocational Technical",
       "address": "70 Hodges Cross Rd, North Adams, MA 01247",
       "members": [
-        "Northern Berkshire Regional Vocational Technical"
+        "Adams",
+        "Williamstown",
+        "Cheshire",
+        "Lanesborough",
+        "Clarksburg",
+        "Florida",
+        "Savoy",
+        "Monroe"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."
@@ -3070,10 +3107,21 @@
       "notes": "Municipal (single-town) district."
     },
     {
-      "district": "Upper Cape Cod Regional Vocational Technical",
+      "district": "Cape Cod Regional Vocational Technical",
       "address": "220 Sandwich Rd, Bourne, MA 02532",
       "members": [
-        "Upper Cape Cod Regional Vocational Technical"
+        "Mashpee",
+        "Barnstable",
+        "Yarmouth",
+        "Harwich",
+        "Dennis",
+        "Chatham",
+        "Brewster",
+        "Orleans",
+        "Eastham",
+        "Wellfleet",
+        "Truro",
+        "Provincetown"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."
