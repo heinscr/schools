@@ -549,6 +549,27 @@
       "address": "215 Fitchburg St, Marlborough, MA 01752"
     },
     {
+      "district": "Blackstone Valley Regional Vocational Technical",
+      "address": "65 Pleasant Street, Upton, MA 01568",
+      "members": [
+        "Bellingham",
+        "Blackstone",
+        "Douglas",
+        "Grafton",
+        "Hopedale",
+        "Mendon",
+        "Milford",
+        "Millbury",
+        "Millville",
+        "Northbridge",
+        "Sutton",
+        "Upton",
+        "Uxbridge"
+      ],
+      "type": "municipal",
+      "notes": "Municipal (single-town) district."
+    },
+    {
       "district": "Blue Hills",
       "members": [
         "Avon",
@@ -1163,27 +1184,6 @@
       "address": "365 Boston Rd, Billerica, MA 01821",
       "members": [
         "Billerica"
-      ],
-      "type": "municipal",
-      "notes": "Municipal (single-town) district."
-    },
-    {
-      "district": "Blackstone Valley Regional Vocational Technical",
-      "address": "65 Pleasant Street, Upton, MA 01568",
-      "members": [
-        "Bellingham",
-        "Blackstone",
-        "Douglas",
-        "Grafton",
-        "Hopedale",
-        "Mendon",
-        "Milford",
-        "Millbury",
-        "Millville",
-        "Northbridge",
-        "Sutton",
-        "Upton",
-        "Uxbridge"
       ],
       "type": "municipal",
       "notes": "Municipal (single-town) district."
@@ -3155,34 +3155,13 @@
       "notes": "Municipal (single-town) district."
     }
   ],
-   "charter": [
-    {
-      "district": "Abby Kelley Foster Charter Public School",
-      "members": [
-        "Worcester"
-      ],
-      "address": "10 New Bond Street Worcester MA"
-    },
-    {
-      "district": "Academy of the Pacific Rim Charter Public School",
-      "members": [
-        "Boston"
-      ],
-      "address": "1 Westinghouse Plaza Building B Boston MA"
-    },
-    {
-      "district": "Advanced Math and Science Academy Charter School",
-      "members": [
-        "Marlborough"
-      ],
-      "address": "201 Forest Street Marlborough MA"
-    },
+ "charter": [
     {
       "district": "Alma del Mar Charter School: Frederick Douglass Campus",
       "members": [
         "New Bedford"
       ],
-      "address": "145 Davis Street New Bedford MA"
+      "address": "145 Davis St New Bedford MA"
     },
     {
       "district": "Alma del Mar Charter School: Sarah D. Ottiwell Campus",
@@ -3192,424 +3171,811 @@
       "address": "515 Belleville Avenue New Bedford MA"
     },
     {
-      "district": "Argosy Collegiate Charter School",
+      "district": "Global Learning Charter Public School",
       "members": [
-        "Fall River"
+        "New Bedford"
       ],
-      "address": "263 Hamlet Street Fall River MA"
+      "address": "190 Ashley Blvd New Bedford MA"
     },
     {
       "district": "Atlantis Charter School",
       "members": [
         "Fall River"
       ],
-      "address": "991 Jefferson Street Fall River MA"
+      "address": "37 Park St Fall River MA"
     },
     {
-      "district": "Baystate Academy Charter School",
+      "district": "Argosy Collegiate Charter School",
       "members": [
-        "Springfield"
+        "Fall River"
       ],
-      "address": "2001 Roosevelt Avenue Springfield MA"
+      "address": "Fall River MA"
     },
     {
-      "district": "Benjamin Banneker Charter Public School",
+      "district": "Sturgis Charter Public School: East Campus",
       "members": [
-        "Cambridge"
+        "Barnstable",
+        "Bourne",
+        "Brewster",
+        "Chatham",
+        "Dennis",
+        "Eastham",
+        "Falmouth",
+        "Harwich",
+        "Mashpee",
+        "Orleans",
+        "Provincetown",
+        "Sandwich",
+        "Truro",
+        "Wellfleet",
+        "Yarmouth"
       ],
-      "address": "21 Notre Dame Avenue Cambridge MA"
+      "address": "427 Main St Hyannis MA"
     },
     {
-      "district": "Benjamin Franklin Classical Charter Public School",
+      "district": "Sturgis Charter Public School: West Campus",
       "members": [
-        "Franklin"
+        "Barnstable",
+        "Bourne",
+        "Brewster",
+        "Chatham",
+        "Dennis",
+        "Eastham",
+        "Falmouth",
+        "Harwich",
+        "Mashpee",
+        "Orleans",
+        "Provincetown",
+        "Sandwich",
+        "Truro",
+        "Wellfleet",
+        "Yarmouth"
       ],
-      "address": "500 Financial Park Franklin MA"
+      "address": "105 West Main St Hyannis MA"
     },
     {
-      "district": "Berkshire Arts & Technology Charter Public School",
+      "district": "Cape Cod Lighthouse Charter School",
       "members": [
-        "Adams"
+        "Barnstable",
+        "Bourne",
+        "Brewster",
+        "Chatham",
+        "Dennis",
+        "Eastham",
+        "Falmouth",
+        "Harwich",
+        "Mashpee",
+        "Orleans",
+        "Provincetown",
+        "Sandwich",
+        "Truro",
+        "Wellfleet",
+        "Yarmouth"
       ],
-      "address": "1 Commercial Street Adams MA"
+      "address": "195 Rt 137 East Harwich MA"
     },
     {
-      "district": "Boston Collegiate Charter School – Lower School",
+      "district": "Martha's Vineyard Charter School",
+      "members": [
+        "Aquinnah",
+        "Chilmark",
+        "Edgartown",
+        "Oak Bluffs",
+        "Tisbury",
+        "West Tisbury"
+      ],
+      "address": "424 State Rd West Tisbury MA"
+    },
+    {
+      "district": "South Shore Charter Public School",
+      "members": [
+        "Abington",
+        "Braintree",
+        "Bridgewater",
+        "Brockton",
+        "Carver",
+        "Cohasset",
+        "Duxbury",
+        "East Bridgewater",
+        "Halifax",
+        "Hanover",
+        "Hanson",
+        "Hingham",
+        "Holbrook",
+        "Hull",
+        "Kingston",
+        "Marshfield",
+        "Middleborough",
+        "Milton",
+        "Norwell",
+        "Pembroke",
+        "Plymouth",
+        "Plympton",
+        "Quincy",
+        "Randolph",
+        "Rockland",
+        "Scituate",
+        "Weymouth",
+        "Whitman"
+      ],
+      "address": "100 Longwater Cir Norwell MA"
+    },
+    {
+      "district": "Rising Tide Charter Public School",
+      "members": [
+        "Carver",
+        "Duxbury",
+        "Halifax",
+        "Hanover",
+        "Hanson",
+        "Kingston",
+        "Lakeville",
+        "Marion",
+        "Marshfield",
+        "Mattapoisett",
+        "Middleborough",
+        "Norwell",
+        "Pembroke",
+        "Plymouth",
+        "Plympton",
+        "Rochester",
+        "Scituate",
+        "Wareham"
+      ],
+      "address": "59 Armstrong Rd Plymouth MA"
+    },
+    {
+      "district": "Map Academy Charter School",
+      "members": [
+        "Plymouth"
+      ],
+      "address": "11 Resnik Rd Plymouth MA"
+    },
+    {
+      "district": "Academy of the Pacific Rim Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "215 Sydney Street Boston MA"
+      "address": "1 Westinghouse Plaza Boston MA"
     },
     {
-      "district": "Boston Collegiate Charter School – Middle & High School",
+      "district": "Boston Collegiate Charter School",
       "members": [
         "Boston"
       ],
-      "address": "11 Mayhew Street Boston MA"
+      "address": "215 Sydney St Dorchester MA"
     },
     {
       "district": "Boston Preparatory Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "885 River Street Boston MA"
+      "address": "885 River St Hyde Park MA"
     },
     {
       "district": "Boston Renaissance Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "1415 Hyde Park Avenue Boston MA"
+      "address": "1415 Hyde Park Ave Hyde Park MA"
     },
     {
       "district": "Bridge Boston Charter School",
       "members": [
         "Boston"
       ],
-      "address": "435 Warren Street Boston MA"
+      "address": "435 Warren St Roxbury MA"
     },
     {
-      "district": "Brooke Charter High School",
+      "district": "Brooke Charter School: Roslindale",
       "members": [
         "Boston"
       ],
-      "address": "200 American Legion Highway Boston MA"
+      "address": "190 Cummins Hwy Roslindale MA"
     },
     {
-      "district": "Brooke East Boston Charter School",
+      "district": "Brooke Charter School: Mattapan",
       "members": [
         "Boston"
       ],
-      "address": "94 Horace Street Boston MA"
+      "address": "150 American Legion Hwy Mattapan MA"
     },
     {
-      "district": "Brooke Mattapan Charter School",
+      "district": "Brooke Charter School: East Boston",
       "members": [
         "Boston"
       ],
-      "address": "150 American Legion Highway Boston MA"
+      "address": "94 Horace St East Boston MA"
     },
     {
-      "district": "Brooke Roslindale Charter School",
+      "district": "Brooke High School",
       "members": [
         "Boston"
       ],
-      "address": "190 Cummins Highway Boston MA"
+      "address": "200 American Legion Hwy Mattapan MA"
     },
     {
-      "district": "Cape Cod Lighthouse Charter School",
-      "members": [
-        "East Harwich"
-      ],
-      "address": "195 Route 137 East Harwich MA"
-    },
-    {
-      "district": "Carlisle Innovation Academy Charter School (CIA)",
-      "members": [
-        "Carlisle"
-      ],
-      "address": "83 School Street Carlisle MA"
-    },
-    {
-      "district": "City on a Hill Charter Public School",
+      "district": "Codman Academy Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "58 Circuit Street Boston MA"
+      "address": "14 Eustis St Dorchester MA"
     },
     {
-      "district": "City on a Hill Charter Public School — Dudley Square",
+      "district": "Conservatory Lab Charter School",
       "members": [
         "Boston"
       ],
-      "address": "58 Circuit Street Boston MA"
-    },
-    {
-      "district": "Community Charter School of Cambridge",
-      "members": [
-        "Cambridge"
-      ],
-      "address": "245 Bent Street Cambridge MA"
-    },
-    {
-      "district": "Community Day Charter Public School — Gateway",
-      "members": [
-        "Lawrence"
-      ],
-      "address": "190 Hampshire Street Lawrence MA"
-    },
-    {
-      "district": "Community Day Charter Public School — Lawrence",
-      "members": [
-        "Lawrence"
-      ],
-      "address": "73 Prospect Street Lawrence MA"
-    },
-    {
-      "district": "Doris and Robert Kemp Charter School",
-      "members": [
-        "Boston"
-      ],
-      "address": "10 Charles Street Boston MA"
-    },
-    {
-      "district": "Dudley Street Neighborhood Charter School",
-      "members": [
-        "Boston"
-      ],
-      "address": "6 Shirley Street Boston MA"
-    },
-    {
-      "district": "Excel Academy Charter School — East Boston",
-      "members": [
-        "Boston"
-      ],
-      "address": "58 Moore Street Boston MA"
-    },
-    {
-      "district": "Excel Academy Charter School — Orient Heights",
-      "members": [
-        "Boston"
-      ],
-      "address": "1150 Saratoga Street Boston MA"
-    },
-    {
-      "district": "Excel Academy Charter School — Chelsea",
-      "members": [
-        "Chelsea"
-      ],
-      "address": "180 Second Street Chelsea MA"
-    },
-    {
-      "district": "Four Rivers Charter Public School",
-      "members": [
-        "Greenfield"
-      ],
-      "address": "248 Colrain Road Greenfield MA"
-    },
-    {
-      "district": "Foxborough Regional Charter School",
-      "members": [
-        "Foxborough"
-      ],
-      "address": "131 Central Street Foxborough MA"
-    },
-    {
-      "district": "Franconia Charter School",
-      "members": [
-        "Boston"
-      ],
-      "address": "75 Norfolk Street Boston MA"
-    },
-    {
-      "district": "Gazelle Academy Charter School",
-      "members": [
-        "Springfield"
-      ],
-      "address": "123 Maple Street Springfield MA"
-    },
-    {
-      "district": "Global Learning Charter Public School",
-      "members": [
-        "New Bedford"
-      ],
-      "address": "190 Ashley Boulevard New Bedford MA"
-    },
-    {
-      "district": "Granite Academy Charter School",
-      "members": [
-        "Quincy"
-      ],
-      "address": "4 Old Colony Avenue Quincy MA"
-    },
-    {
-      "district": "Greater Lowell Charter Public School",
-      "members": [
-        "Lowell"
-      ],
-      "address": "305 Church Street Lowell MA"
-    },
-    {
-      "district": "Hampden Charter School of Science — West",
-      "members": [
-        "West Springfield"
-      ],
-      "address": "447 Westfield Street West Springfield MA"
-    },
-    {
-      "district": "Hampden Charter School of Science — Chicopee",
-      "members": [
-        "Chicopee"
-      ],
-      "address": "757 Chicopee Street Chicopee MA"
+      "address": "395 Columbia Rd Dorchester MA"
     },
     {
       "district": "Helen Y. Davis Leadership Academy Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "23 Leonard Street Boston MA"
+      "address": "23 Leonard St Dorchester MA"
     },
     {
-      "district": "Hilltown Cooperative Charter Public School",
-      "members": [
-        "Easthampton"
-      ],
-      "address": "1 Industrial Parkway Easthampton MA"
-    },
-    {
-      "district": "Helen Y. Davis Leadership Academy Charter Public School",
+      "district": "KIPP Academy Boston Charter School",
       "members": [
         "Boston"
       ],
-      "address": "23 Leonard Street Boston MA"
+      "address": "37 Babson St Mattapan MA"
     },
     {
-      "district": "Holyoke Community Charter School",
-      "members": [
-        "Holyoke"
-      ],
-      "address": "2200 Northampton Street Holyoke MA"
-    },
-    {
-      "district": "Innovation Academy Charter School",
-      "members": [
-        "Tyngsborough"
-      ],
-      "address": "72 Tyng Road Tyngsborough MA"
-    },
-    {
-      "district": "Kingdom Charter School of Leadership",
-      "members": [
-        "Springfield"
-      ],
-      "address": "31 School Street Springfield MA"
-    },
-    {
-      "district": "Lowell Community Charter Public School",
-      "members": [
-        "Lowell"
-      ],
-      "address": "206 Jackson Street Lowell MA"
-    },
-    {
-      "district": "Marblehead Community Charter Public School",
-      "members": [
-        "Marblehead"
-      ],
-      "address": "17 Lime Street Marblehead MA"
-    },
-    {
-      "district": "MATCH Charter Public School",
+      "district": "Match Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "1001 Commonwealth Avenue Boston MA"
-    },
-    {
-      "district": "Mystic Valley Regional Charter School",
-      "members": [
-        "Malden"
-      ],
-      "address": "770 Salem Street Malden MA"
+      "address": "1001 Commonwealth Ave Boston MA"
     },
     {
       "district": "Neighborhood House Charter School",
       "members": [
         "Boston"
       ],
-      "address": "21 Queen Street Boston MA"
+      "address": "21 Queen St Dorchester MA"
     },
     {
-      "district": "New Heights Charter School of Brockton",
+      "district": "Roxbury Preparatory Charter School",
       "members": [
-        "Brockton"
+        "Boston"
       ],
-      "address": "1690 Main Street Brockton MA"
+      "address": "120 Fisher Ave Roxbury MA"
     },
     {
-      "district": "Pioneer Charter School of Science I",
+      "district": "Excel Academy Charter High School",
       "members": [
-        "Everett"
+        "Boston",
+        "Chelsea"
       ],
-      "address": "54 Salem Street Everett MA"
+      "address": "401 Bremen St East Boston MA"
     },
     {
-      "district": "Pioneer Charter School of Science II",
+      "district": "Excel Academy Charter School: East Boston",
       "members": [
+        "Boston"
+      ],
+      "address": "58 Moore St East Boston MA"
+    },
+    {
+      "district": "Excel Academy Charter School: Chelsea",
+      "members": [
+        "Chelsea"
+      ],
+      "address": "180 Second St Chelsea MA"
+    },
+    {
+      "district": "Boston Day and Evening Academy (Horace Mann)",
+      "members": [
+        "Boston"
+      ],
+      "address": "20 Kearsarge Ave Roxbury MA"
+    },
+    {
+      "district": "Boston Green Academy (Horace Mann)",
+      "members": [
+        "Boston"
+      ],
+      "address": "20 Warren St Brighton MA"
+    },
+    {
+      "district": "Dudley Street Neighborhood Charter School (Horace Mann)",
+      "members": [
+        "Boston"
+      ],
+      "address": "6 Shirley St Roxbury MA"
+    },
+    {
+      "district": "Edward M. Kennedy Academy for Health Careers (Horace Mann)",
+      "members": [
+        "Boston"
+      ],
+      "address": "173 Ipswich St Boston MA"
+    },
+    {
+      "district": "UP Academy Boston (Horace Mann)",
+      "members": [
+        "Boston"
+      ],
+      "address": "215 Dorchester St South Boston MA"
+    },
+    {
+      "district": "UP Academy Dorchester (Horace Mann)",
+      "members": [
+        "Boston"
+      ],
+      "address": "35 Westville St Dorchester MA"
+    },
+    {
+      "district": "Mystic Valley Regional Charter School",
+      "members": [
+        "Malden",
+        "Melrose",
+        "Everett",
+        "Medford",
+        "Stoneham",
+        "Wakefield"
+      ],
+      "address": "770 Salem St Malden MA"
+    },
+    {
+      "district": "Pioneer Charter School of Science I (Everett)",
+      "members": [
+        "Chelsea",
+        "Everett",
+        "Revere"
+      ],
+      "address": "51-59 Summer St Everett MA"
+    },
+    {
+      "district": "Pioneer Charter School of Science II (Saugus)",
+      "members": [
+        "Danvers",
+        "Lynn",
+        "Peabody",
+        "Salem",
         "Saugus"
       ],
-      "address": "100 Salem Street Saugus MA"
+      "address": "97 Main St Saugus MA"
+    },
+    {
+      "district": "KIPP Academy Lynn Charter School",
+      "members": [
+        "Lynn"
+      ],
+      "address": "20 Wheeler St Lynn MA"
+    },
+    {
+      "district": "Marblehead Community Charter Public School",
+      "members": [
+        "Marblehead"
+      ],
+      "address": "17 Lime St Marblehead MA"
     },
     {
       "district": "Salem Academy Charter School",
       "members": [
         "Salem"
       ],
-      "address": "45 Congress Street Salem MA"
+      "address": "45 Congress St Salem MA"
     },
     {
-      "district": "Somerville Charter School",
+      "district": "Lawrence Family Development Charter School",
       "members": [
+        "Lawrence"
+      ],
+      "address": "34 West St Lawrence MA"
+    },
+    {
+      "district": "Community Day Charter Public School: Prospect",
+      "members": [
+        "Lawrence"
+      ],
+      "address": "190 Hampshire St Lawrence MA"
+    },
+    {
+      "district": "Community Day Charter Public School: Gateway",
+      "members": [
+        "Lawrence"
+      ],
+      "address": "50 Lawrence St Lawrence MA"
+    },
+    {
+      "district": "Community Day Charter Public School: Webster",
+      "members": [
+        "Lawrence"
+      ],
+      "address": "404 Haverhill St Lawrence MA"
+    },
+    {
+      "district": "River Valley Charter School",
+      "members": [
+        "Amesbury",
+        "Newburyport",
+        "Groveland",
+        "Merrimac",
+        "West Newbury",
+        "Newbury",
+        "Rowley",
+        "Salisbury"
+      ],
+      "address": "2 Perry Way Newburyport MA"
+    },
+    {
+      "district": "Prospect Hill Academy Charter School",
+      "members": [
+        "Cambridge",
         "Somerville"
       ],
-      "address": "10 Victoria Street Somerville MA"
+      "address": "50 Essex St Cambridge MA"
     },
     {
-      "district": "South Shore Charter Public School",
+      "district": "Community Charter School of Cambridge",
       "members": [
-        "Norwell"
+        "Cambridge",
+        "Somerville"
       ],
-      "address": "100 Longwater Circle Norwell MA"
+      "address": "245 Bent St Cambridge MA"
+    },
+    {
+      "district": "Greater Lowell Charter Public School",
+      "members": [
+        "Lowell"
+      ],
+      "address": "101 Jackson St Lowell MA"
+    },
+    {
+      "district": "Lowell Community Charter Public School",
+      "members": [
+        "Lowell"
+      ],
+      "address": "206 Jackson St Lowell MA"
+    },
+    {
+      "district": "Collegiate Charter School of Lowell",
+      "members": [
+        "Lowell"
+      ],
+      "address": "1857 Middlesex St Lowell MA"
+    },
+    {
+      "district": "Innovation Academy Charter School",
+      "members": [
+        "Chelmsford",
+        "Lowell",
+        "Billerica",
+        "Dracut",
+        "Groton",
+        "Tewksbury",
+        "Tyngsborough",
+        "Westford"
+      ],
+      "address": "72 Tyng Rd Tyngsborough MA"
+    },
+    {
+      "district": "Francis W. Parker Charter Essential School",
+      "members": [
+        "Ayer",
+        "Shirley",
+        "Littleton",
+        "Leominster",
+        "Lunenburg",
+        "Worcester"
+      ],
+      "address": "49 Antietam St Devens MA"
+    },
+    {
+      "district": "Sizer School: A North Central Charter Essential School",
+      "members": [
+        "Fitchburg"
+      ],
+      "address": "500 Rindge Rd Fitchburg MA"
+    },
+    {
+      "district": "Advanced Math and Science Academy Charter School",
+      "members": [
+        "Marlborough",
+        "Hudson",
+        "Maynard",
+        "Clinton",
+        "Berlin"
+      ],
+      "address": "201 Forest St Marlborough MA"
+    },
+    {
+      "district": "Benjamin Franklin Classical Charter Public School",
+      "members": [
+        "Bellingham",
+        "Blackstone",
+        "Franklin",
+        "Holliston",
+        "Hopedale",
+        "Medway",
+        "Mendon",
+        "Milford",
+        "Millis",
+        "Millville",
+        "Norfolk",
+        "Plainville",
+        "Upton",
+        "Walpole",
+        "Wrentham"
+      ],
+      "address": "500 Financial Park Franklin MA"
+    },
+    {
+      "district": "Christa McAuliffe Charter School",
+      "members": [
+        "Ashland",
+        "Framingham",
+        "Holliston",
+        "Hopkinton",
+        "Marlborough",
+        "Natick",
+        "Southborough",
+        "Sudbury"
+      ],
+      "address": "139 Newbury St Framingham MA"
+    },
+    {
+      "district": "Foxborough Regional Charter School",
+      "members": [
+        "Avon",
+        "Bellingham",
+        "Bridgewater",
+        "Canton",
+        "Dedham",
+        "Easton",
+        "Foxborough",
+        "Franklin",
+        "Mansfield",
+        "Medfield",
+        "Medway",
+        "Millis",
+        "Milton",
+        "Norfolk",
+        "North Attleborough",
+        "Norton",
+        "Plainville",
+        "Randolph",
+        "Raynham",
+        "Sharon",
+        "Stoughton",
+        "Taunton",
+        "Walpole",
+        "Wellesley",
+        "Westwood",
+        "Weymouth",
+        "Wrentham"
+      ],
+      "address": "131 Central St Foxborough MA"
+    },
+    {
+      "district": "Abby Kelley Foster Charter Public School",
+      "members": [
+        "Auburn",
+        "Leicester",
+        "Millbury",
+        "Oxford",
+        "Shrewsbury",
+        "Sutton",
+        "Holden",
+        "Paxton",
+        "Princeton",
+        "Rutland",
+        "Sterling",
+        "West Boylston",
+        "Worcester"
+      ],
+      "address": "10 New Bond St Worcester MA"
+    },
+    {
+      "district": "Learning First Charter Public School (formerly Seven Hills)",
+      "members": [
+        "Worcester"
+      ],
+      "address": "51 Gage St Worcester MA"
+    },
+    {
+      "district": "Baystate Academy Charter Public School",
+      "members": [
+        "Springfield"
+      ],
+      "address": "170 Pine St Springfield MA"
+    },
+    {
+      "district": "Holyoke Community Charter School",
+      "members": [
+        "Holyoke"
+      ],
+      "address": "2200 Northampton St Holyoke MA"
+    },
+    {
+      "district": "Libertas Academy Charter School",
+      "members": [
+        "Springfield"
+      ],
+      "address": "262 Liberty St Springfield MA"
+    },
+    {
+      "district": "Martin Luther King Jr. Charter School of Excellence",
+      "members": [
+        "Springfield"
+      ],
+      "address": "285 Dorset St Springfield MA"
+    },
+    {
+      "district": "Springfield International Charter School",
+      "members": [
+        "Springfield"
+      ],
+      "address": "160 Joan St Springfield MA"
     },
     {
       "district": "Springfield Preparatory Charter School",
       "members": [
         "Springfield"
       ],
-      "address": "1001 Main Street Springfield MA"
+      "address": "2071 Roosevelt Ave Springfield MA"
     },
     {
-      "district": "Sturgis Charter Public School — East",
-      "members": [
-        "Hyannis"
-      ],
-      "address": "427 Main Street Hyannis MA"
-    },
-    {
-      "district": "Sturgis Charter Public School — West",
-      "members": [
-        "Hyannis"
-      ],
-      "address": "105 West Main Street Hyannis MA"
-    },
-    {
-      "district": "Veritas Preparatory Charter School",
+      "district": "Veritas Preparatory Charter School (Springfield)",
       "members": [
         "Springfield"
       ],
-      "address": "370 Pine Street Springfield MA"
+      "address": "370 Pine St Springfield MA"
     },
     {
-      "district": "Veritas Preparatory Charter School — Holyoke",
+      "district": "Veritas Preparatory Charter School (Holyoke)",
       "members": [
         "Holyoke"
       ],
-      "address": "1 Cabot Street Holyoke MA"
+      "address": "401 Beech St Holyoke MA"
     },
     {
-      "district": "UP Academy Boston Charter School",
+      "district": "Pioneer Valley Performing Arts Charter Public School",
       "members": [
-        "Boston"
+        "Amherst",
+        "Chicopee",
+        "Easthampton",
+        "Granby",
+        "Greenfield",
+        "Hadley",
+        "Holyoke",
+        "Longmeadow",
+        "Ludlow",
+        "Northampton",
+        "South Hadley",
+        "Southampton",
+        "Springfield",
+        "West Springfield",
+        "Westfield",
+        "Whately",
+        "Williamsburg",
+        "Belchertown",
+        "Deerfield",
+        "Hatfield",
+        "Leverett",
+        "Montague",
+        "Orange",
+        "Palmer"
       ],
-      "address": "215 Dorchester Street Boston MA"
+      "address": "15 Mulligan Dr South Hadley MA"
     },
     {
-      "district": "UP Academy Dorchester Charter School",
+      "district": "Pioneer Valley Chinese Immersion Charter School",
       "members": [
-        "Boston"
+        "Amherst",
+        "Hadley",
+        "Northampton",
+        "Easthampton",
+        "South Hadley",
+        "Granby",
+        "Belchertown",
+        "Deerfield",
+        "Hatfield",
+        "Whately"
       ],
-      "address": "35 Westville Street Dorchester MA"
+      "address": "317 Russell St Hadley MA"
+    },
+    {
+      "district": "Hilltown Cooperative Charter Public School",
+      "members": [
+        "Amherst",
+        "Belchertown",
+        "Chesterfield",
+        "Conway",
+        "Deerfield",
+        "Easthampton",
+        "Goshen",
+        "Granby",
+        "Greenfield",
+        "Hadley",
+        "Hatfield",
+        "Leverett",
+        "Montague",
+        "Northampton",
+        "Pelham",
+        "Plainfield",
+        "Shutesbury",
+        "Southampton",
+        "Sunderland",
+        "Westhampton",
+        "Whately",
+        "Williamsburg",
+        "Worthington"
+      ],
+      "address": "1 Industrial Way Easthampton MA"
+    },
+    {
+      "district": "Four Rivers Charter Public School",
+      "members": [
+        "Greenfield",
+        "Montague",
+        "Deerfield",
+        "Sunderland",
+        "Whately",
+        "Leverett",
+        "Shutesbury",
+        "Gill",
+        "Erving",
+        "Bernardston",
+        "Northfield",
+        "Leyden",
+        "Warwick",
+        "Orange",
+        "New Salem",
+        "Wendell",
+        "Shelburne",
+        "Buckland",
+        "Heath",
+        "Colrain",
+        "Charlemont",
+        "Hawley",
+        "Conway"
+      ],
+      "address": "248 Colrain Rd Greenfield MA"
+    },
+    {
+      "district": "Berkshire Arts and Technology Charter Public School (BART)",
+      "members": [
+        "Adams",
+        "Cheshire",
+        "Clarksburg",
+        "Florida",
+        "Hancock",
+        "Lanesborough",
+        "North Adams",
+        "Pittsfield",
+        "Savoy",
+        "Williamstown"
+      ],
+      "address": "1 Commercial St Adams MA"
+    },
+    {
+      "district": "Phoenix Charter Academy Chelsea",
+      "members": [
+        "Chelsea",
+        "Boston",
+        "Everett",
+        "Revere"
+      ],
+      "address": "35 Broadway Chelsea MA"
+    },
+    {
+      "district": "Phoenix Charter Academy Lawrence",
+      "members": [
+        "Lawrence"
+      ],
+      "address": "15 Union St Lawrence MA"
+    },
+    {
+      "district": "Phoenix Charter Academy Springfield",
+      "members": [
+        "Springfield"
+      ],
+      "address": "65 Jamaica St Springfield MA"
     }
   ]
 }
