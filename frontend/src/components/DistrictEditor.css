@@ -1,0 +1,267 @@
+/* District Editor Modal */
+.district-editor-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.district-editor-modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.district-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.district-editor-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1e3a5f;
+  font-weight: 700;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.close-button:hover {
+  background: #f1f5f9;
+  color: #1e3a5f;
+}
+
+/* Form Styles */
+.district-editor-form {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #1e3a5f;
+  font-size: 0.95rem;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  color: #1e3a5f;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-help {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Town Input and List */
+.town-input-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.town-input-container .form-input {
+  flex: 1;
+}
+
+.btn-add-town {
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-add-town:hover {
+  background: #059669;
+}
+
+.towns-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  min-height: 60px;
+}
+
+.town-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.remove-town-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 3px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-town-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.editor-error {
+  background: #fee;
+  border: 2px solid #fcc;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 20px;
+  color: #c33;
+  font-size: 0.95rem;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  background: white;
+  color: #64748b;
+  border: 2px solid #cbd5e1;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btn-save {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .district-editor-backdrop {
+    padding: 10px;
+  }
+
+  .district-editor-modal {
+    max-height: 95vh;
+  }
+
+  .district-editor-header {
+    padding: 16px;
+  }
+
+  .district-editor-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .district-editor-form {
+    padding: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

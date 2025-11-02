@@ -1,3 +1,8 @@
+/* Ensure all elements use border-box sizing */
+* {
+  box-sizing: border-box;
+}
+
 .district-type-icon {
   font-size: 1.2em;
   vertical-align: middle;
@@ -56,6 +61,8 @@
   font-family: system-ui, -apple-system, sans-serif;
   background: #f0f4f8;
   min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .browser-header {
@@ -176,6 +183,9 @@
   grid-template-columns: 450px 1fr;
   gap: 30px;
   min-height: 500px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* District List */
@@ -185,8 +195,11 @@
   padding: 24px;
   background: white;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 750px;
   height: 750px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* Custom Scrollbar */
@@ -237,6 +250,9 @@
   cursor: pointer;
   transition: all 0.2s;
   background: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .district-item:hover {
@@ -272,6 +288,30 @@
  }
 .district-town-span {
   margin-right: 2px;
+}
+
+.edit-district-btn {
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-district-btn:hover {
+  background: #e0e7ff;
+  border-color: #3b82f6;
+  transform: scale(1.05);
+}
+
+.edit-district-btn:active {
+  transform: scale(0.95);
 }
 }
 

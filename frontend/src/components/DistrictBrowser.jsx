@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import ChoroplethMap from './ChoroplethMap';
+import DistrictEditor from './DistrictEditor';
 import './DistrictBrowser.css';
 
 function DistrictBrowser() {
+  const [editingDistrict, setEditingDistrict] = useState(null);
   // District type filters
   const districtTypeOptions = [
     { value: 'municipal', label: 'Municipal', icon: '🏛️' },
@@ -166,6 +168,26 @@ function DistrictBrowser() {
     }
   };
 
+  const handleSaveDistrict = async (updatedData) => {
+    try {
+      const updatedDistrict = await api.updateDistrict(editingDistrict.id, updatedData);
+
+      // Update the districts list
+      setDistricts(prev =>
+        prev.map(d => d.id === updatedDistrict.id ? updatedDistrict : d)
+      );
+
+      // Update selected district if it's the one being edited
+      if (selectedDistrict?.id === updatedDistrict.id) {
+        setSelectedDistrict(updatedDistrict);
+      }
+
+      setEditingDistrict(null);
+    } catch (err) {
+      throw err;
+    }
+  };
+
   return (
     <div className="district-browser">
       <header className="browser-header">
@@ -255,22 +277,33 @@ function DistrictBrowser() {
                 return (
                   <li
                     key={district.id}
-                    onClick={() => handleDistrictClick(district)}
                     className={`district-item ${
                       selectedDistrict?.id === district.id ? 'active' : ''
                     }`}
                   >
-                    <div className="district-name">
-                      <span className="district-type-icon" style={{marginRight: '6px'}}>{typeOpt?.icon}</span>
-                      {district.name}
+                    <div onClick={() => handleDistrictClick(district)} style={{flex: 1}}>
+                      <div className="district-name">
+                        <span className="district-type-icon" style={{marginRight: '6px'}}>{typeOpt?.icon}</span>
+                        {district.name}
+                      </div>
+                      <div className="district-towns">
+                        {district.towns.map((town, idx) => (
+                          <span key={town} className="district-town-span">
+                            {town}{idx < district.towns.length - 1 ? ', ' : ''}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <div className="district-towns">
-                      {district.towns.map((town, idx) => (
-                        <span key={town} className="district-town-span">
-                          {town}{idx < district.towns.length - 1 ? ', ' : ''}
-                        </span>
-                      ))}
-                    </div>
+                    <button
+                      className="edit-district-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingDistrict(district);
+                      }}
+                      title="Edit district"
+                    >
+                      🔧
+                    </button>
                   </li>
                 );
               })}
@@ -304,6 +337,12 @@ function DistrictBrowser() {
           </div>
         </div>
       </div>
+
+      <DistrictEditor
+        district={editingDistrict}
+        onClose={() => setEditingDistrict(null)}
+        onSave={handleSaveDistrict}
+      />
     </div>
   );
 }

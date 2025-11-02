@@ -107,6 +107,36 @@ class ApiService {
 
     return response.json();
   }
+
+  /**
+   * Update an existing district
+   * @param {string} districtId - District ID
+   * @param {Object} districtData - Updated district data
+   * @returns {Promise<Object>} - Updated district
+   */
+  async updateDistrict(districtId, districtData) {
+    const url = `${API_BASE_URL}/api/districts/${districtId}`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(districtData),
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('District not found');
+      }
+      throw new Error(`Failed to update district: ${response.statusText}`);
+    }
+
+    // Clear cache after update
+    this._districtsByTownCache = {};
+
+    return response.json();
+  }
 }
 
 export default new ApiService();
