@@ -280,20 +280,8 @@ function DistrictBrowser() {
                     className={`district-item ${
                       selectedDistrict?.id === district.id ? 'active' : ''
                     }`}
+                    onClick={() => handleDistrictClick(district)}
                   >
-                    <div onClick={() => handleDistrictClick(district)} style={{flex: 1}}>
-                      <div className="district-name">
-                        <span className="district-type-icon" style={{marginRight: '6px'}}>{typeOpt?.icon}</span>
-                        {district.name}
-                      </div>
-                      <div className="district-towns">
-                        {district.towns.map((town, idx) => (
-                          <span key={town} className="district-town-span">
-                            {town}{idx < district.towns.length - 1 ? ', ' : ''}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
                     <button
                       className="edit-district-btn"
                       onClick={(e) => {
@@ -304,6 +292,17 @@ function DistrictBrowser() {
                     >
                       🔧
                     </button>
+                    <div className="district-name">
+                      <span className="district-type-icon" style={{marginRight: '6px'}}>{typeOpt?.icon}</span>
+                      {district.name}
+                    </div>
+                    <div className="district-towns">
+                      {district.towns.map((town, idx) => (
+                        <span key={town} className="district-town-span">
+                          {town}{idx < district.towns.length - 1 ? ', ' : ''}
+                        </span>
+                      ))}
+                    </div>
                   </li>
                 );
               })}
@@ -311,30 +310,13 @@ function DistrictBrowser() {
           )}
         </div>
 
-        <div className="district-detail-and-map">
-          <div className="map-section">
-            <ChoroplethMap
-              selectedDistrict={selectedDistrict}
-              clickedTown={clickedTown}
-              onTownClick={handleTownClick}
-              districtTypeOptions={districtTypeOptions}
-            />
-          </div>
-
-          <div className="district-detail">
-            {selectedDistrict ? (
-              <div className="detail-content">
-                <h2>District Information</h2>
-                <div className="json-display">
-                  <pre>{JSON.stringify(selectedDistrict, null, 2)}</pre>
-                </div>
-              </div>
-            ) : (
-              <div className="detail-placeholder">
-                <p>Select a district to view details</p>
-              </div>
-            )}
-          </div>
+        <div className="map-section">
+          <ChoroplethMap
+            selectedDistrict={selectedDistrict}
+            clickedTown={clickedTown}
+            onTownClick={handleTownClick}
+            districtTypeOptions={districtTypeOptions}
+          />
         </div>
       </div>
 
