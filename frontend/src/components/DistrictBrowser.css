@@ -7,6 +7,14 @@
   font-size: 0.95em;
   margin-left: 2px;
 }
+
+.district-type-count::before {
+  content: '(';
+}
+
+.district-type-count::after {
+  content: ')';
+}
 /* District Type Filters */
 .district-type-filters {
   display: flex;
@@ -434,6 +442,7 @@
     flex-shrink: 0;
     margin-right: 0;
     padding: 8px 12px;
+    flex-direction: column;
   }
 
   /* Hide label text on mobile, keep icon and count */
@@ -442,11 +451,20 @@
   }
 
   .district-type-icon {
-    margin-right: 4px !important;
+    margin-right: 0 !important;
+    margin-bottom: 2px;
   }
 
   .district-type-count {
     font-size: 0.9em;
+  }
+
+  .district-type-count::before {
+    content: '';
+  }
+
+  .district-type-count::after {
+    content: '';
   }
 }
 
