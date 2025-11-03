@@ -29,24 +29,23 @@ Fixed Lambda function to reference the correct S3 bucket:
 - **Before:** `aws_s3_bucket.frontend.id`
 - **After:** `aws_s3_bucket.main.id`
 
-### 3. API Gateway
-Created a new HTTP API Gateway (v2) for salary endpoints since the existing infrastructure uses REST API Gateway (v1):
+### 3. API Gateway (Updated: Consolidated)
+**Previously** used a separate HTTP API Gateway (v2), but **now consolidated** into the main REST API Gateway:
 
 ```hcl
-resource "aws_apigatewayv2_api" "salaries" {
-  name          = "${var.project_name}-salaries-api"
-  protocol_type = "HTTP"
-  # ... CORS configuration
+resource "aws_api_gateway_resource" "salary_schedule_proxy" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_resource.salary_schedule_path.id
+  path_part   = "{proxy+}"
 }
 ```
 
-**Why separate API Gateway?**
-- Existing infrastructure uses REST API Gateway with proxy integration
-- Salary API uses HTTP API Gateway (v2) which is:
-  - Simpler and cheaper
-  - Better for Lambda proxy integrations
-  - Easier to configure CORS
-  - Auto-deploys changes
+**Consolidated Architecture:**
+- Single REST API Gateway for all endpoints (districts + salaries)
+- Both Lambdas use AWS_PROXY integration
+- Simplifies infrastructure and reduces costs (no second API Gateway)
+- All endpoints share the same domain and stage
+- Salary routes: `/api/salary-schedule/{proxy+}`, `/api/salary-compare`, `/api/salary-heatmap`
 
 ### 4. Tags
 Updated all resources to use `merge(local.common_tags, {...})` pattern consistent with existing infrastructure.
@@ -56,21 +55,23 @@ Added to DynamoDB tables:
 - Point-in-time recovery
 - Server-side encryption
 
-## New Outputs
+## Terraform Outputs
 
-Added to Terraform outputs:
+Added Lambda function outputs:
 
 ```hcl
-output "salaries_api_endpoint" {
-  value       = aws_apigatewayv2_stage.salaries.invoke_url
-  description = "Salary API endpoint URL"
+output "salaries_lambda_function_name" {
+  value       = aws_lambda_function.salaries.function_name
+  description = "Name of the salaries Lambda function"
 }
 
-output "salaries_api_id" {
-  value       = aws_apigatewayv2_api.salaries.id
-  description = "Salary HTTP API Gateway ID"
+output "salaries_lambda_function_arn" {
+  value       = aws_lambda_function.salaries.arn
+  description = "ARN of the salaries Lambda function"
 }
 ```
+
+**Note:** Salary endpoints now use the main API Gateway endpoint (same as districts API).
 
 ## Updated Scripts
 
@@ -118,15 +119,18 @@ Just run `./deploy.sh` from the project root - it handles everything automatical
 
 ## API Endpoints
 
-The salary API will be available at a separate endpoint from the main API:
+**All endpoints now use the same API Gateway:**
 
-- **Main API (districts):** `https://{api-id}.execute-api.us-east-1.amazonaws.com/prod/api/...`
-- **Salary API:** `https://{http-api-id}.execute-api.us-east-1.amazonaws.com/api/...`
+- **Unified API:** `https://{api-id}.execute-api.us-east-2.amazonaws.com/prod/api/...`
+  - Districts: `/api/districts/*`
+  - Salary Schedule: `/api/salary-schedule/{districtId}`
+  - Salary Compare: `/api/salary-compare`
+  - Salary Heatmap: `/api/salary-heatmap`
 
-Get the salary API endpoint:
+Get the API endpoint:
 ```bash
 cd infrastructure/terraform
-terraform output salaries_api_endpoint
+terraform output api_endpoint
 ```
 
 ## Verification
@@ -154,25 +158,32 @@ Adding the salary infrastructure:
 |----------|-------------|
 | DynamoDB Tables (2) | ~$0.01 (26MB storage) |
 | Lambda Function | Free tier |
-| HTTP API Gateway | $1 per million requests |
+| REST API Gateway | $3.50 per million requests (shared with main API) |
 | **Total** | **< $1/month** |
+
+**Cost Savings:** Eliminated separate HTTP API Gateway (~$1-2/month savings).
 
 ## Frontend Integration
 
-The frontend will need to use the separate salary API endpoint. Update your API configuration:
+The frontend uses a single API endpoint for all requests:
 
 ```javascript
-// config.js
-export const API_ENDPOINTS = {
-  main: import.meta.env.DISTRICT_API_URL,        // District API
-  salary: import.meta.env.VITE_SALARY_API_URL // Salary API
-};
+// frontend/src/services/api.js
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.DISTRICT_API_URL || 'http://localhost:8000';
+
+// All methods use the same base URL
+async getSalarySchedules(districtId, year = null) {
+  const url = `${API_BASE_URL}/api/salary-schedule/${districtId}${year || ''}`;
+  // ...
+}
+
+async compareSalaries(education, credits, step, options = {}) {
+  const url = `${API_BASE_URL}/api/salary-compare?${queryParams}`;
+  // ...
+}
 ```
 
-Or retrieve dynamically:
-```javascript
-const salaryEndpoint = await fetch(`${mainAPI}/api/config/salary-endpoint`);
-```
+**Environment Variable:** Set `VITE_API_URL` to your API Gateway endpoint.
 
 ## Documentation Updates
 

@@ -391,6 +391,18 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_integration.lambda.id,
       aws_api_gateway_method.proxy_root.id,
       aws_api_gateway_integration.lambda_root.id,
+      # Salary endpoints
+      aws_api_gateway_resource.salary_schedule.id,
+      aws_api_gateway_resource.salary_schedule_path.id,
+      aws_api_gateway_resource.salary_schedule_proxy.id,
+      aws_api_gateway_resource.salary_compare.id,
+      aws_api_gateway_resource.salary_heatmap.id,
+      aws_api_gateway_method.salary_schedule_proxy.id,
+      aws_api_gateway_method.salary_compare.id,
+      aws_api_gateway_method.salary_heatmap.id,
+      aws_api_gateway_integration.salary_schedule_lambda.id,
+      aws_api_gateway_integration.salary_compare_lambda.id,
+      aws_api_gateway_integration.salary_heatmap_lambda.id,
     ]))
   }
 
@@ -400,7 +412,10 @@ resource "aws_api_gateway_deployment" "main" {
 
   depends_on = [
     aws_api_gateway_integration.lambda,
-    aws_api_gateway_integration.lambda_root
+    aws_api_gateway_integration.lambda_root,
+    aws_api_gateway_integration.salary_schedule_lambda,
+    aws_api_gateway_integration.salary_compare_lambda,
+    aws_api_gateway_integration.salary_heatmap_lambda
   ]
 }
 

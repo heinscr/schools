@@ -1,6 +1,11 @@
 // API service for interacting with the backend
-const API_BASE_URL = import.meta.env.DISTRICT_API_URL || 'http://localhost:8000';
-const SALARY_API_URL = import.meta.env.VITE_SALARY_API_URL || 'https://fljv5fgajc.execute-api.us-east-2.amazonaws.com';
+// Note: Vite only exposes env vars prefixed with VITE_. Use those exclusively.
+// Both district and salary endpoints now use the same API Gateway
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_DISTRICT_API_URL ||
+  import.meta.env.VITE_SALARY_API_URL ||
+  'http://localhost:8000';
 
 class ApiService {
   /**
@@ -147,7 +152,7 @@ class ApiService {
    */
   async getSalarySchedules(districtId, year = null) {
     const yearPath = year ? `/${year}` : '';
-    const url = `${SALARY_API_URL}/api/salary-schedule/${districtId}${yearPath}`;
+    const url = `${API_BASE_URL}/api/salary-schedule/${districtId}${yearPath}`;
 
     try {
       const response = await fetch(url);
@@ -191,7 +196,7 @@ class ApiService {
     if (options.year) queryParams.append('year', options.year);
     if (options.limit) queryParams.append('limit', options.limit.toString());
 
-    const url = `${SALARY_API_URL}/api/salary-compare?${queryParams.toString()}`;
+    const url = `${API_BASE_URL}/api/salary-compare?${queryParams.toString()}`;
 
     try {
       const response = await fetch(url);

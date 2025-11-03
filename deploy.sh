@@ -35,7 +35,7 @@ CLOUDFRONT_ID=$(terraform output -raw cloudfront_distribution_id)
 CLOUDFRONT_DOMAIN=$(terraform output -raw cloudfront_domain)
 API_GATEWAY_ID=$(terraform output -raw api_gateway_id)
 API_ENDPOINT=$(terraform output -raw api_endpoint)
-SALARY_API_ENDPOINT=$(terraform output -raw salaries_api_endpoint)
+SALARY_API_ENDPOINT=$(terraform output -raw api_endpoint)
 SALARY_LAMBDA_FUNCTION_NAME=$(terraform output -raw salaries_lambda_function_name)
 SALARIES_TABLE_NAME=$(terraform output -raw salaries_table_name)
 SCHEDULES_TABLE_NAME=$(terraform output -raw schedules_table_name)
@@ -215,7 +215,11 @@ cp ../data/geojson.json public/geojson.json
 echo "Building frontend with API endpoints:"
 echo "  District API: $API_ENDPOINT"
 echo "  Salary API: $SALARY_API_ENDPOINT"
-DISTRICT_API_URL=$API_ENDPOINT VITE_SALARY_API_URL=$SALARY_API_ENDPOINT npm run build
+# Vite only exposes variables starting with VITE_. Set both for compatibility
+VITE_API_URL=$API_ENDPOINT \
+VITE_DISTRICT_API_URL=$API_ENDPOINT \
+VITE_SALARY_API_URL=$SALARY_API_ENDPOINT \
+npm run build
 
 echo -e "${GREEN}✓ Frontend built${NC}"
 

@@ -152,94 +152,103 @@ resource "aws_lambda_function" "salaries" {
 # Note: CloudWatch Log Group will be created automatically by Lambda
 # when the function is first invoked
 
-# HTTP API Gateway for salary endpoints
-resource "aws_apigatewayv2_api" "salaries" {
-  name          = "${var.project_name}-salaries-api"
-  protocol_type = "HTTP"
-  description   = "HTTP API for teacher salary data"
+# REST API Gateway resources for salary endpoints (added to main API Gateway)
 
-  cors_configuration {
-    allow_origins = ["*"]
-    allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    allow_headers = ["*"]
-    max_age       = 300
-  }
-
-  tags = merge(
-    local.common_tags,
-    {
-      Name = "Salaries HTTP API"
-    }
-  )
+# API Gateway resource for salary-schedule proxy
+resource "aws_api_gateway_resource" "salary_schedule" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_rest_api.main.root_resource_id
+  path_part   = "api"
 }
 
-# API Gateway stage
-resource "aws_apigatewayv2_stage" "salaries" {
-  api_id      = aws_apigatewayv2_api.salaries.id
-  name        = "$default"
-  auto_deploy = true
-
-  tags = merge(
-    local.common_tags,
-    {
-      Name = "Salaries API Stage"
-    }
-  )
+resource "aws_api_gateway_resource" "salary_schedule_path" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_resource.salary_schedule.id
+  path_part   = "salary-schedule"
 }
 
-# Lambda permission for API Gateway
+resource "aws_api_gateway_resource" "salary_schedule_proxy" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_resource.salary_schedule_path.id
+  path_part   = "{proxy+}"
+}
+
+# API Gateway resource for salary-compare
+resource "aws_api_gateway_resource" "salary_compare" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_resource.salary_schedule.id
+  path_part   = "salary-compare"
+}
+
+# API Gateway resource for salary-heatmap
+resource "aws_api_gateway_resource" "salary_heatmap" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_resource.salary_schedule.id
+  path_part   = "salary-heatmap"
+}
+
+# Methods for salary-schedule proxy
+resource "aws_api_gateway_method" "salary_schedule_proxy" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.salary_schedule_proxy.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+# Methods for salary-compare
+resource "aws_api_gateway_method" "salary_compare" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.salary_compare.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+# Methods for salary-heatmap
+resource "aws_api_gateway_method" "salary_heatmap" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.salary_heatmap.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+# Integrations with salaries Lambda
+resource "aws_api_gateway_integration" "salary_schedule_lambda" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.salary_schedule_proxy.id
+  http_method = aws_api_gateway_method.salary_schedule_proxy.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.salaries.invoke_arn
+}
+
+resource "aws_api_gateway_integration" "salary_compare_lambda" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.salary_compare.id
+  http_method = aws_api_gateway_method.salary_compare.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.salaries.invoke_arn
+}
+
+resource "aws_api_gateway_integration" "salary_heatmap_lambda" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.salary_heatmap.id
+  http_method = aws_api_gateway_method.salary_heatmap.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.salaries.invoke_arn
+}
+
+# Lambda permission for API Gateway to invoke salaries Lambda
 resource "aws_lambda_permission" "salaries_api_gateway" {
-  statement_id  = "AllowAPIGatewayInvoke"
+  statement_id  = "AllowAPIGatewayInvokeSalaries"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.salaries.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.salaries.execution_arn}/*/*"
-}
-
-# API Gateway integration
-resource "aws_apigatewayv2_integration" "salaries" {
-  api_id           = aws_apigatewayv2_api.salaries.id
-  integration_type = "AWS_PROXY"
-  integration_uri  = aws_lambda_function.salaries.invoke_arn
-  integration_method = "POST"
-  payload_format_version = "2.0"
-}
-
-# Routes
-
-# GET /api/salary-schedule/{districtId}
-resource "aws_apigatewayv2_route" "salary_schedule" {
-  api_id    = aws_apigatewayv2_api.salaries.id
-  route_key = "GET /api/salary-schedule/{districtId}"
-  target    = "integrations/${aws_apigatewayv2_integration.salaries.id}"
-}
-
-# GET /api/salary-schedule/{districtId}/{year}
-resource "aws_apigatewayv2_route" "salary_schedule_year" {
-  api_id    = aws_apigatewayv2_api.salaries.id
-  route_key = "GET /api/salary-schedule/{districtId}/{year}"
-  target    = "integrations/${aws_apigatewayv2_integration.salaries.id}"
-}
-
-# GET /api/salary-compare
-resource "aws_apigatewayv2_route" "salary_compare" {
-  api_id    = aws_apigatewayv2_api.salaries.id
-  route_key = "GET /api/salary-compare"
-  target    = "integrations/${aws_apigatewayv2_integration.salaries.id}"
-}
-
-# GET /api/salary-heatmap
-resource "aws_apigatewayv2_route" "salary_heatmap" {
-  api_id    = aws_apigatewayv2_api.salaries.id
-  route_key = "GET /api/salary-heatmap"
-  target    = "integrations/${aws_apigatewayv2_integration.salaries.id}"
-}
-
-# GET /api/districts/{id}/salary-metadata
-resource "aws_apigatewayv2_route" "district_salary_metadata" {
-  api_id    = aws_apigatewayv2_api.salaries.id
-  route_key = "GET /api/districts/{id}/salary-metadata"
-  target    = "integrations/${aws_apigatewayv2_integration.salaries.id}"
+  source_arn    = "${aws_api_gateway_rest_api.main.execution_arn}/*/*"
 }
 
 # Outputs
@@ -251,14 +260,4 @@ output "salaries_lambda_function_name" {
 output "salaries_lambda_function_arn" {
   value       = aws_lambda_function.salaries.arn
   description = "ARN of the salaries Lambda function"
-}
-
-output "salaries_api_endpoint" {
-  value       = aws_apigatewayv2_stage.salaries.invoke_url
-  description = "Salary API endpoint URL"
-}
-
-output "salaries_api_id" {
-  value       = aws_apigatewayv2_api.salaries.id
-  description = "Salary HTTP API Gateway ID"
 }
