@@ -29,6 +29,17 @@ body {
   min-height: 100vh;
 }
 
+/* Reserve space for a vertical scrollbar to avoid layout shifts when content height changes */
+html {
+  /* Prefer modern, standards-based approach */
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Fallback for older browsers: always show vertical scrollbar track */
+body {
+  overflow-y: scroll;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
