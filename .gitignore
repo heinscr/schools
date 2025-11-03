@@ -20,8 +20,6 @@ yarn-error.log*
 dist/
 build/
 
-# Generated GeoJSON (converted from TopoJSON)
-frontend/public/ma_municipalities.geojson
 
 # Lambda deployment
 backend/package/
@@ -68,6 +66,7 @@ infrastructure/terraform/placeholder/
 *.zip
 data/ma_municipalities.geojson
 data/extract_town_geojson.py
+frontend/public/ma_municipalities.geojson
 frontend/public/geojson.json
 scripts/municipalities_not_in_districts.py
 scripts/towns_not_in_districts.py

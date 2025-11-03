@@ -254,6 +254,23 @@ function DistrictBrowser() {
               </button>
             )}
           </div>
+
+          {/* District Type Filters - in same container */}
+          <div className="district-type-filters-row">
+            {districtTypeOptions.map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                className={`district-type-toggle${selectedTypes.includes(opt.value) ? ' active' : ''}`}
+                onClick={() => handleTypeChange(opt.value)}
+                aria-pressed={selectedTypes.includes(opt.value)}
+              >
+                <span className="district-type-icon">{opt.icon}</span>
+                <span className="district-type-label">{opt.label}</span>
+                <span className="district-type-count">{typeCounts[opt.value] ?? 0}</span>
+              </button>
+            ))}
+          </div>
         </form>
       </div>
 
@@ -268,20 +285,6 @@ function DistrictBrowser() {
           <h2>
             Districts ({districts.length})
           </h2>
-          <div className="district-type-filters">
-            {districtTypeOptions.map(opt => (
-              <button
-                key={opt.value}
-                type="button"
-                className={`district-type-toggle${selectedTypes.includes(opt.value) ? ' active' : ''}`}
-                onClick={() => handleTypeChange(opt.value)}
-                aria-pressed={selectedTypes.includes(opt.value)}
-              >
-                <span className="district-type-icon" style={{marginRight: '6px'}}>{opt.icon}</span>
-                <span className="district-type-label">{opt.label}</span> <span className="district-type-count">{typeCounts[opt.value] ?? 0}</span>
-              </button>
-            ))}
-          </div>
 
           {loading ? (
             <div className="loading">Loading districts...</div>

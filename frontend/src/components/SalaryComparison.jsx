@@ -18,17 +18,48 @@ function SalaryComparison() {
     credits: '30'
   });
   const [selectedTypes, setSelectedTypes] = useState(districtTypeOptions.map(opt => opt.value));
-  const [results, setResults] = useState(null);
-  const [enrichedResults, setEnrichedResults] = useState([]);
+  const [cachedResults, setCachedResults] = useState(null); // Full results from API (cached)
+  const [filteredResults, setFilteredResults] = useState(null); // Filtered by district type
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleTypeChange = (type) => {
-    setSelectedTypes(prev =>
-      prev.includes(type)
+    setSelectedTypes(prev => {
+      const newTypes = prev.includes(type)
         ? prev.filter(t => t !== type)
-        : [...prev, type]
+        : [...prev, type];
+
+      // Apply client-side filtering
+      if (cachedResults) {
+        applyFilters(cachedResults, newTypes);
+      }
+
+      return newTypes;
+    });
+  };
+
+  const applyFilters = (data, types) => {
+    if (!data || !data.results) {
+      setFilteredResults(null);
+      return;
+    }
+
+    // Filter results by selected district types
+    const filtered = data.results.filter(result =>
+      types.includes(result.district_type)
     );
+
+    // Re-rank filtered results
+    const rankedFiltered = filtered.map((result, index) => ({
+      ...result,
+      rank: index + 1
+    }));
+
+    setFilteredResults({
+      ...data,
+      results: rankedFiltered,
+      total: rankedFiltered.length
+    });
   };
 
   const handleSearch = async () => {
@@ -36,20 +67,22 @@ function SalaryComparison() {
     setError(null);
 
     try {
+      // Fetch all results (no district type filter on backend)
       const data = await api.compareSalaries(
         searchParams.education,
         parseInt(searchParams.credits),
-        parseInt(searchParams.step),
-        { districtType: selectedTypes.length === districtTypeOptions.length ? null : selectedTypes }
+        parseInt(searchParams.step)
       );
-      setResults(data);
 
-      // API now includes towns in the response, no need to fetch separately
-      setEnrichedResults(data.results);
+      // Cache the full results
+      setCachedResults(data);
+
+      // Apply current filters
+      applyFilters(data, selectedTypes);
     } catch (err) {
       setError(err.message);
-      setResults(null);
-      setEnrichedResults([]);
+      setCachedResults(null);
+      setFilteredResults(null);
     } finally {
       setLoading(false);
     }
@@ -113,13 +146,37 @@ function SalaryComparison() {
           </select>
         </div>
 
-        <button 
-          className="search-button" 
-          onClick={handleSearch}
-          disabled={loading}
-        >
-          {loading ? 'Searching...' : 'Search Salaries'}
-        </button>
+        <div className="form-group">
+          <label>&nbsp;</label>
+          <button
+            className="search-button"
+            onClick={handleSearch}
+            disabled={loading}
+          >
+            {loading ? 'Searching...' : 'Search Salaries'}
+          </button>
+        </div>
+
+        {/* District Type Filters - in same container */}
+        <div className="district-type-filters-row">
+          {districtTypeOptions.map(opt => {
+            const typeCount = cachedResults?.results.filter(r => r.district_type === opt.value).length || 0;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                className={`district-type-toggle${selectedTypes.includes(opt.value) ? ' active' : ''}`}
+                onClick={() => handleTypeChange(opt.value)}
+                aria-pressed={selectedTypes.includes(opt.value)}
+                disabled={!cachedResults}
+              >
+                <span className="district-type-icon">{opt.icon}</span>
+                <span className="district-type-label">{opt.label}</span>
+                {cachedResults && <span className="district-type-count">{typeCount}</span>}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {error && (
@@ -130,23 +187,23 @@ function SalaryComparison() {
 
       {/* Map Section */}
       <div className="comparison-map-section">
-        <SalaryComparisonMap results={enrichedResults} />
+        <SalaryComparisonMap results={filteredResults?.results || []} />
       </div>
 
-      {results && (
+      {filteredResults && (
         <div className="comparison-results">
           <div className="results-header">
             <h3>Results</h3>
             <div className="search-summary">
-              Showing salaries for <strong>{results.query.education === 'B' ? "Bachelor's" : results.query.education === 'M' ? "Master's" : "Doctorate"}</strong>
-              {results.query.credits > 0 && <span> + {results.query.credits} credits</span>} at <strong>Step {results.query.step}</strong>
-              <span className="result-count"> ({results.total} {results.total === 1 ? 'district' : 'districts'})</span>
+              Showing salaries for <strong>{filteredResults.query.education === 'B' ? "Bachelor's" : filteredResults.query.education === 'M' ? "Master's" : "Doctorate"}</strong>
+              {filteredResults.query.credits > 0 && <span> + {filteredResults.query.credits} credits</span>} at <strong>Step {filteredResults.query.step}</strong>
+              <span className="result-count"> ({filteredResults.total} {filteredResults.total === 1 ? 'district' : 'districts'})</span>
             </div>
           </div>
 
-          {results.results.length === 0 ? (
+          {filteredResults.results.length === 0 ? (
             <div className="no-results">
-              No salary data found for these criteria.
+              No districts match the selected filters.
             </div>
           ) : (
             <div className="results-table-wrapper">
@@ -161,7 +218,7 @@ function SalaryComparison() {
                   </tr>
                 </thead>
                 <tbody>
-                  {results.results.map((result, index) => (
+                  {filteredResults.results.map((result, index) => (
                     <tr key={result.district_id} className="result-row">
                       <td className="rank-cell">
                         <span className={`rank-badge ${index < 3 ? 'top-rank' : ''}`}>
@@ -192,19 +249,19 @@ function SalaryComparison() {
             </div>
           )}
 
-          {results.results.length > 0 && (
+          {filteredResults.results.length > 0 && (
             <div className="results-stats">
               <div className="stat-item">
                 <span className="stat-label">Highest:</span>
-                <span className="stat-value">${Number(results.results[0].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="stat-value">${Number(filteredResults.results[0].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-label">Lowest:</span>
-                <span className="stat-value">${Number(results.results[results.results.length - 1].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="stat-value">${Number(filteredResults.results[filteredResults.results.length - 1].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-label">Difference:</span>
-                <span className="stat-value highlight">${(Number(results.results[0].salary) - Number(results.results[results.results.length - 1].salary)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="stat-value highlight">${(Number(filteredResults.results[0].salary) - Number(filteredResults.results[filteredResults.results.length - 1].salary)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
           )}

@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { api } from '../services/api';
 
-const SalaryComparisonMap = ({ comparisonData }) => {
-  const mapRef = useRef(null);
+const SalaryComparisonMap = ({ results = [] }) => {
+  const containerRef = useRef(null);
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   // Load geo data
   useEffect(() => {
@@ -44,7 +44,7 @@ const SalaryComparisonMap = ({ comparisonData }) => {
   // Render map
   useEffect(() => {
     // Early return if required data is missing or invalid
-    if (!geojson || !geojson.features || !Array.isArray(results) || results.length === 0) {
+    if (!geoData || !geoData.features || !Array.isArray(results) || results.length === 0) {
       return;
     }
 
@@ -68,7 +68,7 @@ const SalaryComparisonMap = ({ comparisonData }) => {
     const baseWidth = dimensions.width - 10;
     const baseHeight = dimensions.height - 10;
     const projection = d3.geoIdentity()
-      .fitSize([baseWidth, baseHeight], geojson);
+      .fitSize([baseWidth, baseHeight], geoData);
 
     // Adjust translate to center with minimal padding
     const [tx, ty] = projection.translate();
@@ -132,7 +132,7 @@ const SalaryComparisonMap = ({ comparisonData }) => {
     // Draw towns
     svg.append('g')
       .selectAll('path')
-      .data(geojson.features || [])
+      .data(geoData.features || [])
       .enter()
       .append('path')
       .attr('d', path)
@@ -194,7 +194,7 @@ const SalaryComparisonMap = ({ comparisonData }) => {
           .style('top', (event.pageY - 10) + 'px');
       });
 
-  }, [geojson, dimensions, results]);
+  }, [geoData, dimensions, results]);
 
   return (
     <div 
