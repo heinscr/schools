@@ -129,8 +129,7 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
     credits = params.get('credits')
     step = params.get('step')
     district_type = params.get('districtType')
-    limit = int(params.get('limit', 10))
-    year = params.get('year', '2021-2022')
+    year = params.get('year')  # No default - show all years unless specified
     
     if not education or credits is None or not step:
         return create_response(400, {
@@ -142,8 +141,7 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
         query_params = {
             'IndexName': 'CompareDistrictsIndex',
             'KeyConditionExpression': Key('GSI2PK').eq(f'COMPARE#{education}#{credits}#{step}'),
-            'ScanIndexForward': False,  # Descending order by salary
-            'Limit': limit
+            'ScanIndexForward': False  # Descending order by salary
         }
         
         # Build filter expression

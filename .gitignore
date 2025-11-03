@@ -86,3 +86,5 @@ scripts/fetch_dese_contracts.py
 scripts/parse_dbf_simple.py
 data/salary_data.json
 infrastructure/.terraform.lock.hcl
+data/generate_municipal_salaries.py
+data/generate_sample_salaries.py
