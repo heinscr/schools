@@ -4,6 +4,7 @@ import React from 'react'
 vi.mock('./ChoroplethMap', () => ({ default: () => <div data-testid="map" /> }))
 vi.mock('./DistrictEditor', () => ({ default: () => <div data-testid="editor" /> }))
 vi.mock('./SalaryTable', () => ({ default: () => <div data-testid="table" /> }))
+vi.mock('./SalaryComparison', () => ({ default: () => <div><h2>Compare Salaries Across Districts</h2></div> }))
 vi.mock('../services/api', () => ({
   default: {
     searchDistricts: vi.fn(async () => ({ data: [] })),
