@@ -97,65 +97,68 @@ function SalaryComparison() {
 
   return (
     <div className="salary-comparison">
-      <div className="comparison-header">
-        <h2>Compare Salaries Across Districts</h2>
+      <div className="search-form">
+        <div className="comparison-header">
+          <h2>Compare Salaries Across Districts</h2>
+        </div>
+
+        <div className="search-controls-row">
+          <div className="form-group">
+            <label htmlFor="education">Education Level</label>
+            <select
+              id="education"
+              value={searchParams.education}
+              onChange={(e) => handleInputChange('education', e.target.value)}
+            >
+              <option value="B">Bachelor's</option>
+              <option value="M">Master's</option>
+              <option value="D">Doctorate</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="credits">Additional Credits</label>
+            <select
+              id="credits"
+              value={searchParams.credits}
+              onChange={(e) => handleInputChange('credits', e.target.value)}
+            >
+              <option value="0">0</option>
+              <option value="15">15</option>
+              <option value="30">30</option>
+              <option value="45">45</option>
+              <option value="60">60</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="step">Experience Step</label>
+            <select
+              id="step"
+              value={searchParams.step}
+              onChange={(e) => handleInputChange('step', e.target.value)}
+            >
+              {[...Array(15)].map((_, i) => (
+                <option key={i + 1} value={i + 1}>{i + 1}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>&nbsp;</label>
+            <button
+              className="search-button"
+              onClick={handleSearch}
+              disabled={loading}
+            >
+              {loading ? 'Searching...' : 'Search Salaries'}
+            </button>
+          </div>
+        </div>
+
         <p className="comparison-description">
           Search for teacher salaries by education level, credits, and experience step
         </p>
-      </div>
-
-      <div className="search-form">
-        <div className="form-group">
-          <label htmlFor="education">Education Level</label>
-          <select
-            id="education"
-            value={searchParams.education}
-            onChange={(e) => handleInputChange('education', e.target.value)}
-          >
-            <option value="B">Bachelor's</option>
-            <option value="M">Master's</option>
-            <option value="D">Doctorate</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="credits">Additional Credits</label>
-          <select
-            id="credits"
-            value={searchParams.credits}
-            onChange={(e) => handleInputChange('credits', e.target.value)}
-          >
-            <option value="0">0</option>
-            <option value="15">15</option>
-            <option value="30">30</option>
-            <option value="45">45</option>
-            <option value="60">60</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="step">Experience Step</label>
-          <select
-            id="step"
-            value={searchParams.step}
-            onChange={(e) => handleInputChange('step', e.target.value)}
-          >
-            {[...Array(15)].map((_, i) => (
-              <option key={i + 1} value={i + 1}>{i + 1}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>&nbsp;</label>
-          <button
-            className="search-button"
-            onClick={handleSearch}
-            disabled={loading}
-          >
-            {loading ? 'Searching...' : 'Search Salaries'}
-          </button>
-        </div>
 
         {/* District Type Filters - in same container */}
         <div className="district-type-filters-row">
@@ -199,6 +202,22 @@ function SalaryComparison() {
               {filteredResults.query.credits > 0 && <span> + {filteredResults.query.credits} credits</span>} at <strong>Step {filteredResults.query.step}</strong>
               <span className="result-count"> ({filteredResults.total} {filteredResults.total === 1 ? 'district' : 'districts'})</span>
             </div>
+            {filteredResults.results.length > 0 && (
+              <div className="results-stats">
+                <div className="stat-item">
+                  <span className="stat-label">Highest:</span>
+                  <span className="stat-value">${Number(filteredResults.results[0].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Lowest:</span>
+                  <span className="stat-value">${Number(filteredResults.results[filteredResults.results.length - 1].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Difference:</span>
+                  <span className="stat-value highlight">${(Number(filteredResults.results[0].salary) - Number(filteredResults.results[filteredResults.results.length - 1].salary)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {filteredResults.results.length === 0 ? (
@@ -249,22 +268,7 @@ function SalaryComparison() {
             </div>
           )}
 
-          {filteredResults.results.length > 0 && (
-            <div className="results-stats">
-              <div className="stat-item">
-                <span className="stat-label">Highest:</span>
-                <span className="stat-value">${Number(filteredResults.results[0].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-label">Lowest:</span>
-                <span className="stat-value">${Number(filteredResults.results[filteredResults.results.length - 1].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-label">Difference:</span>
-                <span className="stat-value highlight">${(Number(filteredResults.results[0].salary) - Number(filteredResults.results[filteredResults.results.length - 1].salary)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </div>
-            </div>
-          )}
+          
         </div>
       )}
     </div>
