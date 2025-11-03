@@ -26,25 +26,8 @@ function SalaryComparison() {
       );
       setResults(data);
       
-      // Fetch full district details for each result to get towns
-      const enriched = await Promise.all(
-        data.results.map(async (result) => {
-          try {
-            const districtDetails = await api.getDistrict(result.district_id);
-            return {
-              ...result,
-              towns: districtDetails.towns || []
-            };
-          } catch (err) {
-            console.error(`Error fetching district ${result.district_id}:`, err);
-            return {
-              ...result,
-              towns: []
-            };
-          }
-        })
-      );
-      setEnrichedResults(enriched);
+      // API now includes towns in the response, no need to fetch separately
+      setEnrichedResults(data.results);
     } catch (err) {
       setError(err.message);
       setResults(null);

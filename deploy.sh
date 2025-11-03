@@ -190,7 +190,7 @@ if aws lambda get-function --function-name $SALARY_LAMBDA_FUNCTION_NAME --region
     echo "Updating Salary Lambda configuration..."
     aws lambda update-function-configuration \
         --function-name $SALARY_LAMBDA_FUNCTION_NAME \
-        --environment "Variables={SALARIES_TABLE_NAME=$SALARIES_TABLE_NAME,SCHEDULES_TABLE_NAME=$SCHEDULES_TABLE_NAME}" \
+        --environment "Variables={SALARIES_TABLE_NAME=$SALARIES_TABLE_NAME,SCHEDULES_TABLE_NAME=$SCHEDULES_TABLE_NAME,DISTRICTS_TABLE_NAME=$DYNAMODB_TABLE}" \
         --region $AWS_REGION \
         --output json > /dev/null
 
