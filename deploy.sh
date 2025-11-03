@@ -1,7 +1,7 @@
 #!/bin/bash
 # Deployment script for MA Teachers Contracts application
 
-set -e  # Exit on error
+set -e  # Exit on error (will be temporarily disabled around tests to capture exit codes)
 
 # Colors for output
 RED='\033[0;31m'
@@ -15,6 +15,106 @@ echo -e "${GREEN}=== MA Teachers Contracts Deployment ===${NC}\n"
 if [ ! -f "deploy.sh" ]; then
     echo -e "${RED}Error: Please run this script from the project root directory${NC}"
     exit 1
+fi
+
+# Parse flags
+RUN_TESTS=true
+for arg in "$@"; do
+    case "$arg" in
+        --no-tests)
+            RUN_TESTS=false
+            shift
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if [ "$RUN_TESTS" = false ]; then
+    echo -e "${YELLOW}Skipping tests due to --no-tests flag${NC}"
+else
+    echo -e "${YELLOW}=== Running Test Suites (Backend & Frontend) ===${NC}"
+
+    # Allow commands to fail so we can prompt
+    set +e
+
+    BACKEND_TEST_EXIT=0
+    FRONTEND_TEST_EXIT=0
+
+    # Backend tests
+    if [ -d "backend" ]; then
+        echo -e "${YELLOW}- Backend: setting up venv, installing dev requirements, and running tests...${NC}"
+        pushd backend >/dev/null
+
+        # Ensure we have Python
+        PYTHON_BIN="python3"
+        if ! command -v $PYTHON_BIN >/dev/null 2>&1; then
+            PYTHON_BIN="python"
+        fi
+
+        # Create a virtual environment if it doesn't exist (avoids PEP 668 issues)
+        if [ ! -d "venv" ] || [ ! -f "venv/bin/activate" ]; then
+            $PYTHON_BIN -m venv venv
+        fi
+
+        # Activate venv
+        # shellcheck disable=SC1091
+        source venv/bin/activate
+
+        # Upgrade pip tooling quietly and install dev requirements inside the venv
+        python -m pip install --upgrade pip setuptools wheel -q
+        if [ -f "requirements-dev.txt" ]; then
+            python -m pip install -r requirements-dev.txt -q
+        fi
+
+        # Run tests
+        pytest -q
+        BACKEND_TEST_EXIT=$?
+
+        # Deactivate venv
+        deactivate
+
+        popd >/dev/null
+    fi
+
+    # Frontend tests
+    if [ -d "frontend" ]; then
+        echo -e "${YELLOW}- Frontend: installing deps and running tests...${NC}"
+        pushd frontend >/dev/null
+        # Install deps quietly; do not fail build due to audit/funding noise
+        if command -v npm >/dev/null 2>&1; then
+            npm install --no-audit --no-fund -s >/dev/null 2>&1
+            npm run test -s
+            FRONTEND_TEST_EXIT=$?
+        else
+            echo -e "${RED}npm not found; skipping frontend tests${NC}"
+            FRONTEND_TEST_EXIT=1
+        fi
+        popd >/dev/null
+    fi
+
+    # Summarize and prompt on failures
+    if [ $BACKEND_TEST_EXIT -ne 0 ] || [ $FRONTEND_TEST_EXIT -ne 0 ]; then
+        echo -e "${RED}One or more test suites failed.${NC}"
+        echo "Backend tests exit code: $BACKEND_TEST_EXIT"
+        echo "Frontend tests exit code: $FRONTEND_TEST_EXIT"
+        echo ""
+        read -r -p "Continue deployment anyway? [y/N]: " CONFIRM
+        case "$CONFIRM" in
+            y|Y|yes|YES)
+                echo -e "${YELLOW}Proceeding with deployment despite failing tests...${NC}"
+                ;;
+            *)
+                echo -e "${RED}Deployment cancelled due to failing tests.${NC}"
+                exit 1
+                ;;
+        esac
+    else
+        echo -e "${GREEN}✓ All tests passed. Continuing with deployment.${NC}"
+    fi
+
+    # Re-enable exit-on-error for deployment steps
+    set -e
 fi
 
 # Get Terraform outputs
@@ -61,8 +161,13 @@ echo "Creating Python Lambda deployment package..."
 cd backend
 rm -rf package lambda-deployment.zip 2>/dev/null || true
 
-# Install dependencies
-pip install -r requirements.txt -t package/ --quiet
+# Install dependencies (use python -m pip to avoid PEP 668 issues)
+if command -v python3 >/dev/null 2>&1; then
+    PIP_BUILD_CMD="python3 -m pip"
+else
+    PIP_BUILD_CMD="pip"
+fi
+$PIP_BUILD_CMD install -r requirements.txt -t package/ --quiet
 
 # Copy application code
 cp -r *.py package/
