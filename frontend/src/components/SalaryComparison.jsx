@@ -127,6 +127,7 @@ function SalaryComparison() {
                     <th className="rank-col">Rank</th>
                     <th className="district-col">District</th>
                     <th className="type-col">Type</th>
+                    <th className="year-col">Year</th>
                     <th className="salary-col">Salary</th>
                   </tr>
                 </thead>
@@ -145,6 +146,9 @@ function SalaryComparison() {
                         <span className="district-type-badge">
                           {result.district_type ? result.district_type.replace('_', ' ') : 'N/A'}
                         </span>
+                      </td>
+                      <td className="year-cell">
+                        {result.school_year || 'N/A'}
                       </td>
                       <td className="salary-cell">
                         ${result.salary ? Number(result.salary).toLocaleString('en-US', {
