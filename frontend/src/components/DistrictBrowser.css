@@ -3,6 +3,46 @@
   box-sizing: border-box;
 }
 
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-button:hover {
+  border-color: #cbd5e0;
+  background: #f8f9fa;
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+}
+
+.salary-comparison-tab {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
 .district-type-icon {
   font-size: 1.2em;
   vertical-align: middle;

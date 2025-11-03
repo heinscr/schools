@@ -3,9 +3,11 @@ import api from '../services/api';
 import ChoroplethMap from './ChoroplethMap';
 import DistrictEditor from './DistrictEditor';
 import SalaryTable from './SalaryTable';
+import SalaryComparison from './SalaryComparison';
 import './DistrictBrowser.css';
 
 function DistrictBrowser() {
+  const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'salaries'
   const [editingDistrict, setEditingDistrict] = useState(null);
   // District type filters
   const districtTypeOptions = [
@@ -193,9 +195,25 @@ function DistrictBrowser() {
     <div className="district-browser">
       <header className="browser-header">
         <h1>Massachusetts School Districts</h1>
+        <div className="tab-navigation">
+          <button 
+            className={`tab-button ${activeTab === 'districts' ? 'active' : ''}`}
+            onClick={() => setActiveTab('districts')}
+          >
+            🗺️ District Browser
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'salaries' ? 'active' : ''}`}
+            onClick={() => setActiveTab('salaries')}
+          >
+            💰 Compare Salaries
+          </button>
+        </div>
       </header>
 
-      <div className="search-section">
+      {activeTab === 'districts' ? (
+        <>
+          <div className="search-section">
         <form onSubmit={handleSearch} className="search-form">
           <div className="search-controls">
             <select
@@ -332,6 +350,12 @@ function DistrictBrowser() {
         onClose={() => setEditingDistrict(null)}
         onSave={handleSaveDistrict}
       />
+        </>
+      ) : (
+        <div className="salary-comparison-tab">
+          <SalaryComparison />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 // API service for interacting with the backend
 const API_BASE_URL = import.meta.env.DISTRICT_API_URL || 'http://localhost:8000';
+const SALARY_API_URL = import.meta.env.VITE_SALARY_API_URL || 'https://fljv5fgajc.execute-api.us-east-2.amazonaws.com';
 
 class ApiService {
   /**
@@ -145,8 +146,6 @@ class ApiService {
    * @returns {Promise<Array>} - Array of salary schedules
    */
   async getSalarySchedules(districtId, year = null) {
-    // Use environment variable for salary API URL, fallback to production
-    const SALARY_API_URL = import.meta.env.VITE_SALARY_API_URL || 'https://fljv5fgajc.execute-api.us-east-2.amazonaws.com';
     const yearPath = year ? `/${year}` : '';
     const url = `${SALARY_API_URL}/api/salary-schedule/${districtId}${yearPath}`;
 
@@ -169,6 +168,49 @@ class ApiService {
       if (error.message.includes('Failed to fetch')) {
         console.warn('Unable to connect to salary schedule service');
         return []; // Return empty array instead of throwing
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Compare salaries across districts for specific credentials
+   * @param {string} education - Education level (B, M, D)
+   * @param {number} credits - Additional credits (0, 15, 30, 45, 60)
+   * @param {number} step - Experience step (1-15)
+   * @param {Object} options - Additional options (districtType, year, limit)
+   * @returns {Promise<Object>} - Response with ranked salary results
+   */
+  async compareSalaries(education, credits, step, options = {}) {
+    const queryParams = new URLSearchParams();
+    queryParams.append('education', education);
+    queryParams.append('credits', credits.toString());
+    queryParams.append('step', step.toString());
+
+    if (options.districtType) queryParams.append('districtType', options.districtType);
+    if (options.year) queryParams.append('year', options.year);
+    if (options.limit) queryParams.append('limit', options.limit.toString());
+
+    const url = `${SALARY_API_URL}/api/salary-compare?${queryParams.toString()}`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        if (response.status === 404) {
+          return { query: { education, credits, step }, results: [], total: 0 };
+        }
+        if (response.status === 503) {
+          console.warn('Salary comparison service is temporarily unavailable');
+          return { query: { education, credits, step }, results: [], total: 0 };
+        }
+        throw new Error(`Failed to compare salaries: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      if (error.message.includes('Failed to fetch')) {
+        console.warn('Unable to connect to salary comparison service');
+        return { query: { education, credits, step }, results: [], total: 0 };
       }
       throw error;
     }

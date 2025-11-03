@@ -165,6 +165,32 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
         response = salaries_table.query(**query_params)
         items = response.get('Items', [])
         
+        # Deduplicate districts: keep only the most recent data per district
+        # (largest school_year, then largest period by ASCII sort)
+        district_map = {}
+        for item in items:
+            district_id = item.get('district_id')
+            school_year = item.get('school_year', '')
+            period = item.get('period', '')
+            
+            if district_id not in district_map:
+                district_map[district_id] = item
+            else:
+                existing = district_map[district_id]
+                existing_year = existing.get('school_year', '')
+                existing_period = existing.get('period', '')
+                
+                # Compare (year, period) tuples - larger is more recent
+                if (school_year, period) > (existing_year, existing_period):
+                    district_map[district_id] = item
+        
+        # Convert to list and sort by salary (descending)
+        deduplicated_items = sorted(
+            district_map.values(),
+            key=lambda x: float(x.get('salary', 0)),
+            reverse=True
+        )
+        
         # Transform results for response
         rankings = [
             {
@@ -179,7 +205,7 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
                 'step': item.get('step'),
                 'salary': item.get('salary')
             }
-            for index, item in enumerate(items)
+            for index, item in enumerate(deduplicated_items)
         ]
         
         return create_response(200, {

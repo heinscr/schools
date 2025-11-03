@@ -68,21 +68,27 @@ def load_salary_json():
     with open(json_path, 'r') as f:
         return json.load(f)
 
-def get_district_type(district_id):
-    """Get district type from districts.json"""
-    districts_path = Path(__file__).parent.parent.parent / 'data' / 'districts.json'
-    with open(districts_path, 'r') as f:
-        districts_data = json.load(f)
+def get_district_type_from_table(district_id, districts_table_name):
+    """
+    Get district type from DynamoDB districts table using the UUID
+    """
+    try:
+        table = dynamodb.Table(districts_table_name)
+        response = table.get_item(
+            Key={
+                'PK': f'DISTRICT#{district_id}',
+                'SK': 'METADATA'
+            }
+        )
+        
+        if 'Item' in response:
+            return response['Item'].get('district_type', 'unknown')
+        
+        return 'unknown'
+    except Exception as e:
+        print(f"  ⚠️  Error looking up district type for {district_id}: {e}")
+        return 'unknown'
 
-    # Search through all categories
-    for category in ['municipal', 'regional_academic', 'regional_vocational', 'county_agricultural']:
-        if category in districts_data:
-            for district in districts_data[category]:
-                dist_name = district.get('district', district.get('name', '')).lower()
-                if district_id in dist_name or dist_name in district_id:
-                    return category
-
-    return 'unknown'
 
 def match_district_name_to_id(district_name, district_map):
     """
@@ -105,7 +111,7 @@ def match_district_name_to_id(district_name, district_map):
     print(f"  ⚠️  No UUID match for '{district_name}', using name as ID")
     return district_name, False
 
-def create_normalized_items(salary_records, district_map):
+def create_normalized_items(salary_records, district_map, districts_table_name):
     """
     Create normalized DynamoDB items (one per salary cell)
     Structure: district_id + composite_key
@@ -132,8 +138,8 @@ def create_normalized_items(salary_records, district_map):
         # Create composite key
         composite_key = f"{school_year}#{period}#{education}#{credits}#{step}"
 
-        # Get district type
-        district_type = get_district_type(district_name)
+        # Get district type from DynamoDB
+        district_type = get_district_type_from_table(district_id, districts_table_name)
 
         # Create item - use the UUID as district_id
         item = {
@@ -165,7 +171,7 @@ def create_normalized_items(salary_records, district_map):
 
     return items
 
-def create_aggregated_items(salary_records, district_map):
+def create_aggregated_items(salary_records, district_map, districts_table_name):
     """
     Create aggregated DynamoDB items (one per schedule)
     Groups salaries by district + year + period
@@ -192,7 +198,7 @@ def create_aggregated_items(salary_records, district_map):
         schedule['district_name'] = district_name
         schedule['school_year'] = record['school_year']
         schedule['period'] = record['period']
-        schedule['district_type'] = get_district_type(district_name)
+        schedule['district_type'] = get_district_type_from_table(district_id, districts_table_name)
 
         # Add salary record with all info
         schedule['salaries'].append({
@@ -288,12 +294,12 @@ def main():
 
     # Create normalized items
     print("\nCreating normalized items...")
-    normalized_items = create_normalized_items(salary_records, district_map)
+    normalized_items = create_normalized_items(salary_records, district_map, districts_table)
     print(f"✓ Created {len(normalized_items)} normalized items")
 
     # Create aggregated items
     print("\nCreating aggregated schedule items...")
-    aggregated_items = create_aggregated_items(salary_records, district_map)
+    aggregated_items = create_aggregated_items(salary_records, district_map, districts_table)
     print(f"✓ Created {len(aggregated_items)} schedule items")
 
     # Write to DynamoDB
