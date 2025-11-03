@@ -20,6 +20,9 @@ yarn-error.log*
 dist/
 build/
 
+# Generated GeoJSON (converted from TopoJSON)
+frontend/public/ma_municipalities.geojson
+
 # Lambda deployment
 backend/package/
 backend/lambda-deployment.zip

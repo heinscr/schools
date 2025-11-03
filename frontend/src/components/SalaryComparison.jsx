@@ -4,28 +4,46 @@ import SalaryComparisonMap from './SalaryComparisonMap';
 import './SalaryComparison.css';
 
 function SalaryComparison() {
+  const districtTypeOptions = [
+    { value: 'municipal', label: 'Municipal', icon: '🏛️' },
+    { value: 'regional_academic', label: 'Regional', icon: '🏫' },
+    { value: 'regional_vocational', label: 'Vocational', icon: '🛠️' },
+    { value: 'county_agricultural', label: 'Agricultural', icon: '🌾' },
+    { value: 'charter', label: 'Charter', icon: '📜' }
+  ];
+
   const [searchParams, setSearchParams] = useState({
     step: '5',
     education: 'M',
     credits: '30'
   });
+  const [selectedTypes, setSelectedTypes] = useState(districtTypeOptions.map(opt => opt.value));
   const [results, setResults] = useState(null);
   const [enrichedResults, setEnrichedResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const handleTypeChange = (type) => {
+    setSelectedTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
   const handleSearch = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await api.compareSalaries(
         searchParams.education,
         parseInt(searchParams.credits),
-        parseInt(searchParams.step)
+        parseInt(searchParams.step),
+        { districtType: selectedTypes.length === districtTypeOptions.length ? null : selectedTypes }
       );
       setResults(data);
-      
+
       // API now includes towns in the response, no need to fetch separately
       setEnrichedResults(data.results);
     } catch (err) {

@@ -1,35 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import * as topojson from 'topojson-client';
-import './ChoroplethMap.css';
+import { api } from '../services/api';
 
-const SalaryComparisonMap = ({ results }) => {
-  const containerRef = useRef(null);
-  const [geojson, setGeojson] = useState(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+const SalaryComparisonMap = ({ comparisonData }) => {
+  const mapRef = useRef(null);
+  const [geoData, setGeoData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Load GeoJSON on mount
+  // Load geo data
   useEffect(() => {
-    fetch('/geojson.json')
-      .then(res => res.json())
-      .then(data => {
-        // Check if data has a content wrapper
-        const topoData = data.content || data;
+    const loadGeoData = async () => {
+      try {
+        const response = await fetch('/ma_municipalities.geojson');
+        const geoJsonData = await response.json();
 
-        // Check if it's TopoJSON format
-        if (topoData.type === 'Topology') {
-          // Convert TopoJSON to GeoJSON
-          const objectKey = Object.keys(topoData.objects)[0];
-          const geojsonData = topojson.feature(topoData, topoData.objects[objectKey]);
-          setGeojson(geojsonData);
-        } else if (data.type === 'FeatureCollection') {
-          // Already GeoJSON
-          setGeojson(data);
-        } else {
-          console.error('Unknown data format:', data);
-        }
-      })
-      .catch(err => console.error('Error loading geojson:', err));
+        setGeoData(geoJsonData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading geo data:', error);
+        setLoading(false);
+      }
+    };
+
+    loadGeoData();
   }, []);
 
   // Handle window resize

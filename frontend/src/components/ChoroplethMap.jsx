@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import * as topojson from 'topojson-client';
 import api from '../services/api';
 import './ChoroplethMap.css';
 
@@ -68,30 +67,14 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
     return () => container.removeEventListener('mouseleave', handleMouseLeave);
   }, []);
 
-  // Load GeoJSON/TopoJSON data
+  // Load GeoJSON data
   useEffect(() => {
-    fetch('/geojson.json')
+    fetch('/ma_municipalities.geojson')
       .then((res) => res.json())
-      .then((data) => {
-        // Check if data has a content wrapper
-        const topoData = data.content || data;
-
-        // Check if it's TopoJSON format
-        if (topoData.type === 'Topology') {
-          // Convert TopoJSON to GeoJSON
-          const objectKey = Object.keys(topoData.objects)[0];
-          console.log('Converting TopoJSON, object key:', objectKey);
-          const geojson = topojson.feature(topoData, topoData.objects[objectKey]);
-          console.log('Converted GeoJSON:', geojson);
-          console.log('Number of features:', geojson.features?.length);
-          setGeojson(geojson);
-        } else if (data.type === 'FeatureCollection') {
-          // Already GeoJSON
-          console.log('Loading regular GeoJSON');
-          setGeojson(data);
-        } else {
-          console.error('Unknown data format:', data);
-        }
+      .then((geojson) => {
+        console.log('Loaded GeoJSON:', geojson);
+        console.log('Number of features:', geojson.features?.length);
+        setGeojson(geojson);
       })
       .catch((err) => console.error('Error loading GeoJSON:', err));
   }, []);
