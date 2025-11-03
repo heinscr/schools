@@ -1,4 +1,4 @@
-# Python
+=# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -47,3 +47,9 @@ lambda-deployment.zip
 # Logs
 *.log
 logs/
+
+# Test/coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
