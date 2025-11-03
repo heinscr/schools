@@ -332,6 +332,19 @@
   height: 750px;
 }
 
+/* Salary Section */
+.salary-section {
+  margin-top: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  padding: 24px;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+  grid-column: 1 / -1; /* Span both columns */
+}
+
 /* District Detail */
 .district-detail {
   border: 1px solid #e2e8f0;

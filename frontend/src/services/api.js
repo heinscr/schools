@@ -1,5 +1,5 @@
 // API service for interacting with the backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.DISTRICT_API_URL || 'http://localhost:8000';
 
 class ApiService {
   /**
@@ -136,6 +136,42 @@ class ApiService {
     this._districtsByTownCache = {};
 
     return response.json();
+  }
+
+  /**
+   * Get salary schedules for a district
+   * @param {string} districtId - District ID
+   * @param {string} year - Optional school year (e.g., "2021-2022")
+   * @returns {Promise<Array>} - Array of salary schedules
+   */
+  async getSalarySchedules(districtId, year = null) {
+    // Use environment variable for salary API URL, fallback to production
+    const SALARY_API_URL = import.meta.env.VITE_SALARY_API_URL || 'https://fljv5fgajc.execute-api.us-east-2.amazonaws.com';
+    const yearPath = year ? `/${year}` : '';
+    const url = `${SALARY_API_URL}/api/salary-schedule/${districtId}${yearPath}`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        if (response.status === 404) {
+          return []; // No salary data available
+        }
+        if (response.status === 503) {
+          console.warn('Salary schedule service is temporarily unavailable');
+          return []; // Service unavailable, return empty array
+        }
+        throw new Error(`Failed to fetch salary schedule: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      // Handle network errors or other fetch failures
+      if (error.message.includes('Failed to fetch')) {
+        console.warn('Unable to connect to salary schedule service');
+        return []; // Return empty array instead of throwing
+      }
+      throw error;
+    }
   }
 }
 

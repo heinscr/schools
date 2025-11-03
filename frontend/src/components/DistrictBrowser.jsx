@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import ChoroplethMap from './ChoroplethMap';
 import DistrictEditor from './DistrictEditor';
+import SalaryTable from './SalaryTable';
 import './DistrictBrowser.css';
 
 function DistrictBrowser() {
@@ -318,6 +319,12 @@ function DistrictBrowser() {
             districtTypeOptions={districtTypeOptions}
           />
         </div>
+
+        {selectedDistrict && (
+          <div className="salary-section">
+            <SalaryTable districtId={selectedDistrict.id} />
+          </div>
+        )}
       </div>
 
       <DistrictEditor

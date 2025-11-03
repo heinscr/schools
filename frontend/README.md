@@ -34,7 +34,7 @@ npm install
 
 2. Update `.env` if your backend is running on a different URL:
    ```
-   VITE_API_URL=http://localhost:8000
+   DISTRICT_API_URL=http://localhost:8000
    ```
 
 3. Start the development server:
@@ -126,7 +126,7 @@ The `api.js` service provides methods for:
 
 ## Environment Variables
 
-- `VITE_API_URL`: Backend API base URL (default: `http://localhost:8000`)
+- `DISTRICT_API_URL`: Backend API base URL (default: `http://localhost:8000`)
 
 ## Technologies
 
@@ -142,7 +142,7 @@ The `api.js` service provides methods for:
 ### API Connection Errors
 
 - Ensure backend is running on port 8000
-- Check `VITE_API_URL` in `.env` matches your backend URL
+- Check `DISTRICT_API_URL` in `.env` matches your backend URL
 - Verify CORS is configured correctly in the backend
 
 ### Build Errors

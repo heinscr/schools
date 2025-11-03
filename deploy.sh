@@ -35,24 +35,30 @@ CLOUDFRONT_ID=$(terraform output -raw cloudfront_distribution_id)
 CLOUDFRONT_DOMAIN=$(terraform output -raw cloudfront_domain)
 API_GATEWAY_ID=$(terraform output -raw api_gateway_id)
 API_ENDPOINT=$(terraform output -raw api_endpoint)
+SALARY_API_ENDPOINT=$(terraform output -raw salaries_api_endpoint)
+SALARY_LAMBDA_FUNCTION_NAME=$(terraform output -raw salaries_lambda_function_name)
+SALARIES_TABLE_NAME=$(terraform output -raw salaries_table_name)
+SCHEDULES_TABLE_NAME=$(terraform output -raw schedules_table_name)
 
 echo -e "${GREEN}✓ Configuration loaded${NC}"
 echo "  S3 Bucket: $S3_BUCKET"
 echo "  Lambda Function: $LAMBDA_FUNCTION_NAME"
+echo "  Salary Lambda Function: $SALARY_LAMBDA_FUNCTION_NAME"
 echo "  Region: $AWS_REGION"
 echo "  DynamoDB Table: $DYNAMODB_TABLE"
 echo "  CloudFront Domain: $CLOUDFRONT_DOMAIN"
 echo "  API Endpoint: $API_ENDPOINT"
+echo "  Salary API Endpoint: $SALARY_API_ENDPOINT"
 echo ""
 
 cd ../..
 
 # Deploy Backend
 echo -e "${YELLOW}=== Deploying Backend ===${NC}"
-cd backend
 
-# Create deployment package
-echo "Creating Lambda deployment package..."
+# 1. Package Python Lambda (districts API)
+echo "Creating Python Lambda deployment package..."
+cd backend
 rm -rf package lambda-deployment.zip 2>/dev/null || true
 
 # Install dependencies
@@ -67,13 +73,47 @@ cd package
 zip -r ../lambda-deployment.zip . -q
 cd ..
 
-echo -e "${GREEN}✓ Lambda package created${NC}"
+echo -e "${GREEN}✓ Python Lambda package created${NC}"
+
+cd ..
+
+# 2. Package Python Lambda (salary API)
+echo "Creating salary Lambda deployment package..."
+cd backend
+
+# Create a temporary directory for packaging
+mkdir -p salary_package
+
+# Copy the salary Lambda handler
+cp salaries.py salary_package/
+
+# Install dependencies (boto3 is included in Lambda runtime, but we might need others)
+# For now, just package the handler since it only uses boto3
+cd salary_package
+
+# Remove old zip if exists
+rm -f ../salaries.zip
+
+# Create zip file
+zip -r ../salaries.zip . -q
+
+cd ..
+
+# Clean up
+rm -rf salary_package
+
+echo -e "${GREEN}✓ Salary Lambda package created${NC}"
+
+cd ..
 
 # Upload to S3
-echo "Uploading Lambda package to S3..."
+echo "Uploading Lambda packages to S3..."
+cd backend
 aws s3 cp lambda-deployment.zip s3://$S3_BUCKET/backend/lambda-deployment.zip --region $AWS_REGION
+aws s3 cp salaries.zip s3://$S3_BUCKET/backend/salaries.zip --region $AWS_REGION
+cd ..
 
-echo -e "${GREEN}✓ Lambda package uploaded${NC}"
+echo -e "${GREEN}✓ Lambda packages uploaded${NC}"
 
 # Check if Lambda function exists
 if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION > /dev/null 2>&1; then
@@ -124,7 +164,43 @@ fi
 
 echo -e "${GREEN}✓ Lambda function deployed${NC}"
 
-cd ..
+# Deploy Salary Lambda
+echo -e "\n${YELLOW}=== Deploying Salary Lambda ===${NC}"
+
+# Check if Salary Lambda function exists
+if aws lambda get-function --function-name $SALARY_LAMBDA_FUNCTION_NAME --region $AWS_REGION > /dev/null 2>&1; then
+    echo "Updating existing Salary Lambda function code..."
+
+    # Wait for any pending updates to complete first
+    echo "Checking if Salary Lambda is ready..."
+    aws lambda wait function-updated --function-name $SALARY_LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
+
+    # Update function code
+    aws lambda update-function-code \
+        --function-name $SALARY_LAMBDA_FUNCTION_NAME \
+        --s3-bucket $S3_BUCKET \
+        --s3-key backend/salaries.zip \
+        --region $AWS_REGION \
+        --output json > /dev/null
+
+    echo "Waiting for code update to complete..."
+    aws lambda wait function-updated --function-name $SALARY_LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
+
+    # Update environment variables
+    echo "Updating Salary Lambda configuration..."
+    aws lambda update-function-configuration \
+        --function-name $SALARY_LAMBDA_FUNCTION_NAME \
+        --environment "Variables={SALARIES_TABLE_NAME=$SALARIES_TABLE_NAME,SCHEDULES_TABLE_NAME=$SCHEDULES_TABLE_NAME}" \
+        --region $AWS_REGION \
+        --output json > /dev/null
+
+    echo "Waiting for configuration update to complete..."
+    aws lambda wait function-updated --function-name $SALARY_LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
+else
+    echo -e "${YELLOW}Salary Lambda function not found. It should be created by Terraform.${NC}"
+fi
+
+echo -e "${GREEN}✓ Salary Lambda function deployed${NC}"
 
 # Deploy Frontend
 
@@ -135,9 +211,11 @@ cd frontend
 echo "Copying geojson.json to frontend/public/geojson.json..."
 cp ../data/geojson.json public/geojson.json
 
-# Build production bundle with API endpoint from Terraform
-echo "Building frontend with API endpoint: $API_ENDPOINT"
-VITE_API_URL=$API_ENDPOINT npm run build
+# Build production bundle with API endpoints from Terraform
+echo "Building frontend with API endpoints:"
+echo "  District API: $API_ENDPOINT"
+echo "  Salary API: $SALARY_API_ENDPOINT"
+DISTRICT_API_URL=$API_ENDPOINT VITE_SALARY_API_URL=$SALARY_API_ENDPOINT npm run build
 
 echo -e "${GREEN}✓ Frontend built${NC}"
 

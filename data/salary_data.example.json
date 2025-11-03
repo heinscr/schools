@@ -1,0 +1,3122 @@
+[
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 1,
+    "salary": 52154.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 1,
+    "salary": 53414.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 1,
+    "salary": 54649.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 1,
+    "salary": 57161.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 1,
+    "salary": 58481.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 1,
+    "salary": 59678.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 1,
+    "salary": 62151.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 1,
+    "salary": 64017.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 1,
+    "salary": 65936.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 2,
+    "salary": 54241.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 2,
+    "salary": 55550.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 2,
+    "salary": 56835.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 2,
+    "salary": 59447.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 2,
+    "salary": 60820.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 2,
+    "salary": 62065.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 2,
+    "salary": 64637.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 2,
+    "salary": 66577.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 2,
+    "salary": 68573.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 3,
+    "salary": 56409.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 3,
+    "salary": 57772.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 3,
+    "salary": 59108.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 3,
+    "salary": 61825.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 3,
+    "salary": 63253.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 3,
+    "salary": 64548.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 3,
+    "salary": 67223.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 3,
+    "salary": 69240.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 3,
+    "salary": 71317.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 4,
+    "salary": 58666.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 4,
+    "salary": 60083.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 4,
+    "salary": 61472.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 4,
+    "salary": 64299.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 4,
+    "salary": 65783.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 4,
+    "salary": 67130.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 4,
+    "salary": 69612.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 4,
+    "salary": 72010.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 4,
+    "salary": 74169.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 5,
+    "salary": 61013.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 5,
+    "salary": 62486.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 5,
+    "salary": 63932.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 5,
+    "salary": 66870.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 5,
+    "salary": 68414.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 5,
+    "salary": 69185.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 5,
+    "salary": 72708.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 5,
+    "salary": 74890.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 5,
+    "salary": 77136.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 6,
+    "salary": 63453.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 6,
+    "salary": 64986.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 6,
+    "salary": 66489.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 6,
+    "salary": 69545.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 6,
+    "salary": 71150.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 6,
+    "salary": 72607.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 6,
+    "salary": 75617.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 6,
+    "salary": 77886.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 6,
+    "salary": 80222.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 7,
+    "salary": 65991.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 7,
+    "salary": 67585.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 7,
+    "salary": 69148.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 7,
+    "salary": 72327.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 7,
+    "salary": 73997.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 7,
+    "salary": 75511.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 7,
+    "salary": 78642.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 7,
+    "salary": 81002.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 7,
+    "salary": 83431.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 8,
+    "salary": 68631.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 8,
+    "salary": 70289.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 8,
+    "salary": 71914.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 8,
+    "salary": 75220.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 8,
+    "salary": 76957.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 8,
+    "salary": 78532.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 8,
+    "salary": 81787.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 8,
+    "salary": 84241.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 8,
+    "salary": 86768.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 9,
+    "salary": 71376.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 9,
+    "salary": 73101.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 9,
+    "salary": 74791.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 9,
+    "salary": 78229.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 9,
+    "salary": 80035.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 9,
+    "salary": 81673.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 9,
+    "salary": 85058.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 9,
+    "salary": 87611.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 9,
+    "salary": 90239.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 10,
+    "salary": 74232.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 10,
+    "salary": 76024.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 10,
+    "salary": 77782.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 10,
+    "salary": 81358.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 10,
+    "salary": 83236.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 10,
+    "salary": 84940.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 10,
+    "salary": 88461.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 10,
+    "salary": 91115.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 10,
+    "salary": 93848.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 11,
+    "salary": 77950.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 11,
+    "salary": 79835.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 11,
+    "salary": 81678.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 11,
+    "salary": 85433.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 11,
+    "salary": 87406.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 11,
+    "salary": 89196.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 11,
+    "salary": 92893.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 11,
+    "salary": 95680.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 11,
+    "salary": 98550.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 12,
+    "salary": 80289.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 12,
+    "salary": 82228.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 12,
+    "salary": 84129.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 12,
+    "salary": 87996.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 12,
+    "salary": 90028.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 12,
+    "salary": 91872.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 12,
+    "salary": 95680.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 12,
+    "salary": 98550.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 12,
+    "salary": 101506.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 13,
+    "salary": 83501.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 13,
+    "salary": 85517.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 13,
+    "salary": 87495.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 13,
+    "salary": 91517.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 13,
+    "salary": 93630.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 13,
+    "salary": 95546.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 13,
+    "salary": 99506.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 13,
+    "salary": 102492.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 13,
+    "salary": 105566.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 0,
+    "step": 14,
+    "salary": 86840.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 15,
+    "step": 14,
+    "salary": 88938.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "B",
+    "credits": 30,
+    "step": 14,
+    "salary": 90994.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 0,
+    "step": 14,
+    "salary": 95177.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 15,
+    "step": 14,
+    "salary": 97375.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 14,
+    "salary": 99368.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 14,
+    "salary": 103486.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 60,
+    "step": 14,
+    "salary": 106592.0
+  },
+  {
+    "district_id": "millis",
+    "district_name": "Millis",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 14,
+    "salary": 109789.0
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 1,
+    "salary": 49259.75
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 1,
+    "salary": 51319.72
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 1,
+    "salary": 52868.18
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 1,
+    "salary": 53894.41
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 1,
+    "salary": 55442.87
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 1,
+    "salary": 56468.02
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 1,
+    "salary": 58017.56
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 1,
+    "salary": 59570.33
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 2,
+    "salary": 51830.14
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 2,
+    "salary": 53894.41
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 2,
+    "salary": 55442.87
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 2,
+    "salary": 55958.67
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 2,
+    "salary": 57508.21
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 2,
+    "salary": 59053.46
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 2,
+    "salary": 60595.48
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 2,
+    "salary": 62138.57
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 3,
+    "salary": 54403.76
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 3,
+    "salary": 56470.17
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 3,
+    "salary": 58018.64
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 3,
+    "salary": 58536.59
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 3,
+    "salary": 60080.76
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 3,
+    "salary": 61624.92
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 3,
+    "salary": 63170.17
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 3,
+    "salary": 64710.04
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 4,
+    "salary": 56470.17
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 4,
+    "salary": 58536.59
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 4,
+    "salary": 60080.76
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 4,
+    "salary": 60595.48
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 4,
+    "salary": 62139.65
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 4,
+    "salary": 63682.74
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 4,
+    "salary": 65226.91
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 4,
+    "salary": 66778.6
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 5,
+    "salary": 59569.26
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 5,
+    "salary": 61624.92
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 5,
+    "salary": 63169.09
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 5,
+    "salary": 64198.54
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 5,
+    "salary": 65749.16
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 5,
+    "salary": 67289.03
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 5,
+    "salary": 68843.94
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 5,
+    "salary": 70381.66
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 6,
+    "salary": 62139.65
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 6,
+    "salary": 64198.54
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 6,
+    "salary": 65749.16
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 6,
+    "salary": 66778.6
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 6,
+    "salary": 68323.85
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 6,
+    "salary": 69869.09
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 6,
+    "salary": 71413.26
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 6,
+    "salary": 72958.5
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 7,
+    "salary": 65226.91
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 7,
+    "salary": 67289.03
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 7,
+    "salary": 68843.94
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 7,
+    "salary": 69869.09
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 7,
+    "salary": 71926.91
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 7,
+    "salary": 73476.45
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 7,
+    "salary": 75015.25
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 7,
+    "salary": 76572.31
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 8,
+    "salary": 68323.85
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 8,
+    "salary": 70381.66
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 8,
+    "salary": 71926.91
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 8,
+    "salary": 72958.5
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 8,
+    "salary": 75015.25
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 8,
+    "salary": 76572.31
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 8,
+    "salary": 78110.03
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 8,
+    "salary": 79653.13
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 9,
+    "salary": 71413.26
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 9,
+    "salary": 73476.45
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 9,
+    "salary": 75015.25
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 9,
+    "salary": 76053.29
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 9,
+    "salary": 78110.03
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 9,
+    "salary": 79653.13
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 9,
+    "salary": 81199.45
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 9,
+    "salary": 82744.69
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 0,
+    "step": 10,
+    "salary": 74501.6
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 15,
+    "step": 10,
+    "salary": 76572.31
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "B",
+    "credits": 30,
+    "step": 10,
+    "salary": 78627.98
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 10,
+    "salary": 79653.13
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 10,
+    "salary": 81199.45
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 10,
+    "salary": 82744.69
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 10,
+    "salary": 84291.01
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 10,
+    "salary": 85836.25
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 11,
+    "salary": 81199.45
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 11,
+    "salary": 82744.69
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 11,
+    "salary": 84291.01
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 11,
+    "salary": 85836.25
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 11,
+    "salary": 87377.2
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 0,
+    "step": 12,
+    "salary": 86507.14
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 15,
+    "step": 12,
+    "salary": 88084.46
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 12,
+    "salary": 86864.62
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 12,
+    "salary": 88415.24
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 12,
+    "salary": 89959.41
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 30,
+    "step": 13,
+    "salary": 92289.19
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 45,
+    "step": 13,
+    "salary": 93865.41
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-1-91",
+    "education": "M",
+    "credits": 60,
+    "step": 13,
+    "salary": 95441.64
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 1,
+    "salary": 49875.5
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 1,
+    "salary": 51961.21
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 1,
+    "salary": 53529.04
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 1,
+    "salary": 54568.09
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 1,
+    "salary": 56135.91
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 1,
+    "salary": 57173.87
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 1,
+    "salary": 58742.78
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 1,
+    "salary": 60314.96
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 2,
+    "salary": 52478.02
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 2,
+    "salary": 54568.09
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 2,
+    "salary": 56135.91
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 2,
+    "salary": 56658.16
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 2,
+    "salary": 58227.07
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 2,
+    "salary": 59791.63
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 2,
+    "salary": 61352.92
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 2,
+    "salary": 62915.31
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 3,
+    "salary": 55083.8
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 3,
+    "salary": 57176.05
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 3,
+    "salary": 58743.87
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 3,
+    "salary": 59268.29
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 3,
+    "salary": 60831.76
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 3,
+    "salary": 62395.24
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 3,
+    "salary": 63959.8
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 3,
+    "salary": 65518.91
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 4,
+    "salary": 57176.05
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 4,
+    "salary": 59268.29
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 4,
+    "salary": 60831.76
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 4,
+    "salary": 61352.92
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 4,
+    "salary": 62916.39
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 4,
+    "salary": 64478.78
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 4,
+    "salary": 66042.25
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 4,
+    "salary": 67613.34
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 5,
+    "salary": 60313.87
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 5,
+    "salary": 62395.24
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 5,
+    "salary": 63958.71
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 5,
+    "salary": 65001.02
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 5,
+    "salary": 66571.02
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 5,
+    "salary": 68130.14
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 5,
+    "salary": 69704.49
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 5,
+    "salary": 71261.43
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 6,
+    "salary": 62916.39
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 6,
+    "salary": 65001.02
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 6,
+    "salary": 66571.02
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 6,
+    "salary": 67613.34
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 6,
+    "salary": 69177.89
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 6,
+    "salary": 70742.45
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 6,
+    "salary": 72305.93
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 6,
+    "salary": 73870.48
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 7,
+    "salary": 66042.25
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 7,
+    "salary": 68130.14
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 7,
+    "salary": 69704.49
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 7,
+    "salary": 70742.45
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 7,
+    "salary": 72825.99
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 7,
+    "salary": 74394.91
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 7,
+    "salary": 75952.94
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 7,
+    "salary": 77529.46
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 8,
+    "salary": 69177.89
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 8,
+    "salary": 71261.43
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 8,
+    "salary": 72825.99
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 8,
+    "salary": 73870.48
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 8,
+    "salary": 75952.94
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 8,
+    "salary": 77529.46
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 8,
+    "salary": 79086.41
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 8,
+    "salary": 80648.79
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 9,
+    "salary": 72305.93
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 9,
+    "salary": 74394.91
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 9,
+    "salary": 75952.94
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 9,
+    "salary": 77003.96
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 9,
+    "salary": 79086.41
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 9,
+    "salary": 80648.79
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 9,
+    "salary": 82214.44
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 9,
+    "salary": 83779.0
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 0,
+    "step": 10,
+    "salary": 75432.87
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 15,
+    "step": 10,
+    "salary": 77529.46
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "B",
+    "credits": 30,
+    "step": 10,
+    "salary": 79610.83
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 10,
+    "salary": 80648.79
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 10,
+    "salary": 82214.44
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 10,
+    "salary": 83779.0
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 10,
+    "salary": 85344.65
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 10,
+    "salary": 86909.2
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 11,
+    "salary": 82214.44
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 11,
+    "salary": 83779.0
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 11,
+    "salary": 85344.65
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 11,
+    "salary": 86909.2
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 11,
+    "salary": 88469.41
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 0,
+    "step": 12,
+    "salary": 87588.48
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 15,
+    "step": 12,
+    "salary": 89185.52
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 12,
+    "salary": 87950.43
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 12,
+    "salary": 89520.43
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 12,
+    "salary": 91083.9
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 30,
+    "step": 13,
+    "salary": 93442.8
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 45,
+    "step": 13,
+    "salary": 95038.73
+  },
+  {
+    "district_id": "medway",
+    "district_name": "Medway",
+    "school_year": "2021-2022",
+    "period": "days-92-183",
+    "education": "M",
+    "credits": 60,
+    "step": 13,
+    "salary": 97111.87
+  }
+]

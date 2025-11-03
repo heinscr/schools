@@ -62,7 +62,7 @@ cd "$FRONTEND_DIR"
 # Create .env.production with API endpoint
 echo -e "${YELLOW}Step 1: Configuring environment${NC}"
 cat > .env.production <<EOF
-VITE_API_URL=$API_ENDPOINT
+DISTRICT_API_URL=$API_ENDPOINT
 EOF
 echo -e "${GREEN}✓ Environment configured${NC}"
 echo "API URL: $API_ENDPOINT"

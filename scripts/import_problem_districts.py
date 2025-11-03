@@ -13,7 +13,8 @@ import sys
 from pathlib import Path
 
 # Add the backend directory to the path so we can import our modules
-sys.path.insert(0, str(Path(__file__).parent))
+backend_path = Path(__file__).parent.parent / 'backend'
+sys.path.insert(0, str(backend_path))
 
 from services.dynamodb_district_service import DynamoDBDistrictService
 from schemas import DistrictCreate
@@ -48,14 +49,13 @@ def import_districts(json_filepath: str, dry_run: bool = False):
 
     # Process each category of districts
     categories = [
-        ('regional_academic', 'Regional Academic', 'regional_academic'),
-        ('regional_vocational', 'Regional Vocational', 'regional_vocational'),
-        ('county_agricultural', 'County Agricultural', 'county_agricultural'),
-        ('other_districts', 'Other Districts', None),
-        ('charter', 'Charter', "charter")
+        ('other_districts', 'Other Districts'),
+        ('regional_academic', 'Regional Academic'),
+        ('regional_vocational', 'Regional Vocational'),
+        ('county_agricultural', 'County Agricultural'),
     ]
 
-    for category_key, category_name, type_value in categories:
+    for category_key, category_name in categories:
         if category_key not in data:
             continue
 
@@ -72,13 +72,6 @@ def import_districts(json_filepath: str, dry_run: bool = False):
             address = district_data.get('address', '').strip()
             members = district_data.get('members', [])
 
-            # Determine district_type
-            if type_value:
-                district_type = type_value
-            else:
-                # For other_districts, use the 'type' field in the data, default to 'municipal'
-                district_type = district_data.get('type', 'municipal')
-
             if not name:
                 print(f"  ⚠️  Skipping district with no name: {district_data}")
                 stats['skipped'] += 1
@@ -88,15 +81,13 @@ def import_districts(json_filepath: str, dry_run: bool = False):
             district_create = DistrictCreate(
                 name=name,
                 main_address=address if address else None,
-                towns=members if members else [],
-                district_type=district_type
+                towns=members if members else []
             )
 
             if dry_run:
                 print(f"  [DRY RUN] Would import/update: {name}")
                 print(f"    Address: {address or 'N/A'}")
                 print(f"    Towns: {', '.join(members) if members else 'N/A'}")
-                print(f"    Type: {district_type}")
                 stats['success'] += 1
             else:
                 try:
@@ -111,8 +102,7 @@ def import_districts(json_filepath: str, dry_run: bool = False):
                         update_data = DistrictUpdate(
                             name=name,
                             main_address=address if address else None,
-                            towns=members if members else [],
-                            district_type=district_type
+                            towns=members if members else []
                         )
                         DynamoDBDistrictService.update_district(districts_table, district_id, update_data)
                         print(f"  ✓ Updated: {name} (ID: {district_id})")
@@ -152,8 +142,8 @@ def main():
     parser.add_argument(
         '--file',
         type=str,
-        default='../data/districts.json',
-        help='Path to the districts.json file (default: ../data/districts.json)'
+        default='../data/problem_districts.json',
+        help='Path to the problem_districts.json file (default: ../data/problem_districts.json)'
     )
     parser.add_argument(
         '--dry-run',

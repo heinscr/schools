@@ -13,7 +13,7 @@ resource "null_resource" "frontend_build" {
     command     = "npm run build"
     working_dir = "${path.module}/../../frontend"
     environment = {
-      VITE_API_URL = aws_api_gateway_deployment.main.invoke_url
+      DISTRICT_API_URL = aws_api_gateway_deployment.main.invoke_url
     }
   }
 
