@@ -401,6 +401,25 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
+  /* Reduce outer padding so the card and content can use more screen width */
+  .salary-comparison {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  /* Tighten inner padding and let the card bleed closer to the edges */
+  .search-form {
+    padding: 12px;
+    margin-left: -8px;
+    margin-right: -8px;
+    border-radius: 10px;
+  }
+
+  /* Slightly tighter spacing between fields */
+  .search-form-inputs {
+    gap: 10px;
+  }
+
   .search-controls-row {
     flex-direction: column;
     max-width: 100%;
@@ -420,8 +439,14 @@
     min-width: 60px;
     flex-shrink: 0;
     margin-right: 0;
-    padding: 8px 12px;
+    padding: 8px 10px;
     flex-direction: column;
+  }
+
+  /* Use full row width for filters and distribute buttons to reduce wrapping */
+  .district-type-filters-row {
+    justify-content: space-between;
+    gap: 6px;
   }
 
   /* Hide label text on mobile, keep icon and count */
