@@ -43,8 +43,15 @@ const SalaryComparisonMap = ({ results = [] }) => {
 
   // Render map
   useEffect(() => {
+    // Ensure container exists
+    if (!containerRef.current) return;
+
+    // Always clear any existing SVG and tooltip before re-rendering
+    d3.select(containerRef.current).select('svg').remove();
+    d3.select('.map-tooltip').remove();
+
     // Early return if required data is missing or invalid
-    if (!geoData || !geoData.features || !Array.isArray(results) || results.length === 0) {
+    if (!geoData || !geoData.features) {
       return;
     }
 
@@ -52,9 +59,6 @@ const SalaryComparisonMap = ({ results = [] }) => {
     if (!dimensions.width || !dimensions.height || dimensions.width < 10 || dimensions.height < 10) {
       return;
     }
-
-    // Clear existing SVG
-    d3.select(containerRef.current).select('svg').remove();
 
     // Create SVG
     const svg = d3.select(containerRef.current)
@@ -76,9 +80,10 @@ const SalaryComparisonMap = ({ results = [] }) => {
 
     const path = d3.geoPath().projection(projection);
 
-    // Build district to towns mapping from results
+    // Build district to towns mapping from results (safe if results is not an array)
+    const safeResults = Array.isArray(results) ? results : [];
     const districtToTowns = {};
-    results.forEach(result => {
+    safeResults.forEach(result => {
       if (result && result.district_id) {
         districtToTowns[result.district_id] = result.towns || [];
       }
@@ -86,7 +91,7 @@ const SalaryComparisonMap = ({ results = [] }) => {
 
     // Build town to salary rank mapping (for coloring)
     const townToRank = {};
-    results.forEach((result, index) => {
+    safeResults.forEach((result, index) => {
       if (!result) return;
       const towns = result.towns || [];
       if (Array.isArray(towns)) {
@@ -97,7 +102,7 @@ const SalaryComparisonMap = ({ results = [] }) => {
             if (!townToRank[townKey]) {
               townToRank[townKey] = {
                 rank: index + 1,
-                total: results.length,
+                total: safeResults.length,
                 salary: result.salary,
                 districtName: result.district_name
               };
@@ -206,20 +211,7 @@ const SalaryComparisonMap = ({ results = [] }) => {
         background: '#f8f9fa'
       }}
     >
-      {(!results || !Array.isArray(results) || results.length === 0) && (
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          color: '#999',
-          fontSize: '16px',
-          textAlign: 'center'
-        }}>
-          Search for salaries to see districts on the map
-        </div>
-      )}
-      
+      {/* Legend only when results present */}
       {results && Array.isArray(results) && results.length > 0 && (
         <div style={{
           position: 'absolute',
