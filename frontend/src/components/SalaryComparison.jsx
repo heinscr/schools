@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../services/api';
+import SalaryComparisonMap from './SalaryComparisonMap';
 import './SalaryComparison.css';
 
 function SalaryComparison() {
@@ -9,6 +10,7 @@ function SalaryComparison() {
     credits: '30'
   });
   const [results, setResults] = useState(null);
+  const [enrichedResults, setEnrichedResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -23,9 +25,30 @@ function SalaryComparison() {
         parseInt(searchParams.step)
       );
       setResults(data);
+      
+      // Fetch full district details for each result to get towns
+      const enriched = await Promise.all(
+        data.results.map(async (result) => {
+          try {
+            const districtDetails = await api.getDistrict(result.district_id);
+            return {
+              ...result,
+              towns: districtDetails.towns || []
+            };
+          } catch (err) {
+            console.error(`Error fetching district ${result.district_id}:`, err);
+            return {
+              ...result,
+              towns: []
+            };
+          }
+        })
+      );
+      setEnrichedResults(enriched);
     } catch (err) {
       setError(err.message);
       setResults(null);
+      setEnrichedResults([]);
     } finally {
       setLoading(false);
     }
@@ -103,6 +126,11 @@ function SalaryComparison() {
           <strong>Error:</strong> {error}
         </div>
       )}
+
+      {/* Map Section */}
+      <div className="comparison-map-section">
+        <SalaryComparisonMap results={enrichedResults} />
+      </div>
 
       {results && (
         <div className="comparison-results">
