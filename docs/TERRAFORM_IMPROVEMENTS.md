@@ -159,7 +159,7 @@ terraform {
 **Error:** "Error creating Lambda Function: ResourceConflictException"
 **Solution:** Function may already exist from old deployment. Import it:
 ```bash
-terraform import aws_lambda_function.api crackpow-schools-api
+terraform import aws_lambda_function.api app-schools-api
 ```
 
 ### API Gateway returns 500 errors

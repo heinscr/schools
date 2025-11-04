@@ -434,10 +434,10 @@ echo -e "\n${GREEN}=== Deployment Complete! ===${NC}\n"
 
 CLOUDFRONT_DOMAIN=$(cd infrastructure/terraform && terraform output -raw cloudfront_domain)
 echo "Frontend URL: https://$CLOUDFRONT_DOMAIN"
-echo "Custom Domain: https://school.crackpow.com (if DNS configured)"
+echo "Custom Domain: https://$CUSTOM_DOMAIN (if DNS configured)"
 echo ""
 echo "Next steps:"
-echo "1. Update DNS CNAME for school.crackpow.com → $CLOUDFRONT_DOMAIN"
+echo "1. Update DNS CNAME for $CUSTOM_DOMAIN → $CLOUDFRONT_DOMAIN"
 echo "2. Load sample data: cd backend && python init_dynamodb_sample_data.py"
 echo "3. Test the application"
 echo ""

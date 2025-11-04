@@ -79,7 +79,7 @@ Include the API key in the `X-API-Key` header:
 #### cURL Example
 
 ```bash
-curl -X POST https://school.crackpow.com/api/districts \
+curl -X POST https://www.example.com/api/districts \
   -H "Content-Type: application/json" \
   -H "X-API-Key: your-api-key-here" \
   -d '{
@@ -93,7 +93,7 @@ curl -X POST https://school.crackpow.com/api/districts \
 #### JavaScript/Fetch Example
 
 ```javascript
-const response = await fetch('https://school.crackpow.com/api/districts', {
+const response = await fetch('https://www.example.com/api/districts', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ data = {
 }
 
 response = requests.post(
-    'https://school.crackpow.com/api/districts',
+    'https://www.example.com/api/districts',
     headers=headers,
     json=data
 )

@@ -1,10 +1,17 @@
 import os
 import boto3
+from dotenv import load_dotenv
+
+# Load environment variables from .env file for local development
+load_dotenv()
 
 # Get DynamoDB configuration from environment
 DYNAMODB_ENDPOINT = os.getenv("DYNAMODB_ENDPOINT")  # For local development
 AWS_REGION = os.getenv("AWS_REGION", "us-east-2")
-DISTRICTS_TABLE_NAME = os.getenv("DYNAMODB_DISTRICTS_TABLE", "crackpow-schools-districts")
+DISTRICTS_TABLE_NAME = os.getenv("DYNAMODB_DISTRICTS_TABLE")
+
+if not DISTRICTS_TABLE_NAME:
+    raise ValueError("DYNAMODB_DISTRICTS_TABLE environment variable must be set")
 
 # Create DynamoDB client
 def get_dynamodb_client():

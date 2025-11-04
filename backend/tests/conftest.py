@@ -1,0 +1,19 @@
+"""
+Pytest configuration and fixtures for backend tests
+"""
+import os
+import sys
+from pathlib import Path
+
+# Set environment variables before any modules are imported
+# Use test-specific table names that don't conflict with real tables
+os.environ["DYNAMODB_DISTRICTS_TABLE"] = "test-districts"
+os.environ["SALARIES_TABLE_NAME"] = "test-salaries"
+os.environ["SCHEDULES_TABLE_NAME"] = "test-schedules"
+os.environ["DISTRICTS_TABLE_NAME"] = "test-districts"
+os.environ["API_KEY"] = "test-api-key-for-unit-tests"
+
+# Add backend directory to path
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
