@@ -23,6 +23,7 @@ from config import (
     DEFAULT_OFFSET
 )
 from auth import require_api_key
+from validation import validate_search_query, validate_name_filter, validate_town_filter
 
 # Load environment from .env for local development
 load_dotenv()
@@ -90,10 +91,14 @@ async def list_districts(
     table = Depends(get_table)
 ):
     """List all districts with optional filtering"""
+    # Validate inputs
+    validated_name = validate_name_filter(name)
+    validated_town = validate_town_filter(town)
+
     districts, total = DynamoDBDistrictService.get_districts(
         table=table,
-        name=name,
-        town=town,
+        name=validated_name,
+        town=validated_town,
         limit=limit,
         offset=offset
     )
@@ -117,9 +122,12 @@ async def search_districts(
     table = Depends(get_table)
 ):
     """Search districts by name or town"""
+    # Validate search query input
+    validated_query = validate_search_query(q)
+
     districts, total = DynamoDBDistrictService.search_districts(
         table=table,
-        query_text=q,
+        query_text=validated_query,
         limit=limit,
         offset=offset
     )
