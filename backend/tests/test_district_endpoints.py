@@ -203,6 +203,25 @@ def test_create_district_unauthorized_no_api_key(monkeypatch):
 
 def test_create_district_forbidden_invalid_api_key(monkeypatch):
     """Test that POST with invalid auth token returns 401"""
+    # Mock get_cognito_keys to return valid keys structure
+    # This prevents HTTP calls to Cognito in tests
+    import cognito_auth
+    monkeypatch.setattr(
+        cognito_auth,
+        'get_cognito_keys',
+        lambda: {
+            "keys": [
+                {
+                    "kid": "test-key-id",
+                    "kty": "RSA",
+                    "use": "sig",
+                    "n": "test-n",
+                    "e": "AQAB"
+                }
+            ]
+        }
+    )
+
     client = TestClient(backend_main.app)
 
     payload = {
@@ -214,6 +233,7 @@ def test_create_district_forbidden_invalid_api_key(monkeypatch):
     headers = {'Authorization': 'Bearer invalid-token'}
     r = client.post('/api/districts', json=payload, headers=headers)
     assert r.status_code == 401
+    assert 'Invalid token' in r.json()['detail'] or 'Token' in r.json()['detail']
 
 
 def test_update_district_unauthorized_no_api_key(monkeypatch):
