@@ -81,7 +81,15 @@ def verify_cognito_token(token: str) -> Dict:
 
     try:
         # Get the key ID from the token header
-        headers = jwt.get_unverified_headers(token)
+        try:
+            headers = jwt.get_unverified_headers(token)
+        except Exception:
+            # Invalid JWT format
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token format"
+            )
+
         kid = headers.get("kid")
 
         if not kid:
@@ -117,6 +125,9 @@ def verify_cognito_token(token: str) -> Dict:
 
         return claims
 
+    except HTTPException:
+        # Re-raise HTTPExceptions as-is
+        raise
     except JWTError as e:
         raise HTTPException(
             status_code=401,
