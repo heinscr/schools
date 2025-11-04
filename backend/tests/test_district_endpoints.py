@@ -55,7 +55,7 @@ def test_get_district_by_id_not_found(monkeypatch):
         staticmethod(lambda table, district_id: None)
     )
 
-    r = client.get('/api/districts/NOPE')
+    r = client.get('/api/districts/DISTRICT%23notfound')
     assert r.status_code == 404
 
 
@@ -101,7 +101,7 @@ def test_update_district_success(monkeypatch):
 
     payload = {'name': 'Updated District'}
     headers = {'X-API-Key': TEST_API_KEY}
-    r = client.put('/api/districts/DIST#1', json=payload, headers=headers)
+    r = client.put('/api/districts/DIST%231', json=payload, headers=headers)
     assert r.status_code == 200
     assert r.json()['name'] == 'Updated District'
 
@@ -119,7 +119,7 @@ def test_update_district_not_found(monkeypatch):
     )
 
     headers = {'X-API-Key': TEST_API_KEY}
-    r = client.put('/api/districts/DIST#missing', json={'name': 'X'}, headers=headers)
+    r = client.put('/api/districts/DIST%23missing', json={'name': 'X'}, headers=headers)
     assert r.status_code == 404
 
 
@@ -133,7 +133,7 @@ def test_delete_district_success(monkeypatch):
     )
 
     headers = {'X-API-Key': TEST_API_KEY}
-    r = client.delete('/api/districts/DIST#1', headers=headers)
+    r = client.delete('/api/districts/DIST%231', headers=headers)
     assert r.status_code == 204
 
 
@@ -147,7 +147,7 @@ def test_delete_district_not_found(monkeypatch):
     )
 
     headers = {'X-API-Key': TEST_API_KEY}
-    r = client.delete('/api/districts/DIST#404', headers=headers)
+    r = client.delete('/api/districts/DIST%23404', headers=headers)
     assert r.status_code == 404
 
 
@@ -187,7 +187,7 @@ def test_update_district_unauthorized_no_api_key(monkeypatch):
     client = TestClient(backend_main.app)
 
     payload = {'name': 'Updated District'}
-    r = client.put('/api/districts/DIST#1', json=payload)
+    r = client.put('/api/districts/DIST%231', json=payload)
     assert r.status_code == 401
 
 
@@ -195,7 +195,7 @@ def test_delete_district_unauthorized_no_api_key(monkeypatch):
     """Test that DELETE without API key returns 401"""
     client = TestClient(backend_main.app)
 
-    r = client.delete('/api/districts/DIST#1')
+    r = client.delete('/api/districts/DIST%231')
     assert r.status_code == 401
 
 

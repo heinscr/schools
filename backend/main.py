@@ -23,7 +23,7 @@ from config import (
     DEFAULT_OFFSET
 )
 from auth import require_api_key
-from validation import validate_search_query, validate_name_filter, validate_town_filter
+from validation import validate_search_query, validate_name_filter, validate_town_filter, validate_district_id
 
 # Load environment from .env for local development
 load_dotenv()
@@ -149,7 +149,10 @@ async def get_district(
     table = Depends(get_table)
 ):
     """Get a specific district by ID"""
-    district = DynamoDBDistrictService.get_district(table=table, district_id=district_id)
+    # Validate district ID
+    validated_district_id = validate_district_id(district_id)
+
+    district = DynamoDBDistrictService.get_district(table=table, district_id=validated_district_id)
     if not district:
         raise HTTPException(status_code=404, detail="District not found")
 
@@ -178,9 +181,12 @@ async def update_district(
     api_key: str = Depends(require_api_key)
 ):
     """Update a district (requires API key)"""
+    # Validate district ID
+    validated_district_id = validate_district_id(district_id)
+
     district_dict = DynamoDBDistrictService.update_district(
         table=table,
-        district_id=district_id,
+        district_id=validated_district_id,
         district_data=district
     )
     if not district_dict:
@@ -196,7 +202,10 @@ async def delete_district(
     api_key: str = Depends(require_api_key)
 ):
     """Delete a district (requires API key)"""
-    success = DynamoDBDistrictService.delete_district(table=table, district_id=district_id)
+    # Validate district ID
+    validated_district_id = validate_district_id(district_id)
+
+    success = DynamoDBDistrictService.delete_district(table=table, district_id=validated_district_id)
     if not success:
         raise HTTPException(status_code=404, detail="District not found")
     return None

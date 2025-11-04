@@ -10,10 +10,14 @@ from fastapi import HTTPException
 MAX_SEARCH_QUERY_LENGTH = 100
 MAX_NAME_LENGTH = 200
 MAX_TOWN_LENGTH = 100
+MAX_DISTRICT_ID_LENGTH = 100
 
 # Allowed characters patterns
 # Allow alphanumeric, spaces, hyphens, apostrophes, periods, and common punctuation
 SAFE_TEXT_PATTERN = re.compile(r'^[a-zA-Z0-9\s\-\'.&,()]+$')
+
+# District ID pattern - allows DISTRICT#<uuid> or similar formats (# can be URL-encoded as %23)
+DISTRICT_ID_PATTERN = re.compile(r'^[A-Z]+(%23|#)[a-zA-Z0-9\-]+$')
 
 
 def validate_search_query(query: Optional[str]) -> Optional[str]:
@@ -134,3 +138,41 @@ def validate_town_filter(town: Optional[str]) -> Optional[str]:
         )
 
     return town
+
+
+def validate_district_id(district_id: str) -> str:
+    """
+    Validate district ID format
+
+    Args:
+        district_id: The district ID to validate
+
+    Returns:
+        Validated district ID
+
+    Raises:
+        HTTPException: If district ID is invalid
+    """
+    if not district_id or not district_id.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="District ID cannot be empty"
+        )
+
+    district_id = district_id.strip()
+
+    # Check length
+    if len(district_id) > MAX_DISTRICT_ID_LENGTH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"District ID too long (max {MAX_DISTRICT_ID_LENGTH} characters)"
+        )
+
+    # Check format - must be like DISTRICT#abc123 or ENTITY#xyz
+    if not DISTRICT_ID_PATTERN.match(district_id):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid district ID format. Must be in format: PREFIX#identifier (e.g., DISTRICT#abc123)"
+        )
+
+    return district_id
