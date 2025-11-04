@@ -48,23 +48,47 @@ app = FastAPI(
 # Configure CORS
 # Get allowed origins from environment or use defaults
 allowed_origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://school.crackpow.com"
+    "http://localhost:3000",  # React dev server
+    "http://localhost:5173",  # Vite dev server
 ]
+
+# Add custom domain from environment (production)
+custom_domain = os.getenv("CUSTOM_DOMAIN")
+if custom_domain:
+    allowed_origins.append(f"https://{custom_domain}")
+else:
+    # Fallback to hardcoded domain if not in env
+    allowed_origins.append("https://school.crackpow.com")
 
 # Add CloudFront domain from environment if set
 cloudfront_domain = os.getenv("CLOUDFRONT_DOMAIN")
 if cloudfront_domain:
     allowed_origins.append(f"https://{cloudfront_domain}")
 
+# Allowed HTTP methods - only what's needed
+allowed_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+
+# Allowed headers - whitelist common safe headers
+allowed_headers = [
+    "Content-Type",
+    "Authorization",
+    "X-API-Key",  # Our custom API key header
+    "Accept",
+    "Origin",
+    "User-Agent",
+    "DNT",
+    "Cache-Control",
+    "X-Requested-With"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["X-API-Key"],
+    allow_origins=allowed_origins,  # Specific origins only
+    allow_credentials=False,  # Disable credentials to prevent CSRF attacks
+    allow_methods=allowed_methods,  # Only necessary methods
+    allow_headers=allowed_headers,  # Whitelist specific headers
+    expose_headers=[],  # Don't expose any custom headers
+    max_age=600,  # Cache preflight requests for 10 minutes
 )
 
 
