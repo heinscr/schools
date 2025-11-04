@@ -56,9 +56,6 @@ allowed_origins = [
 custom_domain = os.getenv("CUSTOM_DOMAIN")
 if custom_domain:
     allowed_origins.append(f"https://{custom_domain}")
-else:
-    # Fallback to hardcoded domain if not in env
-    allowed_origins.append("https://school.crackpow.com")
 
 # Add CloudFront domain from environment if set
 cloudfront_domain = os.getenv("CLOUDFRONT_DOMAIN")

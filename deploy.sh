@@ -248,11 +248,23 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
     # Get API key from Terraform output (managed by Terraform)
     API_KEY=$(cd infrastructure/terraform && terraform output -raw api_key 2>/dev/null || echo "")
 
+    # Get CUSTOM_DOMAIN from backend/.env if it exists
+    CUSTOM_DOMAIN=""
+    if [ -f "backend/.env" ]; then
+        CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
+    fi
+
     if [ -z "$API_KEY" ]; then
         echo -e "${YELLOW}Warning: API_KEY not found in Terraform. Write operations will be disabled.${NC}"
         ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
     else
         ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN,API_KEY=$API_KEY"
+    fi
+
+    # Add CUSTOM_DOMAIN if it exists
+    if [ -n "$CUSTOM_DOMAIN" ]; then
+        ENV_VARS="$ENV_VARS,CUSTOM_DOMAIN=$CUSTOM_DOMAIN"
+        echo "  Using custom domain: $CUSTOM_DOMAIN"
     fi
 
     aws lambda update-function-configuration \
@@ -269,11 +281,23 @@ else
     # Get API key from Terraform output (managed by Terraform)
     API_KEY=$(cd infrastructure/terraform && terraform output -raw api_key 2>/dev/null || echo "")
 
+    # Get CUSTOM_DOMAIN from backend/.env if it exists
+    CUSTOM_DOMAIN=""
+    if [ -f "backend/.env" ]; then
+        CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
+    fi
+
     if [ -z "$API_KEY" ]; then
         echo -e "${YELLOW}Warning: API_KEY not found in Terraform. Write operations will be disabled.${NC}"
         ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
     else
         ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN,API_KEY=$API_KEY"
+    fi
+
+    # Add CUSTOM_DOMAIN if it exists
+    if [ -n "$CUSTOM_DOMAIN" ]; then
+        ENV_VARS="$ENV_VARS,CUSTOM_DOMAIN=$CUSTOM_DOMAIN"
+        echo "  Using custom domain: $CUSTOM_DOMAIN"
     fi
 
     aws lambda create-function \
@@ -318,9 +342,24 @@ if aws lambda get-function --function-name $SALARY_LAMBDA_FUNCTION_NAME --region
 
     # Update environment variables
     echo "Updating Salary Lambda configuration..."
+    
+    # Get CUSTOM_DOMAIN from backend/.env if it exists
+    CUSTOM_DOMAIN=""
+    if [ -f "backend/.env" ]; then
+        CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
+    fi
+    
+    SALARY_ENV_VARS="SALARIES_TABLE_NAME=$SALARIES_TABLE_NAME,SCHEDULES_TABLE_NAME=$SCHEDULES_TABLE_NAME,DISTRICTS_TABLE_NAME=$DYNAMODB_TABLE"
+    
+    # Add CUSTOM_DOMAIN if it exists
+    if [ -n "$CUSTOM_DOMAIN" ]; then
+        SALARY_ENV_VARS="$SALARY_ENV_VARS,CUSTOM_DOMAIN=$CUSTOM_DOMAIN"
+        echo "  Using custom domain: $CUSTOM_DOMAIN"
+    fi
+    
     aws lambda update-function-configuration \
         --function-name $SALARY_LAMBDA_FUNCTION_NAME \
-        --environment "Variables={SALARIES_TABLE_NAME=$SALARIES_TABLE_NAME,SCHEDULES_TABLE_NAME=$SCHEDULES_TABLE_NAME,DISTRICTS_TABLE_NAME=$DYNAMODB_TABLE}" \
+        --environment "Variables={$SALARY_ENV_VARS}" \
         --region $AWS_REGION \
         --output json > /dev/null
 
