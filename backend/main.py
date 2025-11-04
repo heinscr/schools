@@ -22,6 +22,7 @@ from config import (
     MIN_QUERY_LIMIT,
     DEFAULT_OFFSET
 )
+from auth import require_api_key
 
 # Load environment from .env for local development
 load_dotenv()
@@ -62,6 +63,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-API-Key"],
 )
 
 
@@ -149,9 +151,10 @@ async def get_district(
 @app.post("/api/districts", response_model=DistrictResponse, status_code=201)
 async def create_district(
     district: DistrictCreate,
-    table = Depends(get_table)
+    table = Depends(get_table),
+    api_key: str = Depends(require_api_key)
 ):
-    """Create a new district"""
+    """Create a new district (requires API key)"""
     try:
         district_dict = DynamoDBDistrictService.create_district(table=table, district_data=district)
         return DistrictResponse(**district_dict)
@@ -163,9 +166,10 @@ async def create_district(
 async def update_district(
     district_id: str,
     district: DistrictUpdate,
-    table = Depends(get_table)
+    table = Depends(get_table),
+    api_key: str = Depends(require_api_key)
 ):
-    """Update a district"""
+    """Update a district (requires API key)"""
     district_dict = DynamoDBDistrictService.update_district(
         table=table,
         district_id=district_id,
@@ -180,9 +184,10 @@ async def update_district(
 @app.delete("/api/districts/{district_id}", status_code=204)
 async def delete_district(
     district_id: str,
-    table = Depends(get_table)
+    table = Depends(get_table),
+    api_key: str = Depends(require_api_key)
 ):
-    """Delete a district"""
+    """Delete a district (requires API key)"""
     success = DynamoDBDistrictService.delete_district(table=table, district_id=district_id)
     if not success:
         raise HTTPException(status_code=404, detail="District not found")

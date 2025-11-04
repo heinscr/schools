@@ -1,3 +1,7 @@
+# Include main dependencies
+-r requirements.txt
+
+# Testing dependencies
 pytest==8.3.2
 pytest-asyncio==0.23.8
 httpx==0.27.2

@@ -244,9 +244,20 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
 
     # Update environment variables
     echo "Updating Lambda configuration..."
+
+    # Get API key from Terraform output (managed by Terraform)
+    API_KEY=$(cd infrastructure/terraform && terraform output -raw api_key 2>/dev/null || echo "")
+
+    if [ -z "$API_KEY" ]; then
+        echo -e "${YELLOW}Warning: API_KEY not found in Terraform. Write operations will be disabled.${NC}"
+        ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
+    else
+        ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN,API_KEY=$API_KEY"
+    fi
+
     aws lambda update-function-configuration \
         --function-name $LAMBDA_FUNCTION_NAME \
-        --environment "Variables={DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN}" \
+        --environment "Variables={$ENV_VARS}" \
         --region $AWS_REGION \
         --output json > /dev/null
 
@@ -254,13 +265,24 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
     aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
 else
     echo "Creating new Lambda function..."
+
+    # Get API key from Terraform output (managed by Terraform)
+    API_KEY=$(cd infrastructure/terraform && terraform output -raw api_key 2>/dev/null || echo "")
+
+    if [ -z "$API_KEY" ]; then
+        echo -e "${YELLOW}Warning: API_KEY not found in Terraform. Write operations will be disabled.${NC}"
+        ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
+    else
+        ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN,API_KEY=$API_KEY"
+    fi
+
     aws lambda create-function \
         --function-name $LAMBDA_FUNCTION_NAME \
         --runtime python3.12 \
         --role $LAMBDA_ROLE_ARN \
         --handler main.handler \
         --code S3Bucket=$S3_BUCKET,S3Key=backend/lambda-deployment.zip \
-        --environment "Variables={DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN}" \
+        --environment "Variables={$ENV_VARS}" \
         --timeout 30 \
         --memory-size 512 \
         --region $AWS_REGION \
