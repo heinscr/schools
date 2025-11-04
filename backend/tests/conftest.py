@@ -18,6 +18,13 @@ os.environ["RATE_LIMIT_GENERAL"] = "1000/minute"
 os.environ["RATE_LIMIT_SEARCH"] = "1000/minute"
 os.environ["RATE_LIMIT_WRITE"] = "1000/minute"
 
+# Set mock Cognito configuration for testing
+# These values won't be used for actual authentication (we override the dependency)
+# but they prevent errors when Cognito auth module is imported
+os.environ["COGNITO_USER_POOL_ID"] = "us-east-1_TEST123456"
+os.environ["COGNITO_CLIENT_ID"] = "test-client-id-123456789"
+os.environ["COGNITO_REGION"] = "us-east-1"
+
 # Add backend directory to path
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
