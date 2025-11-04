@@ -392,9 +392,48 @@ npm run build
 
 echo -e "${GREEN}✓ Frontend built${NC}"
 
-# Upload to S3
+# Generate config.json from Terraform outputs
+echo "Generating config.json with Cognito configuration..."
+cd ../infrastructure/terraform
+
+COGNITO_USER_POOL_ID=$(terraform output -raw cognito_user_pool_id 2>/dev/null || echo "")
+COGNITO_CLIENT_ID=$(terraform output -raw cognito_client_id 2>/dev/null || echo "")
+COGNITO_REGION=$(terraform output -raw region 2>/dev/null || echo "us-east-1")
+COGNITO_DOMAIN=$(terraform output -raw cognito_domain 2>/dev/null || echo "")
+
+cd ../../frontend
+
+if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
+    cat > dist/config.json <<EOF
+{
+  "apiUrl": "$API_ENDPOINT",
+  "cognitoUserPoolId": "$COGNITO_USER_POOL_ID",
+  "cognitoClientId": "$COGNITO_CLIENT_ID",
+  "cognitoRegion": "$COGNITO_REGION",
+  "cognitoDomain": "$COGNITO_DOMAIN.auth.$COGNITO_REGION.amazoncognito.com"
+}
+EOF
+    echo -e "${GREEN}✓ config.json generated with Cognito configuration${NC}"
+else
+    # Fallback for environments without Cognito
+    cat > dist/config.json <<EOF
+{
+  "apiUrl": "$API_ENDPOINT"
+}
+EOF
+    echo -e "${YELLOW}⚠ config.json generated without Cognito (not configured)${NC}"
+fi
+
+# Upload to S3 (excluding config.json from sync, will upload separately)
 echo "Uploading frontend to S3..."
-aws s3 sync dist/ s3://$S3_BUCKET/frontend/ --delete --region $AWS_REGION
+aws s3 sync dist/ s3://$S3_BUCKET/frontend/ --delete --region $AWS_REGION --exclude "config.json"
+
+# Upload config.json separately with no-cache headers
+echo "Uploading config.json with no-cache headers..."
+aws s3 cp dist/config.json s3://$S3_BUCKET/frontend/config.json \
+    --region $AWS_REGION \
+    --cache-control "no-cache, no-store, must-revalidate" \
+    --content-type "application/json"
 
 echo -e "${GREEN}✓ Frontend uploaded${NC}"
 
