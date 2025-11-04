@@ -1,10 +1,14 @@
 import sys
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
+
+# Load environment variables from .env
+load_dotenv(BACKEND_DIR / ".env")
 
 from fastapi.testclient import TestClient
 import main as backend_main
@@ -15,19 +19,23 @@ TEST_API_KEY = "test-api-key-for-unit-tests"
 # Mock the API key in the environment
 os.environ["API_KEY"] = TEST_API_KEY
 
+# Get custom domain from environment
+CUSTOM_DOMAIN = os.getenv("CUSTOM_DOMAIN")
+CUSTOM_ORIGIN = f"https://{CUSTOM_DOMAIN}"
+
 
 def test_cors_allowed_origin():
     """Test that requests from allowed origins include CORS headers"""
     client = TestClient(backend_main.app)
 
     # Test with allowed origin
-    headers = {"Origin": "https://school.crackpow.com"}
+    headers = {"Origin": CUSTOM_ORIGIN}
     r = client.get("/health", headers=headers)
 
     assert r.status_code == 200
     # CORS middleware should add the Access-Control-Allow-Origin header
     assert "access-control-allow-origin" in r.headers
-    assert r.headers["access-control-allow-origin"] == "https://school.crackpow.com"
+    assert r.headers["access-control-allow-origin"] == CUSTOM_ORIGIN
 
 
 def test_cors_disallowed_origin():
@@ -49,7 +57,7 @@ def test_cors_preflight_allowed_origin():
     client = TestClient(backend_main.app)
 
     headers = {
-        "Origin": "https://school.crackpow.com",
+        "Origin": CUSTOM_ORIGIN,
         "Access-Control-Request-Method": "POST",
         "Access-Control-Request-Headers": "Content-Type,X-API-Key"
     }
@@ -58,7 +66,7 @@ def test_cors_preflight_allowed_origin():
 
     assert r.status_code == 200
     assert "access-control-allow-origin" in r.headers
-    assert r.headers["access-control-allow-origin"] == "https://school.crackpow.com"
+    assert r.headers["access-control-allow-origin"] == CUSTOM_ORIGIN
     assert "access-control-allow-methods" in r.headers
     assert "access-control-allow-headers" in r.headers
 
@@ -67,7 +75,7 @@ def test_cors_no_credentials():
     """Test that credentials are not allowed (security measure)"""
     client = TestClient(backend_main.app)
 
-    headers = {"Origin": "https://school.crackpow.com"}
+    headers = {"Origin": CUSTOM_ORIGIN}
     r = client.get("/health", headers=headers)
 
     # Access-Control-Allow-Credentials should NOT be present or should be false
@@ -80,7 +88,7 @@ def test_cors_allowed_methods():
     client = TestClient(backend_main.app)
 
     headers = {
-        "Origin": "https://school.crackpow.com",
+        "Origin": CUSTOM_ORIGIN,
         "Access-Control-Request-Method": "GET"
     }
 
@@ -104,7 +112,7 @@ def test_cors_allowed_headers():
     client = TestClient(backend_main.app)
 
     headers = {
-        "Origin": "https://school.crackpow.com",
+        "Origin": CUSTOM_ORIGIN,
         "Access-Control-Request-Method": "POST",
         "Access-Control-Request-Headers": "Content-Type,X-API-Key"
     }
@@ -142,7 +150,7 @@ def test_cors_max_age_set():
     client = TestClient(backend_main.app)
 
     headers = {
-        "Origin": "https://school.crackpow.com",
+        "Origin": CUSTOM_ORIGIN,
         "Access-Control-Request-Method": "GET"
     }
 
