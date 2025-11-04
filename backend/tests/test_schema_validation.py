@@ -197,7 +197,13 @@ def test_create_district_too_many_towns(monkeypatch):
     headers = {'X-API-Key': TEST_API_KEY}
     r = client.post('/api/districts', json=payload, headers=headers)
     assert r.status_code == 422 or r.status_code == 400
-    assert 'too many towns' in r.json()['detail'][0]['msg'].lower() or 'too many towns' in str(r.json()).lower()
+    response_json = r.json()
+    # Check both old and new error formats
+    if isinstance(response_json['detail'], list) and len(response_json['detail']) > 0:
+        error_msg = response_json['detail'][0].get('msg') or response_json['detail'][0].get('message')
+        assert 'too many towns' in error_msg.lower() or 'too many towns' in str(response_json).lower()
+    else:
+        assert 'too many towns' in str(response_json).lower()
 
 
 def test_create_district_invalid_town_characters(monkeypatch):

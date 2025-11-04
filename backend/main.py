@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 from typing import Optional
 from contextlib import asynccontextmanager
 import os
@@ -24,6 +25,12 @@ from config import (
 )
 from auth import require_api_key
 from validation import validate_search_query, validate_name_filter, validate_town_filter, validate_district_id
+from error_handlers import (
+    http_exception_handler,
+    validation_exception_handler,
+    general_exception_handler,
+    safe_create_district_error
+)
 
 # Load environment from .env for local development
 load_dotenv()
@@ -44,6 +51,11 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan
 )
+
+# Register error handlers
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
 
 # Configure CORS
 # Get allowed origins from environment or use defaults
@@ -191,7 +203,7 @@ async def create_district(
         district_dict = DynamoDBDistrictService.create_district(table=table, district_data=district)
         return DistrictResponse(**district_dict)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise safe_create_district_error(e)
 
 
 @app.put("/api/districts/{district_id}", response_model=DistrictResponse)
