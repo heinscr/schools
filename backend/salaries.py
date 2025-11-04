@@ -88,6 +88,10 @@ def handler(event, context):
     method = event.get('httpMethod') or event.get('requestContext', {}).get('http', {}).get('method', '')
     query_params = event.get('queryStringParameters') or {}
     
+    # Handle OPTIONS preflight requests
+    if method == 'OPTIONS':
+        return create_response(200, {})
+    
     try:
         # Route: GET /api/salary-schedule/{districtId}/{year?}
         if method == 'GET' and '/api/salary-schedule/' in path:

@@ -190,8 +190,9 @@ cd backend
 # Create a temporary directory for packaging
 mkdir -p salary_package
 
-# Copy the salary Lambda handler and utils
+# Copy the salary Lambda handler, config, and utils
 cp salaries.py salary_package/
+cp config.py salary_package/
 [ -d "utils" ] && cp -r utils salary_package/
 
 # Install dependencies (boto3 is included in Lambda runtime, but we might need others)
