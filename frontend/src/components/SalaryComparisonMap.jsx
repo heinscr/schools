@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { formatCurrency } from '../utils/formatters';
+import { logger } from '../utils/logger';
 
 const SalaryComparisonMap = ({ results = [] }) => {
   const containerRef = useRef(null);
@@ -18,7 +19,7 @@ const SalaryComparisonMap = ({ results = [] }) => {
         setGeoData(geoJsonData);
         setLoading(false);
       } catch (error) {
-        console.error('Error loading geo data:', error);
+        logger.error('Error loading geo data:', error);
         setLoading(false);
       }
     };

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { formatCurrency } from '../utils/formatters';
+import { logger } from '../utils/logger';
 import './SalaryTable.css';
 
 function SalaryTable({ districtId }) {
@@ -19,8 +20,8 @@ function SalaryTable({ districtId }) {
       setError(null);
       try {
         const data = await api.getSalarySchedules(districtId);
-        console.log('Salary data received:', data);
-        console.log('First schedule:', data[0]);
+        logger.log('Salary data received:', data);
+        logger.log('First schedule:', data[0]);
         setSchedules(data);
       } catch (err) {
         setError(err.message);
@@ -51,7 +52,7 @@ function SalaryTable({ districtId }) {
   return (
     <div className="salary-tables">
       {schedules.map((schedule, idx) => {
-        console.log(`Schedule ${idx}:`, schedule);
+        logger.log(`Schedule ${idx}:`, schedule);
         
         // Group salaries by step for table display
         const salariesByStep = {};

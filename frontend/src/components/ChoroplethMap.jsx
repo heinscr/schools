@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import api from '../services/api';
 import { DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
+import { logger } from '../utils/logger';
 import './ChoroplethMap.css';
 
 const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTypeOptions }) => {
@@ -66,11 +67,11 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
     fetch('/ma_municipalities.geojson')
       .then((res) => res.json())
       .then((geojson) => {
-        console.log('Loaded GeoJSON:', geojson);
-        console.log('Number of features:', geojson.features?.length);
+        logger.log('Loaded GeoJSON:', geojson);
+        logger.log('Number of features:', geojson.features?.length);
         setGeojson(geojson);
       })
-      .catch((err) => console.error('Error loading GeoJSON:', err));
+      .catch((err) => logger.error('Error loading GeoJSON:', err));
   }, []);
 
   // Update panRef when pan changes
@@ -81,12 +82,12 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
   // Main render effect
   useEffect(() => {
     if (!geojson || !containerRef.current) {
-      console.log('Not rendering - geojson:', !!geojson, 'features:', geojson?.features?.length);
+      logger.log('Not rendering - geojson:', !!geojson, 'features:', geojson?.features?.length);
       return;
     }
 
     if (!geojson.features || geojson.features.length === 0) {
-      console.error('GeoJSON has no features!', geojson);
+      logger.error('GeoJSON has no features!', geojson);
       return;
     }
 

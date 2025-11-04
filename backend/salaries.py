@@ -4,6 +4,7 @@ Provides salary schedule queries, comparisons, heatmaps, and metadata
 """
 import json
 import os
+import logging
 from typing import Dict, Any, Optional, List
 
 import boto3
@@ -12,6 +13,17 @@ from boto3.dynamodb.conditions import Key
 # Import shared utilities
 from utils.responses import create_response
 from utils.dynamodb import get_district_towns as get_district_towns_util
+from config import (
+    COMPARE_INDEX_NAME,
+    VALID_EDUCATION_LEVELS,
+    VALID_CREDITS,
+    MIN_STEP,
+    MAX_STEP
+)
+
+# Configure logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb')
@@ -24,11 +36,52 @@ salaries_table = dynamodb.Table(SALARIES_TABLE_NAME) if SALARIES_TABLE_NAME else
 schedules_table = dynamodb.Table(SCHEDULES_TABLE_NAME) if SCHEDULES_TABLE_NAME else None
 
 
+def validate_education_level(education: Optional[str]) -> str:
+    """Validate and normalize education level"""
+    if not education:
+        raise ValueError("Education level is required")
+    
+    education = education.upper().strip()
+    if education not in VALID_EDUCATION_LEVELS:
+        raise ValueError(f"Invalid education level '{education}'. Must be one of: {', '.join(sorted(VALID_EDUCATION_LEVELS))}")
+    return education
+
+
+def validate_credits(credits: Optional[str]) -> int:
+    """Validate credits parameter"""
+    if credits is None:
+        raise ValueError("Credits parameter is required")
+    
+    try:
+        credits_int = int(credits)
+    except (ValueError, TypeError):
+        raise ValueError(f"Invalid credits '{credits}'. Must be an integer")
+    
+    if credits_int not in VALID_CREDITS:
+        raise ValueError(f"Invalid credits {credits_int}. Must be one of: {', '.join(map(str, sorted(VALID_CREDITS)))}")
+    return credits_int
+
+
+def validate_step(step: Optional[str]) -> int:
+    """Validate step parameter"""
+    if not step:
+        raise ValueError("Step parameter is required")
+    
+    try:
+        step_int = int(step)
+    except (ValueError, TypeError):
+        raise ValueError(f"Invalid step '{step}'. Must be an integer")
+    
+    if not (MIN_STEP <= step_int <= MAX_STEP):
+        raise ValueError(f"Invalid step {step_int}. Must be between {MIN_STEP} and {MAX_STEP}")
+    return step_int
+
+
 def handler(event, context):
     """
     Main Lambda handler for salary API routes
     """
-    print(f"Event: {json.dumps(event)}")
+    logger.info("Processing Lambda request", extra={"path": event.get('path'), "method": event.get('httpMethod')})
     
     # Extract path and method (supports both REST and HTTP API formats)
     path = event.get('path') or event.get('rawPath', '')
@@ -61,11 +114,12 @@ def handler(event, context):
         
         return create_response(404, {'error': 'Not found'})
         
+    except ValueError as e:
+        logger.warning(f"Validation error: {str(e)}")
+        return create_response(400, {'error': str(e)})
     except Exception as e:
-        print(f"Error: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return create_response(500, {'error': str(e)})
+        logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+        return create_response(500, {'error': 'Internal server error'})
 
 
 def get_salary_schedule(district_id: str, year: Optional[str] = None) -> Dict[str, Any]:
@@ -96,33 +150,30 @@ def get_salary_schedule(district_id: str, year: Optional[str] = None) -> Dict[st
         return create_response(200, items)
         
     except Exception as e:
-        print(f"Error querying schedules: {str(e)}")
+        logger.error(f"Error querying schedules: {str(e)}", exc_info=True)
         raise
 
 
 def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
     """
     Compare salaries across districts for specific education/credits/step
-    GET /api/salary-compare?education=M&credits=30&step=5&districtType=municipal&limit=10&year=2021-2022
+    GET /api/salary-compare?education=M&credits=30&step=5&districtType=municipal&year=2021-2022
     """
     if not salaries_table:
         return create_response(503, {'error': 'Salaries table not configured'})
     
-    education = params.get('education')
-    credits = params.get('credits')
-    step = params.get('step')
+    # Validate required parameters
+    education = validate_education_level(params.get('education'))
+    credits = validate_credits(params.get('credits'))
+    step = validate_step(params.get('step'))
+    
     district_type = params.get('districtType')
     year = params.get('year')  # No default - show all years unless specified
-    
-    if not education or credits is None or not step:
-        return create_response(400, {
-            'error': 'Missing required parameters: education, credits, step'
-        })
     
     try:
         # Query using GSI2 (CompareDistrictsIndex)
         query_params = {
-            'IndexName': 'CompareDistrictsIndex',
+            'IndexName': COMPARE_INDEX_NAME,
             'KeyConditionExpression': Key('GSI2PK').eq(f'COMPARE#{education}#{credits}#{step}'),
             'ScanIndexForward': False  # Descending order by salary
         }
@@ -197,8 +248,8 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
         return create_response(200, {
             'query': {
                 'education': education,
-                'credits': int(credits),
-                'step': int(step),
+                'credits': credits,
+                'step': step,
                 'districtType': district_type,
                 'year': year
             },
@@ -206,8 +257,11 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
             'total': len(rankings)
         })
         
+    except ValueError:
+        # Re-raise validation errors to be caught by handler
+        raise
     except Exception as e:
-        print(f"Error comparing salaries: {str(e)}")
+        logger.error(f"Error comparing salaries: {str(e)}", exc_info=True)
         raise
 
 
@@ -219,20 +273,16 @@ def get_salary_heatmap(params: Dict[str, str]) -> Dict[str, Any]:
     if not salaries_table:
         return create_response(503, {'error': 'Salaries table not configured'})
     
-    education = params.get('education')
-    credits = params.get('credits')
-    step = params.get('step')
+    # Validate required parameters
+    education = validate_education_level(params.get('education'))
+    credits = validate_credits(params.get('credits'))
+    step = validate_step(params.get('step'))
     year = params.get('year', '2021-2022')
-    
-    if not education or credits is None or not step:
-        return create_response(400, {
-            'error': 'Missing required parameters: education, credits, step'
-        })
     
     try:
         # Query using GSI2 to get all districts
         query_params = {
-            'IndexName': 'CompareDistrictsIndex',
+            'IndexName': COMPARE_INDEX_NAME,
             'KeyConditionExpression': Key('GSI2PK').eq(f'COMPARE#{education}#{credits}#{step}')
         }
         
@@ -276,16 +326,19 @@ def get_salary_heatmap(params: Dict[str, str]) -> Dict[str, Any]:
         return create_response(200, {
             'query': {
                 'education': education,
-                'credits': int(credits),
-                'step': int(step),
+                'credits': credits,
+                'step': step,
                 'year': year
             },
             'statistics': stats,
             'data': heatmap_data
         })
         
+    except ValueError:
+        # Re-raise validation errors to be caught by handler
+        raise
     except Exception as e:
-        print(f"Error getting salary heatmap: {str(e)}")
+        logger.error(f"Error getting salary heatmap: {str(e)}", exc_info=True)
         raise
 
 

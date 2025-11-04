@@ -11,15 +11,19 @@ from utils.dynamodb import get_district_towns
 
 
 def test_compare_salaries_missing_params(monkeypatch):
+    """Test that missing parameters raise ValueError"""
     monkeypatch.setattr(lambda_mod, 'salaries_table', object())
-    resp = lambda_mod.compare_salaries({'education': 'M', 'credits': '30'})  # missing step
-    assert resp['statusCode'] == 400
+    import pytest
+    with pytest.raises(ValueError, match="Step parameter is required"):
+        lambda_mod.compare_salaries({'education': 'M', 'credits': '30'})  # missing step
 
 
 def test_heatmap_missing_params(monkeypatch):
+    """Test that missing parameters raise ValueError"""
     monkeypatch.setattr(lambda_mod, 'salaries_table', object())
-    resp = lambda_mod.get_salary_heatmap({'education': 'M', 'step': '5'})  # missing credits
-    assert resp['statusCode'] == 400
+    import pytest
+    with pytest.raises(ValueError, match="Credits parameter is required"):
+        lambda_mod.get_salary_heatmap({'education': 'M', 'step': '5'})  # missing credits
 
 
 def test_schedule_not_configured(monkeypatch):

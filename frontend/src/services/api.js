@@ -1,6 +1,8 @@
 // API service for interacting with the backend
 // Note: Vite only exposes env vars prefixed with VITE_. Use those exclusively.
 // Both district and salary endpoints now use the same API Gateway
+import { logger } from '../utils/logger';
+
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   import.meta.env.VITE_DISTRICT_API_URL ||
@@ -161,7 +163,7 @@ class ApiService {
           return []; // No salary data available
         }
         if (response.status === 503) {
-          console.warn('Salary schedule service is temporarily unavailable');
+          logger.warn('Salary schedule service is temporarily unavailable');
           return []; // Service unavailable, return empty array
         }
         throw new Error(`Failed to fetch salary schedule: ${response.statusText}`);
@@ -171,7 +173,7 @@ class ApiService {
     } catch (error) {
       // Handle network errors or other fetch failures
       if (error.message.includes('Failed to fetch')) {
-        console.warn('Unable to connect to salary schedule service');
+        logger.warn('Unable to connect to salary schedule service');
         return []; // Return empty array instead of throwing
       }
       throw error;
@@ -205,7 +207,7 @@ class ApiService {
           return { query: { education, credits, step }, results: [], total: 0 };
         }
         if (response.status === 503) {
-          console.warn('Salary comparison service is temporarily unavailable');
+          logger.warn('Salary comparison service is temporarily unavailable');
           return { query: { education, credits, step }, results: [], total: 0 };
         }
         throw new Error(`Failed to compare salaries: ${response.statusText}`);
@@ -214,7 +216,7 @@ class ApiService {
       return response.json();
     } catch (error) {
       if (error.message.includes('Failed to fetch')) {
-        console.warn('Unable to connect to salary comparison service');
+        logger.warn('Unable to connect to salary comparison service');
         return { query: { education, credits, step }, results: [], total: 0 };
       }
       throw error;

@@ -16,6 +16,12 @@ from schemas import (
     DistrictListResponse
 )
 from services.dynamodb_district_service import DynamoDBDistrictService
+from config import (
+    MAX_QUERY_LIMIT,
+    DEFAULT_QUERY_LIMIT,
+    MIN_QUERY_LIMIT,
+    DEFAULT_OFFSET
+)
 
 # Load environment from .env for local development
 load_dotenv()
@@ -77,8 +83,8 @@ async def health_check():
 async def list_districts(
     name: Optional[str] = Query(None, description="Filter by district name (partial match)"),
     town: Optional[str] = Query(None, description="Filter by town name (partial match)"),
-    limit: int = Query(50, ge=1, le=100, description="Number of results to return"),
-    offset: int = Query(0, ge=0, description="Number of results to skip"),
+    limit: int = Query(DEFAULT_QUERY_LIMIT, ge=MIN_QUERY_LIMIT, le=MAX_QUERY_LIMIT, description="Number of results to return"),
+    offset: int = Query(DEFAULT_OFFSET, ge=0, description="Number of results to skip"),
     table = Depends(get_table)
 ):
     """List all districts with optional filtering"""
@@ -104,8 +110,8 @@ async def list_districts(
 @app.get("/api/districts/search", response_model=DistrictListResponse)
 async def search_districts(
     q: Optional[str] = Query(None, description="Search query (searches both district names and towns)"),
-    limit: int = Query(50, ge=1, le=100, description="Number of results to return"),
-    offset: int = Query(0, ge=0, description="Number of results to skip"),
+    limit: int = Query(DEFAULT_QUERY_LIMIT, ge=MIN_QUERY_LIMIT, le=MAX_QUERY_LIMIT, description="Number of results to return"),
+    offset: int = Query(DEFAULT_OFFSET, ge=0, description="Number of results to skip"),
     table = Depends(get_table)
 ):
     """Search districts by name or town"""
