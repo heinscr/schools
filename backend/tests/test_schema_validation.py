@@ -11,12 +11,28 @@ from fastapi.testclient import TestClient
 import main as backend_main
 from pydantic import ValidationError
 from schemas import DistrictCreate, DistrictUpdate
+from auth_helpers import mock_admin_user
 
-# Test API key for authenticated requests
+# Test API key for authenticated requests (backward compatibility)
 TEST_API_KEY = "test-api-key-for-unit-tests"
 
 # Mock the API key in the environment
 os.environ["API_KEY"] = TEST_API_KEY
+
+
+def mock_require_admin_role():
+    """Mock admin authentication dependency"""
+    async def _mock():
+        return mock_admin_user()
+    return _mock
+
+
+@pytest.fixture(autouse=True)
+def override_auth():
+    """Automatically override auth for all tests in this module"""
+    backend_main.app.dependency_overrides[backend_main.require_admin_role] = mock_require_admin_role()
+    yield
+    backend_main.app.dependency_overrides.clear()
 
 
 def test_create_district_valid_data(monkeypatch):
@@ -46,8 +62,8 @@ def test_create_district_valid_data(monkeypatch):
         'towns': ['Boston', 'Cambridge'],
         'district_type': 'municipal'
     }
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.post('/api/districts', json=payload, headers=headers)
+    
+    r = client.post('/api/districts', json=payload)
     assert r.status_code == 201
 
 
@@ -69,8 +85,8 @@ def test_create_district_invalid_name_characters(monkeypatch):
             'towns': ['Boston'],
             'district_type': 'municipal'
         }
-        headers = {'X-API-Key': TEST_API_KEY}
-        r = client.post('/api/districts', json=payload, headers=headers)
+        
+        r = client.post('/api/districts', json=payload)
         assert r.status_code == 422 or r.status_code == 400, f"Should reject name: {name}"
 
 
@@ -110,8 +126,8 @@ def test_create_district_valid_name_characters(monkeypatch):
             'towns': ['Boston'],
             'district_type': 'municipal'
         }
-        headers = {'X-API-Key': TEST_API_KEY}
-        r = client.post('/api/districts', json=payload, headers=headers)
+        
+        r = client.post('/api/districts', json=payload)
         assert r.status_code == 201, f"Should accept name: {name}"
 
 
@@ -133,8 +149,8 @@ def test_create_district_invalid_district_type(monkeypatch):
             'towns': ['Boston'],
             'district_type': district_type
         }
-        headers = {'X-API-Key': TEST_API_KEY}
-        r = client.post('/api/districts', json=payload, headers=headers)
+        
+        r = client.post('/api/districts', json=payload)
         assert r.status_code == 422 or r.status_code == 400, f"Should reject type: {district_type}"
 
 
@@ -176,8 +192,8 @@ def test_create_district_valid_district_types(monkeypatch):
             'towns': ['Boston'],
             'district_type': district_type
         }
-        headers = {'X-API-Key': TEST_API_KEY}
-        r = client.post('/api/districts', json=payload, headers=headers)
+        
+        r = client.post('/api/districts', json=payload)
         assert r.status_code == 201, f"Should accept type: {district_type}"
 
 
@@ -194,8 +210,8 @@ def test_create_district_too_many_towns(monkeypatch):
         'towns': too_many_towns,
         'district_type': 'municipal'
     }
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.post('/api/districts', json=payload, headers=headers)
+    
+    r = client.post('/api/districts', json=payload)
     assert r.status_code == 422 or r.status_code == 400
     response_json = r.json()
     # Check both old and new error formats
@@ -223,8 +239,8 @@ def test_create_district_invalid_town_characters(monkeypatch):
             'towns': towns,
             'district_type': 'municipal'
         }
-        headers = {'X-API-Key': TEST_API_KEY}
-        r = client.post('/api/districts', json=payload, headers=headers)
+        
+        r = client.post('/api/districts', json=payload)
         assert r.status_code == 422 or r.status_code == 400, f"Should reject towns: {towns}"
 
 
@@ -240,8 +256,8 @@ def test_create_district_town_too_long(monkeypatch):
         'towns': [long_town],
         'district_type': 'municipal'
     }
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.post('/api/districts', json=payload, headers=headers)
+    
+    r = client.post('/api/districts', json=payload)
     assert r.status_code == 422 or r.status_code == 400
 
 
@@ -328,18 +344,18 @@ def test_update_district_validation(monkeypatch):
 
     # Test invalid name
     payload = {'name': '<script>alert("xss")</script>'}
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.put('/api/districts/DISTRICT%23123', json=payload, headers=headers)
+    
+    r = client.put('/api/districts/DISTRICT%23123', json=payload)
     assert r.status_code == 422 or r.status_code == 400
 
     # Test invalid district type
     payload = {'district_type': 'invalid_type'}
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.put('/api/districts/DISTRICT%23123', json=payload, headers=headers)
+    
+    r = client.put('/api/districts/DISTRICT%23123', json=payload)
     assert r.status_code == 422 or r.status_code == 400
 
     # Test valid update
     payload = {'name': 'Updated District'}
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.put('/api/districts/DISTRICT%23123', json=payload, headers=headers)
+    
+    r = client.put('/api/districts/DISTRICT%23123', json=payload)
     assert r.status_code == 200

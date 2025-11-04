@@ -116,7 +116,6 @@ def test_http_exception_detail_development(monkeypatch):
 def test_create_district_error_sanitization(monkeypatch):
     """Test that create_district errors are sanitized properly"""
     monkeypatch.setenv("ENVIRONMENT", "production")
-    monkeypatch.setenv("API_KEY", "test-key-12345")
 
     # Force reload
     import importlib
@@ -124,6 +123,14 @@ def test_create_district_error_sanitization(monkeypatch):
     importlib.reload(error_handlers)
 
     import main
+    from auth_helpers import mock_admin_user
+
+    # Mock admin auth
+    async def mock_auth():
+        return mock_admin_user()
+
+    main.app.dependency_overrides[main.require_admin_role] = mock_auth
+
     client = TestClient(main.app)
 
     # Try to create a district with invalid data
@@ -137,8 +144,7 @@ def test_create_district_error_sanitization(monkeypatch):
                 "address": "123 Main St",
                 "district_type": "municipal",
                 "towns": ["TestTown"]
-            },
-            headers={"X-API-Key": "test-key-12345"}
+            }
         )
 
         # Should get error response
@@ -148,6 +154,9 @@ def test_create_district_error_sanitization(monkeypatch):
         # In production, should not show the raw ValueError message
         if os.getenv("ENVIRONMENT", "production").lower() == "production":
             assert "ValueError" not in data.get("detail", "")
+
+    # Clean up
+    main.app.dependency_overrides.clear()
 
 
 def test_error_response_format(monkeypatch):

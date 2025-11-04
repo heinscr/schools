@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 import os
+from unittest.mock import AsyncMock
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
@@ -8,12 +9,20 @@ if str(BACKEND_DIR) not in sys.path:
 
 from fastapi.testclient import TestClient
 import main as backend_main
+from auth_helpers import mock_admin_user, get_auth_headers
 
-# Test API key for authenticated requests
+# Test API key for authenticated requests (backward compatibility)
 TEST_API_KEY = "test-api-key-for-unit-tests"
 
 # Mock the API key in the environment
 os.environ["API_KEY"] = TEST_API_KEY
+
+
+def mock_require_admin_role():
+    """Mock admin authentication dependency"""
+    async def _mock():
+        return mock_admin_user()
+    return _mock
 
 
 def _resp_district(**overrides):
@@ -60,6 +69,9 @@ def test_get_district_by_id_not_found(monkeypatch):
 
 
 def test_create_district_success(monkeypatch):
+    # Override auth dependency to return mock admin user
+    backend_main.app.dependency_overrides[backend_main.require_admin_role] = mock_require_admin_role()
+
     client = TestClient(backend_main.app)
 
     created = _resp_district(name='New District')
@@ -79,13 +91,18 @@ def test_create_district_success(monkeypatch):
         'towns': ['TownC'],
         'district_type': 'municipal'
     }
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.post('/api/districts', json=payload, headers=headers)
+    r = client.post('/api/districts', json=payload)
     assert r.status_code == 201
     assert r.json()['name'] == 'New District'
 
+    # Clean up
+    backend_main.app.dependency_overrides.clear()
+
 
 def test_update_district_success(monkeypatch):
+    # Override auth dependency
+    backend_main.app.dependency_overrides[backend_main.require_admin_role] = mock_require_admin_role()
+
     client = TestClient(backend_main.app)
 
     updated = _resp_district(name='Updated District')
@@ -100,13 +117,18 @@ def test_update_district_success(monkeypatch):
     )
 
     payload = {'name': 'Updated District'}
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.put('/api/districts/DIST%231', json=payload, headers=headers)
+    r = client.put('/api/districts/DIST%231', json=payload)
     assert r.status_code == 200
     assert r.json()['name'] == 'Updated District'
 
+    # Clean up
+    backend_main.app.dependency_overrides.clear()
+
 
 def test_update_district_not_found(monkeypatch):
+    # Override auth dependency
+    backend_main.app.dependency_overrides[backend_main.require_admin_role] = mock_require_admin_role()
+
     client = TestClient(backend_main.app)
 
     def fake_update(table, district_id, district_data):
@@ -118,12 +140,17 @@ def test_update_district_not_found(monkeypatch):
         staticmethod(fake_update)
     )
 
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.put('/api/districts/DIST%23missing', json={'name': 'X'}, headers=headers)
+    r = client.put('/api/districts/DIST%23missing', json={'name': 'X'})
     assert r.status_code == 404
+
+    # Clean up
+    backend_main.app.dependency_overrides.clear()
 
 
 def test_delete_district_success(monkeypatch):
+    # Override auth dependency
+    backend_main.app.dependency_overrides[backend_main.require_admin_role] = mock_require_admin_role()
+
     client = TestClient(backend_main.app)
 
     monkeypatch.setattr(
@@ -132,12 +159,17 @@ def test_delete_district_success(monkeypatch):
         staticmethod(lambda table, district_id: True)
     )
 
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.delete('/api/districts/DIST%231', headers=headers)
+    r = client.delete('/api/districts/DIST%231')
     assert r.status_code == 204
+
+    # Clean up
+    backend_main.app.dependency_overrides.clear()
 
 
 def test_delete_district_not_found(monkeypatch):
+    # Override auth dependency
+    backend_main.app.dependency_overrides[backend_main.require_admin_role] = mock_require_admin_role()
+
     client = TestClient(backend_main.app)
 
     monkeypatch.setattr(
@@ -146,13 +178,15 @@ def test_delete_district_not_found(monkeypatch):
         staticmethod(lambda table, district_id: False)
     )
 
-    headers = {'X-API-Key': TEST_API_KEY}
-    r = client.delete('/api/districts/DIST%23404', headers=headers)
+    r = client.delete('/api/districts/DIST%23404')
     assert r.status_code == 404
+
+    # Clean up
+    backend_main.app.dependency_overrides.clear()
 
 
 def test_create_district_unauthorized_no_api_key(monkeypatch):
-    """Test that POST without API key returns 401"""
+    """Test that POST without authentication returns 401"""
     client = TestClient(backend_main.app)
 
     payload = {
@@ -163,11 +197,12 @@ def test_create_district_unauthorized_no_api_key(monkeypatch):
     }
     r = client.post('/api/districts', json=payload)
     assert r.status_code == 401
-    assert 'API key required' in r.json()['detail']
+    # Check for Cognito auth error message
+    assert 'Authentication required' in r.json()['detail'] or 'log in' in r.json()['detail'].lower()
 
 
 def test_create_district_forbidden_invalid_api_key(monkeypatch):
-    """Test that POST with invalid API key returns 403"""
+    """Test that POST with invalid auth token returns 401"""
     client = TestClient(backend_main.app)
 
     payload = {
@@ -176,10 +211,9 @@ def test_create_district_forbidden_invalid_api_key(monkeypatch):
         'towns': ['TownC'],
         'district_type': 'municipal'
     }
-    headers = {'X-API-Key': 'wrong-key'}
+    headers = {'Authorization': 'Bearer invalid-token'}
     r = client.post('/api/districts', json=payload, headers=headers)
-    assert r.status_code == 403
-    assert 'Invalid API key' in r.json()['detail']
+    assert r.status_code == 401
 
 
 def test_update_district_unauthorized_no_api_key(monkeypatch):
