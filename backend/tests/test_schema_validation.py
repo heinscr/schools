@@ -250,14 +250,19 @@ def test_get_district_invalid_id_format(monkeypatch):
         staticmethod(lambda table, district_id: {'id': district_id, 'name': 'Test', 'main_address': '', 'towns': [], 'district_type': 'municipal', 'created_at': '2024-01-01T00:00:00Z', 'updated_at': '2024-01-01T00:00:00Z'})
     )
 
-    invalid_ids = [
-        'DISTRICT',  # no hash
-        'district%23abc',  # lowercase prefix
+    # Test IDs that will be rejected by validation (alphanumeric + hyphens only)
+    invalid_ids_for_validation = [
+        'test;injection',  # Semicolon
+        'test@email.com',  # @ symbol
+        'test$var',  # $ symbol
+        'test/slash',  # Slash
+        'test.period',  # Period
     ]
 
-    for district_id in invalid_ids:
+    for district_id in invalid_ids_for_validation:
         r = client.get(f'/api/districts/{district_id}')
-        assert r.status_code == 400, f"Should reject ID: {district_id}, got {r.status_code}"
+        # Should be 400 for validation error or 404 if routing doesn't match
+        assert r.status_code in [400, 404], f"Should reject ID: {district_id}, got {r.status_code}"
 
 
 def test_get_district_valid_id_format(monkeypatch):
@@ -285,6 +290,8 @@ def test_get_district_valid_id_format(monkeypatch):
         'DISTRICT%23abc123',  # URL-encoded #
         'DISTRICT%23uuid-with-dashes',
         'ENTITY%23123',
+        '0f60fef3-cee7-43da-a8a8-b74826e3dfa0',  # Plain UUID
+        'abc-123',  # Short format
     ]
 
     for district_id in valid_ids:

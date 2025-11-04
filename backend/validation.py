@@ -16,8 +16,11 @@ MAX_DISTRICT_ID_LENGTH = 100
 # Allow alphanumeric, spaces, hyphens, apostrophes, periods, and common punctuation
 SAFE_TEXT_PATTERN = re.compile(r'^[a-zA-Z0-9\s\-\'.&,()]+$')
 
-# District ID pattern - allows DISTRICT#<uuid> or similar formats (# can be URL-encoded as %23)
-DISTRICT_ID_PATTERN = re.compile(r'^[A-Z]+(%23|#)[a-zA-Z0-9\-]+$')
+# District ID pattern - allows:
+# 1. Plain alphanumeric with hyphens (UUIDs, etc): 0f60fef3-cee7-43da-a8a8-b74826e3dfa0
+# 2. Prefixed format: DISTRICT#<uuid> or DISTRICT%23<uuid> (URL-encoded)
+# Only allows: letters (a-z, A-Z), numbers (0-9), hyphens (-), hash (#), and URL-encoded hash (%23)
+DISTRICT_ID_PATTERN = re.compile(r'^[a-zA-Z0-9\-]+$|^[A-Z]+(%23|#)[a-zA-Z0-9\-]+$')
 
 
 def validate_search_query(query: Optional[str]) -> Optional[str]:
