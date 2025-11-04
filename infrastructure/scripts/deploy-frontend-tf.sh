@@ -91,8 +91,39 @@ fi
 echo -e "${GREEN}✓ Frontend built successfully${NC}"
 echo ""
 
+# Generate config.json from Terraform outputs
+echo -e "${YELLOW}Step 4: Generating config.json${NC}"
+cd "$TERRAFORM_DIR"
+
+COGNITO_USER_POOL_ID=$(terraform output -raw cognito_user_pool_id 2>/dev/null || echo "")
+COGNITO_CLIENT_ID=$(terraform output -raw cognito_client_id 2>/dev/null || echo "")
+COGNITO_REGION=$(terraform output -raw region 2>/dev/null || echo "us-east-1")
+COGNITO_DOMAIN=$(terraform output -raw cognito_domain 2>/dev/null || echo "")
+
+if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
+    cat > "$FRONTEND_DIR/dist/config.json" <<EOF
+{
+  "apiUrl": "$API_ENDPOINT",
+  "cognitoUserPoolId": "$COGNITO_USER_POOL_ID",
+  "cognitoClientId": "$COGNITO_CLIENT_ID",
+  "cognitoRegion": "$COGNITO_REGION",
+  "cognitoDomain": "$COGNITO_DOMAIN.auth.$COGNITO_REGION.amazoncognito.com"
+}
+EOF
+    echo -e "${GREEN}✓ config.json generated with Cognito configuration${NC}"
+else
+    # Fallback for environments without Cognito
+    cat > "$FRONTEND_DIR/dist/config.json" <<EOF
+{
+  "apiUrl": "$API_ENDPOINT"
+}
+EOF
+    echo -e "${YELLOW}⚠ config.json generated without Cognito (not configured)${NC}"
+fi
+echo ""
+
 # Sync to S3
-echo -e "${YELLOW}Step 4: Uploading to S3${NC}"
+echo -e "${YELLOW}Step 5: Uploading to S3${NC}"
 S3_PATH="s3://$S3_BUCKET/${S3_PREFIX}"
 
 aws s3 sync dist/ "$S3_PATH" \
@@ -100,7 +131,8 @@ aws s3 sync dist/ "$S3_PATH" \
     --delete \
     --cache-control "public, max-age=31536000" \
     --exclude "*.html" \
-    --exclude "index.html"
+    --exclude "index.html" \
+    --exclude "config.json"
 
 # Upload HTML files with no-cache
 aws s3 sync dist/ "$S3_PATH" \
@@ -110,12 +142,18 @@ aws s3 sync dist/ "$S3_PATH" \
     --exclude "*" \
     --include "*.html"
 
+# Upload config.json separately with no-cache (so changes are picked up immediately)
+aws s3 cp "$FRONTEND_DIR/dist/config.json" "$S3_PATH/config.json" \
+    --region "$REGION" \
+    --cache-control "no-cache, no-store, must-revalidate" \
+    --content-type "application/json"
+
 echo -e "${GREEN}✓ Files uploaded to S3 at $S3_PATH${NC}"
 echo ""
 
 # Invalidate CloudFront cache
 if [ -n "$CF_DISTRIBUTION_ID" ]; then
-    echo -e "${YELLOW}Step 5: Invalidating CloudFront cache${NC}"
+    echo -e "${YELLOW}Step 6: Invalidating CloudFront cache${NC}"
 
     INVALIDATION_ID=$(aws cloudfront create-invalidation \
         --distribution-id "$CF_DISTRIBUTION_ID" \
