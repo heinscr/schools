@@ -232,10 +232,13 @@ const SalaryComparisonMap = ({ results = [] }) => {
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
           zIndex: 10
         }}>
-          <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: '#4a5568' }}>
+          <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: '#4a5568', textAlign: 'center' }}>
             Salary Ranking
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ fontSize: '11px', color: '#666', display: 'flex'}}>
+              <span>Lowest</span>
+            </div>
             <div style={{
               width: '120px',
               height: '20px',
@@ -243,8 +246,7 @@ const SalaryComparisonMap = ({ results = [] }) => {
               borderRadius: '4px',
               border: '1px solid #e0e0e0'
             }}></div>
-            <div style={{ fontSize: '11px', color: '#666', display: 'flex', justifyContent: 'space-between', width: '120px' }}>
-              <span>Lowest</span>
+            <div style={{ fontSize: '11px', color: '#666', display: 'flex'}}>
               <span>Highest</span>
             </div>
           </div>
