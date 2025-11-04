@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import { formatCurrency } from '../utils/formatters';
 
 const SalaryComparisonMap = ({ results = [] }) => {
   const containerRef = useRef(null);
@@ -60,11 +61,18 @@ const SalaryComparisonMap = ({ results = [] }) => {
       return;
     }
 
-    // Create SVG
+    // Use zoom level to match DistrictBrowser - higher zoom = more zoomed in
+    const zoom = 1.0;
+    const zoomedWidth = (dimensions.width - 10) / zoom;
+    const zoomedHeight = (dimensions.height - 10) / zoom;
+
+    // Create SVG with viewBox for consistent zoom behavior
     const svg = d3.select(containerRef.current)
       .append('svg')
-      .attr('width', dimensions.width)
-      .attr('height', dimensions.height)
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewBox', `0 0 ${zoomedWidth} ${zoomedHeight}`)
+      .attr('preserveAspectRatio', 'xMidYMid meet')
       .style('background-color', '#ffffff')
       .style('border', '1px solid #ccc');
 
@@ -177,7 +185,7 @@ const SalaryComparisonMap = ({ results = [] }) => {
               <strong>${d.properties?.TOWN || 'Unknown'}</strong><br/>
               ${info.districtName}<br/>
               Rank: #${info.rank} of ${info.total}<br/>
-              Salary: $${Number(info.salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              Salary: ${formatCurrency(info.salary)}
             `);
           
           tooltip

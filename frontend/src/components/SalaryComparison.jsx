@@ -1,23 +1,17 @@
 import { useState } from 'react';
 import api from '../services/api';
 import SalaryComparisonMap from './SalaryComparisonMap';
+import { DISTRICT_TYPE_OPTIONS } from '../constants/districtTypes';
+import { formatCurrency } from '../utils/formatters';
 import './SalaryComparison.css';
 
 function SalaryComparison() {
-  const districtTypeOptions = [
-    { value: 'municipal', label: 'Municipal', icon: '🏛️' },
-    { value: 'regional_academic', label: 'Regional', icon: '🏫' },
-    { value: 'regional_vocational', label: 'Vocational', icon: '🛠️' },
-    { value: 'county_agricultural', label: 'Agricultural', icon: '🌾' },
-    { value: 'charter', label: 'Charter', icon: '📜' }
-  ];
-
   const [searchParams, setSearchParams] = useState({
     step: '5',
     education: 'M',
     credits: '30'
   });
-  const [selectedTypes, setSelectedTypes] = useState(districtTypeOptions.map(opt => opt.value));
+  const [selectedTypes, setSelectedTypes] = useState(DISTRICT_TYPE_OPTIONS.map(opt => opt.value));
   const [cachedResults, setCachedResults] = useState(null); // Full results from API (cached)
   const [filteredResults, setFilteredResults] = useState(null); // Filtered by district type
   const [loading, setLoading] = useState(false);
@@ -162,7 +156,7 @@ function SalaryComparison() {
 
         {/* District Type Filters - in same container */}
         <div className="district-type-filters-row">
-          {districtTypeOptions.map(opt => {
+          {DISTRICT_TYPE_OPTIONS.map(opt => {
             const typeCount = cachedResults?.results.filter(r => r.district_type === opt.value).length || 0;
             return (
               <button
@@ -206,15 +200,15 @@ function SalaryComparison() {
               <div className="results-stats">
                 <div className="stat-item">
                   <span className="stat-label">Highest:</span>
-                  <span className="stat-value">${Number(filteredResults.results[0].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="stat-value">{formatCurrency(filteredResults.results[0].salary)}</span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-label">Lowest:</span>
-                  <span className="stat-value">${Number(filteredResults.results[filteredResults.results.length - 1].salary).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="stat-value">{formatCurrency(filteredResults.results[filteredResults.results.length - 1].salary)}</span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-label">Difference:</span>
-                  <span className="stat-value highlight">${(Number(filteredResults.results[0].salary) - Number(filteredResults.results[filteredResults.results.length - 1].salary)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="stat-value highlight">{formatCurrency(Number(filteredResults.results[0].salary) - Number(filteredResults.results[filteredResults.results.length - 1].salary))}</span>
                 </div>
               </div>
             )}
@@ -256,10 +250,7 @@ function SalaryComparison() {
                         {result.school_year || 'N/A'}
                       </td>
                       <td className="salary-cell">
-                        ${result.salary ? Number(result.salary).toLocaleString('en-US', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        }) : 'N/A'}
+                        {formatCurrency(result.salary)}
                       </td>
                     </tr>
                   ))}

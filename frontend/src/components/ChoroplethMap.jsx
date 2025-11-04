@@ -1,17 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import api from '../services/api';
+import { DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
+import { normalizeTownName } from '../utils/formatters';
 import './ChoroplethMap.css';
 
 const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTypeOptions }) => {
-  // Custom sort order for district types
-  const DISTRICT_TYPE_ORDER = {
-    municipal: 0,
-    regional_academic: 1,
-    regional_vocational: 2,
-    county_agricultural: 3,
-    charter: 4,
-  };
   // Detect mobile devices
   const [isMobile, setIsMobile] = useState(false);
 
@@ -170,11 +164,11 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
     const selectedTowns = new Set();
     if (selectedDistrict) {
       const towns = selectedDistrict.members || selectedDistrict.towns || [];
-      towns.forEach(t => selectedTowns.add(t.trim().toLowerCase()));
+      towns.forEach(t => selectedTowns.add(normalizeTownName(t)));
     }
 
     // Normalize clicked town name
-    const normalizedClickedTown = clickedTown ? clickedTown.trim().toLowerCase() : null;
+    const normalizedClickedTown = normalizeTownName(clickedTown);
 
     // Create tooltip
     const tooltip = d3.select(tooltipRef.current);
@@ -190,7 +184,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
       .attr('stroke-width', 0.5)
       .attr('fill', d => {
         const props = d.properties;
-        const townName = (props.TOWN || props.NAME || props.TOWN_NAME || '').trim().toLowerCase();
+        const townName = normalizeTownName(props.TOWN || props.NAME || props.TOWN_NAME);
 
         // Clicked town takes precedence with orange/amber color
         if (normalizedClickedTown && townName === normalizedClickedTown) {

@@ -4,28 +4,15 @@ import ChoroplethMap from './ChoroplethMap';
 import DistrictEditor from './DistrictEditor';
 import SalaryTable from './SalaryTable';
 import SalaryComparison from './SalaryComparison';
+import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
+import { normalizeTownName } from '../utils/formatters';
 import './DistrictBrowser.css';
 
 function DistrictBrowser() {
   const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'salaries'
   const [editingDistrict, setEditingDistrict] = useState(null);
   // District type filters
-  const districtTypeOptions = [
-    { value: 'municipal', label: 'Municipal', icon: '🏛️' },
-    { value: 'regional_academic', label: 'Regional', icon: '🏫' },
-    { value: 'regional_vocational', label: 'Vocational', icon: '🛠️' },
-    { value: 'county_agricultural', label: 'Agricultural', icon: '🌾' },  
-    { value: 'charter', label: 'Charter', icon: '📜' }
-  ];
-  const [selectedTypes, setSelectedTypes] = useState(districtTypeOptions.map(opt => opt.value));
-
-  const DISTRICT_TYPE_ORDER = {
-  municipal: 0,
-  regional_academic: 1,
-  regional_vocational: 2,
-  county_agricultural: 3,
-  charter: 4,
-};
+  const [selectedTypes, setSelectedTypes] = useState(DISTRICT_TYPE_OPTIONS.map(opt => opt.value));
 
   // Handle checkbox change
   const handleTypeChange = (type) => {
@@ -49,7 +36,7 @@ function DistrictBrowser() {
     });
 
   // Get total count for each type
-  const typeCounts = districtTypeOptions.reduce((acc, opt) => {
+  const typeCounts = DISTRICT_TYPE_OPTIONS.reduce((acc, opt) => {
     acc[opt.value] = districts.filter(d => d.district_type === opt.value).length;
     return acc;
   }, {});
@@ -116,7 +103,7 @@ function DistrictBrowser() {
 
   const handleTownClick = async (townName) => {
     // Normalize town name for cache lookup
-    const townKey = townName.trim().toLowerCase();
+    const townKey = normalizeTownName(townName);
     // If new town, reset cycle and fetch districts
     if (lastClickedTown !== townKey) {
       setLastClickedTown(townKey);
@@ -257,7 +244,7 @@ function DistrictBrowser() {
 
           {/* District Type Filters - in same container */}
           <div className="district-type-filters-row">
-            {districtTypeOptions.map(opt => (
+            {DISTRICT_TYPE_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 type="button"
@@ -295,7 +282,7 @@ function DistrictBrowser() {
           ) : (
             <ul className="district-items">
               {filteredDistricts.map((district) => {
-                const typeOpt = districtTypeOptions.find(opt => opt.value === district.district_type);
+                const typeOpt = DISTRICT_TYPE_OPTIONS.find(opt => opt.value === district.district_type);
                 return (
                   <li
                     key={district.id}
@@ -337,7 +324,7 @@ function DistrictBrowser() {
             selectedDistrict={selectedDistrict}
             clickedTown={clickedTown}
             onTownClick={handleTownClick}
-            districtTypeOptions={districtTypeOptions}
+            districtTypeOptions={DISTRICT_TYPE_OPTIONS}
           />
         </div>
 

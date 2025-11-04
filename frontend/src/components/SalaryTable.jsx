@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import { formatCurrency } from '../utils/formatters';
 import './SalaryTable.css';
 
 function SalaryTable({ districtId }) {
@@ -114,9 +115,7 @@ function SalaryTable({ districtId }) {
                     <td className="step-cell">{step}</td>
                     {sortedColumns.map(col => (
                       <td key={col.key} className="salary-cell">
-                        {salariesByStep[step][col.key] !== undefined && salariesByStep[step][col.key] !== null
-                          ? `$${Number(salariesByStep[step][col.key]).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                          : 'N/A'}
+                        {formatCurrency(salariesByStep[step][col.key])}
                       </td>
                     ))}
                   </tr>
