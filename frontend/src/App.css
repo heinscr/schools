@@ -2,10 +2,18 @@
   min-height: 100vh;
   background: #f8f9fa;
   width: 100%;
+  position: relative;
 }
 
 #root {
   margin: 0;
   padding: 0;
   width: 100%;
+}
+
+.app-header-auth {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
 }

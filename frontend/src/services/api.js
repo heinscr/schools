@@ -2,6 +2,7 @@
 // Note: Vite only exposes env vars prefixed with VITE_. Use those exclusively.
 // Both district and salary endpoints now use the same API Gateway
 import { logger } from '../utils/logger';
+import authService from './auth';
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
@@ -10,13 +11,27 @@ const API_BASE_URL =
   'http://localhost:8000';
 
 class ApiService {
+  // Simple in-memory cache for town-based queries
+  _districtsByTownCache = {};
+
+  /**
+   * Get authentication headers for API requests
+   */
+  _getAuthHeaders() {
+    const token = authService.getToken();
+    if (token) {
+      return {
+        'Authorization': `Bearer ${token}`,
+      };
+    }
+    return {};
+  }
+
   /**
    * Fetch all districts with optional filters
    * @param {Object} params - Query parameters (name, town, limit, offset)
    * @returns {Promise<Object>} - Response with districts data
    */
-  // Simple in-memory cache for town-based queries
-  _districtsByTownCache = {};
 
   async getDistricts(params = {}) {
     const queryParams = new URLSearchParams();
@@ -105,12 +120,14 @@ class ApiService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...this._getAuthHeaders(),
       },
       body: JSON.stringify(districtData),
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to create district: ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to create district: ${response.statusText}`);
     }
 
     return response.json();
@@ -129,6 +146,7 @@ class ApiService {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        ...this._getAuthHeaders(),
       },
       body: JSON.stringify(districtData),
     });
@@ -137,7 +155,11 @@ class ApiService {
       if (response.status === 404) {
         throw new Error('District not found');
       }
-      throw new Error(`Failed to update district: ${response.statusText}`);
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to update district: ${response.statusText}`);
     }
 
     // Clear cache after update

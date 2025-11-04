@@ -23,7 +23,8 @@ from config import (
     MIN_QUERY_LIMIT,
     DEFAULT_OFFSET
 )
-from auth import require_api_key
+from auth import require_api_key  # Deprecated - keeping for backward compatibility
+from cognito_auth import require_admin_role, get_current_user_optional
 from validation import validate_search_query, validate_name_filter, validate_town_filter, validate_district_id
 from error_handlers import (
     http_exception_handler,
@@ -216,9 +217,9 @@ async def create_district(
     request: Request,
     district: DistrictCreate,
     table = Depends(get_table),
-    api_key: str = Depends(require_api_key)
+    user: dict = Depends(require_admin_role)
 ):
-    """Create a new district (requires API key)"""
+    """Create a new district (requires admin authentication)"""
     try:
         district_dict = DynamoDBDistrictService.create_district(table=table, district_data=district)
         return DistrictResponse(**district_dict)
@@ -233,9 +234,9 @@ async def update_district(
     district_id: str,
     district: DistrictUpdate,
     table = Depends(get_table),
-    api_key: str = Depends(require_api_key)
+    user: dict = Depends(require_admin_role)
 ):
-    """Update a district (requires API key)"""
+    """Update a district (requires admin authentication)"""
     # Validate district ID
     validated_district_id = validate_district_id(district_id)
 
@@ -256,9 +257,9 @@ async def delete_district(
     request: Request,
     district_id: str,
     table = Depends(get_table),
-    api_key: str = Depends(require_api_key)
+    user: dict = Depends(require_admin_role)
 ):
-    """Delete a district (requires API key)"""
+    """Delete a district (requires admin authentication)"""
     # Validate district ID
     validated_district_id = validate_district_id(district_id)
 
@@ -266,6 +267,30 @@ async def delete_district(
     if not success:
         raise HTTPException(status_code=404, detail="District not found")
     return None
+
+
+@app.get("/api/auth/me")
+@limiter.limit(GENERAL_RATE_LIMIT)
+async def get_current_user(
+    request: Request,
+    user: dict = Depends(get_current_user_optional)
+):
+    """Get current authenticated user information"""
+    if not user:
+        return {
+            "authenticated": False,
+            "user": None
+        }
+
+    return {
+        "authenticated": True,
+        "user": {
+            "email": user.get("email"),
+            "username": user.get("username"),
+            "is_admin": user.get("is_admin", False),
+            "groups": user.get("groups", [])
+        }
+    }
 
 
 # Salary endpoints (delegating to salaries module functions)

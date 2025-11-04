@@ -8,11 +8,14 @@ import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/distric
 import { normalizeTownName } from '../utils/formatters';
 import './DistrictBrowser.css';
 
-function DistrictBrowser() {
+function DistrictBrowser({ user }) {
   const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'salaries'
   const [editingDistrict, setEditingDistrict] = useState(null);
   // District type filters
   const [selectedTypes, setSelectedTypes] = useState(DISTRICT_TYPE_OPTIONS.map(opt => opt.value));
+
+  // Check if user is admin
+  const isAdmin = user?.is_admin || false;
 
   // Handle checkbox change
   const handleTypeChange = (type) => {
@@ -291,16 +294,18 @@ function DistrictBrowser() {
                     }`}
                     onClick={() => handleDistrictClick(district)}
                   >
-                    <button
-                      className="edit-district-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingDistrict(district);
-                      }}
-                      title="Edit district"
-                    >
-                      🔧
-                    </button>
+                    {isAdmin && (
+                      <button
+                        className="edit-district-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingDistrict(district);
+                        }}
+                        title="Edit district"
+                      >
+                        🔧
+                      </button>
+                    )}
                     <div className="district-name">
                       <span className="district-type-icon" style={{marginRight: '6px'}}>{typeOpt?.icon}</span>
                       {district.name}
@@ -339,6 +344,7 @@ function DistrictBrowser() {
         district={editingDistrict}
         onClose={() => setEditingDistrict(null)}
         onSave={handleSaveDistrict}
+        user={user}
       />
         </>
       ) : (
