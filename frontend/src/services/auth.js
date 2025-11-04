@@ -14,7 +14,14 @@ class AuthService {
    */
   async init() {
     try {
-      const response = await fetch('/config.json');
+      // Try to load runtime config from production deployment
+      const configUrl = `${window.location.origin}/config.json`;
+      const response = await fetch(configUrl);
+
+      if (!response.ok) {
+        throw new Error(`Failed to load config: ${response.status}`);
+      }
+
       const config = await response.json();
 
       this.cognitoConfig = {
@@ -26,7 +33,7 @@ class AuthService {
 
       return this.cognitoConfig;
     } catch (error) {
-      console.error('Failed to load Cognito configuration:', error);
+      console.warn('Failed to load Cognito configuration from /config.json, using environment variables:', error.message);
       // Fallback to environment variables for local development
       this.cognitoConfig = {
         userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
@@ -39,11 +46,26 @@ class AuthService {
   }
 
   /**
+   * Check if Cognito is configured
+   */
+  isConfigured() {
+    return !!(
+      this.cognitoConfig?.userPoolId &&
+      this.cognitoConfig?.clientId &&
+      this.cognitoConfig?.domain
+    );
+  }
+
+  /**
    * Get the Cognito hosted UI login URL
    */
   getLoginUrl() {
     if (!this.cognitoConfig) {
       throw new Error('Auth service not initialized');
+    }
+
+    if (!this.isConfigured()) {
+      throw new Error('Cognito is not configured. Please set environment variables or deploy config.json');
     }
 
     const redirectUri = window.location.origin;

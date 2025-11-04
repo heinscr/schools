@@ -6,6 +6,7 @@ function Login({ onAuthChange }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
+  const [cognitoConfigured, setCognitoConfigured] = useState(false);
 
   useEffect(() => {
     initAuth();
@@ -15,6 +16,15 @@ function Login({ onAuthChange }) {
     try {
       // Initialize auth service
       await authService.init();
+
+      // Check if Cognito is properly configured
+      setCognitoConfigured(authService.isConfigured());
+
+      if (!authService.isConfigured()) {
+        console.warn('Cognito is not configured. Authentication features will be disabled.');
+        setLoading(false);
+        return;
+      }
 
       // Check for OAuth callback
       const hasCallback = authService.handleCallback();
@@ -70,6 +80,11 @@ function Login({ onAuthChange }) {
 
   if (loading) {
     return null; // Don't show anything while loading
+  }
+
+  // Don't show login button if Cognito is not configured
+  if (!cognitoConfigured) {
+    return null;
   }
 
   if (!user) {
