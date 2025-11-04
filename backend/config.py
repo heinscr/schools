@@ -12,6 +12,10 @@ MIN_QUERY_LIMIT = 1
 COMPARE_INDEX_NAME = "CompareDistrictsIndex"
 GSI_TOWN_INDEX_NAME = "GSI_TOWN"
 
+# DoS Protection - Maximum items to fetch from DynamoDB in a single operation
+# This prevents expensive queries that could exhaust resources
+MAX_DYNAMODB_FETCH_LIMIT = 1000
+
 # Salary Configuration
 DEFAULT_SCHOOL_YEAR = "2021-2022"
 VALID_EDUCATION_LEVELS = {'B', 'M', 'D'}

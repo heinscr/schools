@@ -6,6 +6,7 @@ from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
 from schemas import DistrictCreate, DistrictUpdate
+from config import MAX_DYNAMODB_FETCH_LIMIT
 
 
 class DynamoDBDistrictService:
@@ -124,35 +125,46 @@ class DynamoDBDistrictService:
     @staticmethod
     def _query_by_town(table, town: str, limit: int, offset: int) -> Tuple[List[dict], int]:
         """Query districts by town using GSI_TOWN"""
+        # Use pagination to limit items fetched from DynamoDB
+        # Add buffer to account for offset, cap for DoS protection
+        max_items_to_fetch = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
+
         response = table.query(
             IndexName='GSI_TOWN',
-            KeyConditionExpression=Key('GSI_TOWN_PK').eq(f'TOWN#{town.upper()}')
+            KeyConditionExpression=Key('GSI_TOWN_PK').eq(f'TOWN#{town.upper()}'),
+            Limit=max_items_to_fetch
         )
 
-        # Get unique district IDs
-        district_ids = set()
+        # Get unique district IDs (maintain order)
+        district_ids = []
+        seen_ids = set()
         for item in response.get('Items', []):
-            if 'district_id' in item:
-                district_ids.add(item['district_id'])
+            if 'district_id' in item and item['district_id'] not in seen_ids:
+                district_ids.append(item['district_id'])
+                seen_ids.add(item['district_id'])
 
-        # Fetch full district data
+        # Fetch only the district IDs we need (after offset, up to limit)
+        # This reduces N+1 queries to only what's needed
         districts = []
-        for district_id in district_ids:
+        for district_id in district_ids[offset:offset + limit]:
             district = DynamoDBDistrictService.get_district(table, district_id)
             if district:
                 districts.append(district)
 
-        # Apply pagination
-        total = len(districts)
-        districts = districts[offset:offset + limit]
+        # Return actual count
+        total = len(district_ids)
 
         return districts, total
 
     @staticmethod
     def _scan_by_name(table, name: str, limit: int, offset: int) -> Tuple[List[dict], int]:
         """Scan districts by name"""
+        # Limit scan to prevent DoS
+        max_items_to_fetch = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
+
         response = table.scan(
-            FilterExpression=Attr('entity_type').eq('district') & Attr('name_lower').eq(name.lower())
+            FilterExpression=Attr('entity_type').eq('district') & Attr('name_lower').eq(name.lower()),
+            Limit=max_items_to_fetch
         )
 
         districts = [DynamoDBDistrictService._item_to_dict(item) for item in response.get('Items', [])]
@@ -165,8 +177,12 @@ class DynamoDBDistrictService:
     @staticmethod
     def _get_all_districts(table, limit: int, offset: int) -> Tuple[List[dict], int]:
         """Get all districts"""
+        # Limit scan to prevent DoS
+        max_items_to_fetch = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
+
         response = table.scan(
-            FilterExpression=Attr('entity_type').eq('district')
+            FilterExpression=Attr('entity_type').eq('district'),
+            Limit=max_items_to_fetch
         )
 
         districts = [DynamoDBDistrictService._item_to_dict(item) for item in response.get('Items', [])]
@@ -284,39 +300,47 @@ class DynamoDBDistrictService:
             return DynamoDBDistrictService._get_all_districts(table, limit, offset)
 
         try:
-            # Search by name
+            # Limit operations to prevent DoS
+            max_items_to_fetch = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
+
+            # Search by name with limit
             name_results = table.scan(
-                FilterExpression=Attr('entity_type').eq('district') & Attr('name_lower').contains(query_text.lower())
+                FilterExpression=Attr('entity_type').eq('district') & Attr('name_lower').contains(query_text.lower()),
+                Limit=max_items_to_fetch
             )
 
-            # Search by town using GSI
+            # Search by town using GSI with limit
             town_results = table.query(
                 IndexName='GSI_TOWN',
-                KeyConditionExpression=Key('GSI_TOWN_PK').eq(f'TOWN#{query_text.upper()}')
+                KeyConditionExpression=Key('GSI_TOWN_PK').eq(f'TOWN#{query_text.upper()}'),
+                Limit=max_items_to_fetch
             )
 
-            # Combine results
-            district_ids = set()
+            # Combine results (maintain order, avoid duplicates)
+            district_ids = []
+            seen_ids = set()
 
-            # Add districts from name search
+            # Add districts from name search first
             for item in name_results.get('Items', []):
-                district_ids.add(item['district_id'])
+                if item['district_id'] not in seen_ids:
+                    district_ids.append(item['district_id'])
+                    seen_ids.add(item['district_id'])
 
             # Add districts from town search
             for item in town_results.get('Items', []):
-                if 'district_id' in item:
-                    district_ids.add(item['district_id'])
+                if 'district_id' in item and item['district_id'] not in seen_ids:
+                    district_ids.append(item['district_id'])
+                    seen_ids.add(item['district_id'])
 
-            # Fetch full district data
+            # Fetch only the district IDs we need (after offset, up to limit)
             districts = []
-            for district_id in district_ids:
+            for district_id in district_ids[offset:offset + limit]:
                 district = DynamoDBDistrictService.get_district(table, district_id)
                 if district:
                     districts.append(district)
 
-            # Apply pagination
-            total = len(districts)
-            districts = districts[offset:offset + limit]
+            # Return actual count
+            total = len(district_ids)
 
             return districts, total
         except ClientError as e:
