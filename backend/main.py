@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from typing import Optional
@@ -31,6 +31,14 @@ from error_handlers import (
     general_exception_handler,
     safe_create_district_error
 )
+from rate_limiter import (
+    limiter,
+    get_rate_limit_handler,
+    GENERAL_RATE_LIMIT,
+    SEARCH_RATE_LIMIT,
+    WRITE_RATE_LIMIT
+)
+from slowapi.errors import RateLimitExceeded
 
 # Load environment from .env for local development
 load_dotenv()
@@ -52,10 +60,14 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Add rate limiter state
+app.state.limiter = limiter
+
 # Register error handlers
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
+app.add_exception_handler(RateLimitExceeded, get_rate_limit_handler())
 
 # Configure CORS
 # Get allowed origins from environment or use defaults
@@ -116,7 +128,9 @@ async def health_check():
 
 # District endpoints
 @app.get("/api/districts", response_model=DistrictListResponse)
+@limiter.limit(GENERAL_RATE_LIMIT)
 async def list_districts(
+    request: Request,
     name: Optional[str] = Query(None, description="Filter by district name (partial match)"),
     town: Optional[str] = Query(None, description="Filter by town name (partial match)"),
     limit: int = Query(DEFAULT_QUERY_LIMIT, ge=MIN_QUERY_LIMIT, le=MAX_QUERY_LIMIT, description="Number of results to return"),
@@ -148,7 +162,9 @@ async def list_districts(
 
 
 @app.get("/api/districts/search", response_model=DistrictListResponse)
+@limiter.limit(SEARCH_RATE_LIMIT)
 async def search_districts(
+    request: Request,
     q: Optional[str] = Query(None, description="Search query (searches both district names and towns)"),
     limit: int = Query(DEFAULT_QUERY_LIMIT, ge=MIN_QUERY_LIMIT, le=MAX_QUERY_LIMIT, description="Number of results to return"),
     offset: int = Query(DEFAULT_OFFSET, ge=0, description="Number of results to skip"),
@@ -177,7 +193,9 @@ async def search_districts(
 
 
 @app.get("/api/districts/{district_id}", response_model=DistrictResponse)
+@limiter.limit(GENERAL_RATE_LIMIT)
 async def get_district(
+    request: Request,
     district_id: str,
     table = Depends(get_table)
 ):
@@ -193,7 +211,9 @@ async def get_district(
 
 
 @app.post("/api/districts", response_model=DistrictResponse, status_code=201)
+@limiter.limit(WRITE_RATE_LIMIT)
 async def create_district(
+    request: Request,
     district: DistrictCreate,
     table = Depends(get_table),
     api_key: str = Depends(require_api_key)
@@ -207,7 +227,9 @@ async def create_district(
 
 
 @app.put("/api/districts/{district_id}", response_model=DistrictResponse)
+@limiter.limit(WRITE_RATE_LIMIT)
 async def update_district(
+    request: Request,
     district_id: str,
     district: DistrictUpdate,
     table = Depends(get_table),
@@ -229,7 +251,9 @@ async def update_district(
 
 
 @app.delete("/api/districts/{district_id}", status_code=204)
+@limiter.limit(WRITE_RATE_LIMIT)
 async def delete_district(
+    request: Request,
     district_id: str,
     table = Depends(get_table),
     api_key: str = Depends(require_api_key)
@@ -261,7 +285,8 @@ import salaries
 
 @app.get("/api/salary-schedule/{district_id}")
 @app.get("/api/salary-schedule/{district_id}/{year}")
-async def get_salary_schedule(district_id: str, year: Optional[str] = None):
+@limiter.limit(GENERAL_RATE_LIMIT)
+async def get_salary_schedule(request: Request, district_id: str, year: Optional[str] = None):
     """Get salary schedule(s) for a district"""
     # Set the table references in the salaries module
     salaries.schedules_table = schedules_table
@@ -274,7 +299,9 @@ async def get_salary_schedule(district_id: str, year: Optional[str] = None):
 
 
 @app.get("/api/salary-compare")
+@limiter.limit(GENERAL_RATE_LIMIT)
 async def compare_salaries(
+    request: Request,
     education: str = Query(..., description="Education level (B, M, D)"),
     credits: int = Query(..., description="Additional credits"),
     step: int = Query(..., description="Experience step"),
@@ -308,7 +335,9 @@ async def compare_salaries(
 
 
 @app.get("/api/salary-heatmap")
+@limiter.limit(GENERAL_RATE_LIMIT)
 async def get_salary_heatmap(
+    request: Request,
     education: str = Query(..., description="Education level (B, M, D)"),
     credits: int = Query(..., description="Additional credits"),
     step: int = Query(..., description="Experience step"),
@@ -334,7 +363,8 @@ async def get_salary_heatmap(
 
 
 @app.get("/api/districts/{district_id}/salary-metadata")
-async def get_salary_metadata(district_id: str):
+@limiter.limit(GENERAL_RATE_LIMIT)
+async def get_salary_metadata(request: Request, district_id: str):
     """Get salary metadata for a district"""
     # Set the table references in the salaries module
     salaries.schedules_table = schedules_table

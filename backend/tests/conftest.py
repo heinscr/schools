@@ -13,6 +13,11 @@ os.environ["SCHEDULES_TABLE_NAME"] = "test-schedules"
 os.environ["DISTRICTS_TABLE_NAME"] = "test-districts"
 os.environ["API_KEY"] = "test-api-key-for-unit-tests"
 
+# Set high rate limits for testing to avoid hitting limits during test runs
+os.environ["RATE_LIMIT_GENERAL"] = "1000/minute"
+os.environ["RATE_LIMIT_SEARCH"] = "1000/minute"
+os.environ["RATE_LIMIT_WRITE"] = "1000/minute"
+
 # Add backend directory to path
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
