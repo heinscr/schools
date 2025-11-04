@@ -5,10 +5,13 @@ Provides salary schedule queries, comparisons, heatmaps, and metadata
 import json
 import os
 from typing import Dict, Any, Optional, List
-from decimal import Decimal
 
 import boto3
 from boto3.dynamodb.conditions import Key
+
+# Import shared utilities
+from utils.responses import create_response
+from utils.dynamodb import get_district_towns as get_district_towns_util
 
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb')
@@ -19,96 +22,6 @@ DISTRICTS_TABLE_NAME = os.environ.get('DISTRICTS_TABLE_NAME')
 
 salaries_table = dynamodb.Table(SALARIES_TABLE_NAME) if SALARIES_TABLE_NAME else None
 schedules_table = dynamodb.Table(SCHEDULES_TABLE_NAME) if SCHEDULES_TABLE_NAME else None
-districts_table = dynamodb.Table(DISTRICTS_TABLE_NAME) if DISTRICTS_TABLE_NAME else None
-
-
-def decimal_to_float(obj):
-    """Convert Decimal objects to float for JSON serialization"""
-    if isinstance(obj, Decimal):
-        return float(obj)
-    raise TypeError
-
-
-def create_response(status_code: int, body: Any) -> Dict[str, Any]:
-    """Create a standardized API response"""
-    return {
-        'statusCode': status_code,
-        'headers': {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type'
-        },
-        'body': json.dumps(body, default=decimal_to_float)
-    }
-
-
-def get_district_towns(district_ids: List[str]) -> Dict[str, List[str]]:
-    """
-    Batch fetch towns for multiple districts
-    Returns dict mapping district_id to list of town names
-    """
-    if not districts_table or not district_ids:
-        print(f"get_district_towns: table={districts_table}, ids_count={len(district_ids) if district_ids else 0}")
-        return {}
-    
-    district_towns = {}
-    
-    try:
-        # Use DynamoDB client for batch_get_item
-        client = boto3.client('dynamodb')
-        print(f"Fetching towns for {len(district_ids)} districts")
-        
-        # Batch get items (max 100 at a time)
-        for i in range(0, len(district_ids), 100):
-            batch = district_ids[i:i + 100]
-            print(f"Batch {i//100 + 1}: {len(batch)} districts")
-            
-            # Build request items
-            keys = [
-                {
-                    'PK': {'S': f'DISTRICT#{district_id}'},
-                    'SK': {'S': 'METADATA'}
-                }
-                for district_id in batch
-            ]
-            
-            response = client.batch_get_item(
-                RequestItems={
-                    DISTRICTS_TABLE_NAME: {
-                        'Keys': keys
-                    }
-                }
-            )
-            
-            items = response.get('Responses', {}).get(DISTRICTS_TABLE_NAME, [])
-            print(f"Got {len(items)} items back from DynamoDB")
-            
-            # Extract towns from responses
-            for item in items:
-                # Convert DynamoDB low-level format to normal values
-                district_id_attr = item.get('district_id', {})
-                district_id = district_id_attr.get('S') if isinstance(district_id_attr, dict) else district_id_attr
-                
-                towns_attr = item.get('towns', {})
-                if isinstance(towns_attr, dict) and 'L' in towns_attr:
-                    towns = [t.get('S', '') for t in towns_attr['L'] if isinstance(t, dict)]
-                else:
-                    towns = []
-                
-                if district_id:
-                    district_towns[district_id] = towns
-                    print(f"  {district_id}: {towns}")
-        
-        print(f"Returning {len(district_towns)} district->towns mappings")
-        
-    except Exception as e:
-        print(f"Error batch fetching district towns: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        # Return empty dict on error
-    
-    return district_towns
 
 
 def handler(event, context):
@@ -261,7 +174,7 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
         
         # Batch fetch towns for all districts
         district_ids = [item.get('district_id') for item in deduplicated_items]
-        district_towns_map = get_district_towns(district_ids)
+        district_towns_map = get_district_towns_util(district_ids, DISTRICTS_TABLE_NAME)
         
         # Transform results for response
         rankings = [

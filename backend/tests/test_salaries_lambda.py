@@ -8,6 +8,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 import salaries as lambda_mod
+from utils.dynamodb import get_district_towns
 
 
 class FakeTable:
@@ -56,7 +57,7 @@ def test_compare_salaries_lambda(monkeypatch):
     ]
 
     monkeypatch.setattr(lambda_mod, 'salaries_table', FakeTable(items))
-    monkeypatch.setattr(lambda_mod, 'get_district_towns', lambda ids: {'d1': ['Town1'], 'd2': ['Town2']})
+    monkeypatch.setattr('utils.dynamodb.get_district_towns', lambda ids, table_name: {'d1': ['Town1'], 'd2': ['Town2']})
 
     resp = lambda_mod.compare_salaries({'education': 'M', 'credits': '30', 'step': '5'})
     assert resp['statusCode'] == 200

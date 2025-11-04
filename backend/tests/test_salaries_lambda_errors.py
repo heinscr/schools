@@ -7,6 +7,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 import salaries as lambda_mod
+from utils.dynamodb import get_district_towns
 
 
 def test_compare_salaries_missing_params(monkeypatch):
@@ -51,18 +52,19 @@ def test_metadata_not_found(monkeypatch):
     assert resp['statusCode'] == 404
 
 
-def test_get_district_towns_empty_inputs(monkeypatch):
-    monkeypatch.setattr(lambda_mod, 'districts_table', None)
-    assert lambda_mod.get_district_towns([]) == {}
+def test_get_district_towns_empty_inputs():
+    # Test empty inputs return empty dict
+    assert get_district_towns([], '') == {}
 
 
 def test_get_district_towns_exception(monkeypatch):
     # Force batch_get_item to raise to cover exception path
+    import boto3
+
     class FakeClient:
-        def batch_get_item(self, **kwargs):
+        def batch_get_item(self, **_kwargs):
             raise RuntimeError('boom')
-    monkeypatch.setattr(lambda_mod, 'districts_table', object())
-    monkeypatch.setattr(lambda_mod, 'DISTRICTS_TABLE_NAME', 'tbl')
-    monkeypatch.setattr(lambda_mod.boto3, 'client', lambda *_args, **_kw: FakeClient())
-    out = lambda_mod.get_district_towns(['d1', 'd2'])
+
+    monkeypatch.setattr(boto3, 'client', lambda *args, **kwargs: FakeClient())
+    out = get_district_towns(['d1', 'd2'], 'test_table')
     assert out == {}

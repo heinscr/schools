@@ -172,6 +172,7 @@ $PIP_BUILD_CMD install -r requirements.txt -t package/ --quiet
 # Copy application code
 cp -r *.py package/
 [ -d "services" ] && cp -r services package/
+[ -d "utils" ] && cp -r utils package/
 
 # Create zip
 cd package
@@ -189,8 +190,9 @@ cd backend
 # Create a temporary directory for packaging
 mkdir -p salary_package
 
-# Copy the salary Lambda handler
+# Copy the salary Lambda handler and utils
 cp salaries.py salary_package/
+[ -d "utils" ] && cp -r utils salary_package/
 
 # Install dependencies (boto3 is included in Lambda runtime, but we might need others)
 # For now, just package the handler since it only uses boto3
