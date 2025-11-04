@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field, field_validator, ValidationError
 import re
 
 # Validation constants
-# Allow alphanumeric, spaces, hyphens (including em dash), apostrophes, periods, ampersands, commas, parentheses, and hash
-SAFE_TEXT_PATTERN = re.compile(r'^[a-zA-Z0-9\s\-\'.&,()#—]+$')
+# Allow alphanumeric, spaces, hyphens (including em dash), apostrophes, periods, ampersands, commas, parentheses, colons, and hash
+SAFE_TEXT_PATTERN = re.compile(r'^[a-zA-Z0-9\s\-\'.&,():#—]+$')
 DISTRICT_TYPE_PATTERN = re.compile(r'^[a-z_]+$')
 VALID_DISTRICT_TYPES = {
     'municipal',
@@ -56,7 +56,7 @@ class DistrictBase(BaseModel):
         if not SAFE_TEXT_PATTERN.match(v):
             raise ValueError(
                 'District name contains invalid characters. '
-                'Only alphanumeric, spaces, hyphens, apostrophes, periods, '
+                'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
                 'ampersands, commas, parentheses, and hash symbols are allowed.'
             )
 
@@ -76,7 +76,7 @@ class DistrictBase(BaseModel):
         if not SAFE_TEXT_PATTERN.match(v):
             raise ValueError(
                 'Main address contains invalid characters. '
-                'Only alphanumeric, spaces, hyphens, apostrophes, periods, '
+                'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
                 'ampersands, commas, parentheses, and hash symbols are allowed.'
             )
 
@@ -111,7 +111,7 @@ class DistrictCreate(DistrictBase):
             if not SAFE_TEXT_PATTERN.match(town):
                 raise ValueError(
                     f'Town name contains invalid characters: {town[:50]}... '
-                    'Only alphanumeric, spaces, hyphens, apostrophes, periods, '
+                    'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
                     'ampersands, commas, parentheses, and hash symbols are allowed.'
                 )
 
@@ -159,7 +159,7 @@ class DistrictUpdate(BaseModel):
         if not SAFE_TEXT_PATTERN.match(v):
             raise ValueError(
                 'District name contains invalid characters. '
-                'Only alphanumeric, spaces, hyphens, apostrophes, periods, '
+                'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
                 'ampersands, commas, parentheses, and hash symbols are allowed.'
             )
 
@@ -179,7 +179,7 @@ class DistrictUpdate(BaseModel):
         if not SAFE_TEXT_PATTERN.match(v):
             raise ValueError(
                 'Main address contains invalid characters. '
-                'Only alphanumeric, spaces, hyphens, apostrophes, periods, '
+                'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
                 'ampersands, commas, parentheses, and hash symbols are allowed.'
             )
 
@@ -208,7 +208,7 @@ class DistrictUpdate(BaseModel):
             if not SAFE_TEXT_PATTERN.match(town):
                 raise ValueError(
                     f'Town name contains invalid characters: {town[:50]}... '
-                    'Only alphanumeric, spaces, hyphens, apostrophes, periods, '
+                    'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
                     'ampersands, commas, parentheses, and hash symbols are allowed.'
                 )
 

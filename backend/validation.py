@@ -13,8 +13,8 @@ MAX_TOWN_LENGTH = 100
 MAX_DISTRICT_ID_LENGTH = 100
 
 # Allowed characters patterns
-# Allow alphanumeric, spaces, hyphens, apostrophes, periods, and common punctuation
-SAFE_TEXT_PATTERN = re.compile(r'^[a-zA-Z0-9\s\-\'.&,()]+$')
+# Allow alphanumeric, spaces, hyphens, apostrophes, periods, colons, and common punctuation
+SAFE_TEXT_PATTERN = re.compile(r'^[a-zA-Z0-9\s\-\'.&,():]+$')
 
 # District ID pattern - allows:
 # 1. Plain alphanumeric with hyphens (UUIDs, etc): 0f60fef3-cee7-43da-a8a8-b74826e3dfa0
@@ -57,7 +57,7 @@ def validate_search_query(query: Optional[str]) -> Optional[str]:
     if not SAFE_TEXT_PATTERN.match(query):
         raise HTTPException(
             status_code=400,
-            detail="Search query contains invalid characters. Only alphanumeric, spaces, hyphens, apostrophes, periods, and common punctuation are allowed."
+            detail="Search query contains invalid characters. Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, and common punctuation are allowed."
         )
 
     return query
@@ -97,7 +97,7 @@ def validate_name_filter(name: Optional[str]) -> Optional[str]:
     if not SAFE_TEXT_PATTERN.match(name):
         raise HTTPException(
             status_code=400,
-            detail="Name filter contains invalid characters. Only alphanumeric, spaces, hyphens, apostrophes, periods, and common punctuation are allowed."
+            detail="Name filter contains invalid characters. Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, and common punctuation are allowed."
         )
 
     return name
@@ -137,7 +137,7 @@ def validate_town_filter(town: Optional[str]) -> Optional[str]:
     if not SAFE_TEXT_PATTERN.match(town):
         raise HTTPException(
             status_code=400,
-            detail="Town filter contains invalid characters. Only alphanumeric, spaces, hyphens, apostrophes, periods, and common punctuation are allowed."
+            detail="Town filter contains invalid characters. Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, and common punctuation are allowed."
         )
 
     return town
