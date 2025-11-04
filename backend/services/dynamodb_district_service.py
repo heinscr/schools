@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-from datetime import datetime
+from datetime import datetime, UTC
 from decimal import Decimal
 import uuid
 from boto3.dynamodb.conditions import Key, Attr
@@ -19,7 +19,7 @@ class DynamoDBDistrictService:
     @staticmethod
     def _create_district_item(district_id: str, district_data: DistrictCreate) -> dict:
         """Create a DynamoDB item from district data"""
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(UTC).isoformat()
 
         item = {
             'PK': f'DISTRICT#{district_id}',
@@ -210,7 +210,7 @@ class DynamoDBDistrictService:
                 expr_attr_values[':district_type'] = district_data.district_type
 
             update_expr_parts.append('updated_at = :updated_at')
-            expr_attr_values[':updated_at'] = datetime.utcnow().isoformat()
+            expr_attr_values[':updated_at'] = datetime.now(UTC).isoformat()
 
             if district_data.towns is not None:
                 update_expr_parts.append('towns = :towns')

@@ -1,8 +1,12 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
+from contextlib import asynccontextmanager
+import os
+import json
 import boto3
 from boto3.dynamodb.conditions import Key
+from dotenv import load_dotenv
 
 from database import get_table, init_db
 from schemas import (
@@ -12,23 +16,28 @@ from schemas import (
     DistrictListResponse
 )
 from services.dynamodb_district_service import DynamoDBDistrictService
-import os
-import json
-from dotenv import load_dotenv
-
-app = FastAPI(
-    title="MA Teachers Contracts API",
-    description="API for looking up Massachusetts teachers contracts",
-    version="0.1.0"
-)
 
 # Load environment from .env for local development
 load_dotenv()
 
-# Configure CORS
-# Allow CloudFront domains (*.cloudfront.net) and custom domain
-import os
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan - startup and shutdown logic"""
+    # Startup: Initialize database
+    init_db()
+    yield
+    # Shutdown: cleanup if needed
+
+
+app = FastAPI(
+    title="MA Teachers Contracts API",
+    description="API for looking up Massachusetts teachers contracts",
+    version="0.1.0",
+    lifespan=lifespan
+)
+
+# Configure CORS
 # Get allowed origins from environment or use defaults
 allowed_origins = [
     "http://localhost:3000",
@@ -48,12 +57,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database on startup"""
-    init_db()
 
 
 @app.get("/")
