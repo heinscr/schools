@@ -13,7 +13,8 @@
         "Acton",
         "Boxborough"
       ],
-      "address": "15 Charter Rd, Acton, MA 01720"
+      "address": "15 Charter Rd, Acton, MA 01720",
+      "district_url": "http://www.abschools.org/"
     },
     {
       "district": "Amherst-Pelham",
@@ -24,7 +25,8 @@
         "Shutesbury"
       ],
       "notes": "Grades 7–12 for some member towns",
-      "address": "170 Chestnut Street, Amherst, MA 01002"
+      "address": "170 Chestnut Street, Amherst, MA 01002",
+      "district_url": "https://arps.org"
     },
     {
       "district": "Ashburnham-Westminster",
@@ -32,7 +34,8 @@
         "Ashburnham",
         "Westminster"
       ],
-      "address": "11 Oakmont Drive, Ashburnham, MA 01430"
+      "address": "11 Oakmont Drive, Ashburnham, MA 01430",
+      "district_url": "https://www.awrsd.org"
     },
     {
       "district": "Athol-Royalston",
@@ -40,7 +43,8 @@
         "Athol",
         "Royalston"
       ],
-      "address": "1062 Pleasant Street, Athol, MA 01331"
+      "address": "1062 Pleasant Street, Athol, MA 01331",
+      "district_url": "https://www.arrsd.org"
     },
     {
       "district": "Ayer-Shirley",
@@ -48,7 +52,8 @@
         "Ayer",
         "Shirley"
       ],
-      "address": "115 Washington St, Ayer, MA 01432"
+      "address": "115 Washington St, Ayer, MA 01432",
+      "district_url": "https://www.asrsd.org/"
     },
     {
       "district": "Berkshire Hills",
@@ -57,7 +62,8 @@
         "Stockbridge",
         "West Stockbridge"
       ],
-      "address": "50 Main Street PO Box 617, Stockbridge, MA 01262"
+      "address": "50 Main Street PO Box 617, Stockbridge, MA 01262",
+      "district_url": "https://www.bhrsd.org"
     },
     {
       "district": "Berlin-Boylston",
@@ -65,7 +71,8 @@
         "Berlin",
         "Boylston"
       ],
-      "address": "215 Main Street, Boylston, MA 01505"
+      "address": "215 Main Street, Boylston, MA 01505",
+      "district_url": "https://www.bbrsd.org"
     },
     {
       "district": "Central Berkshire",
@@ -78,7 +85,8 @@
         "Washington",
         "Windsor"
       ],
-      "address": "PO Box 299, Dalton, MA 01227"
+      "address": "PO Box 299, Dalton, MA 01227",
+      "district_url": "https://www.cbrsd.org"
     },
     {
       "district": "Chesterfield-Goshen",
@@ -87,7 +95,8 @@
         "Goshen"
       ],
       "notes": "PK–6",
-      "address": "PO Box 300, Chesterfield, MA 01012"
+      "address": "PO Box 300, Chesterfield, MA 01012",
+      "district_url": "https://www.hr-k12.org"
     },
     {
       "district": "Concord-Carlisle",
@@ -96,7 +105,8 @@
         "Concord"
       ],
       "notes": "9–12",
-      "address": "120 Meriam Rd, Concord, MA 01742"
+      "address": "120 Meriam Rd, Concord, MA 01742",
+      "district_url": "https://www.concordps.org"
     },
     {
       "district": "Dennis-Yarmouth",
@@ -104,7 +114,8 @@
         "Dennis",
         "Yarmouth"
       ],
-      "address": "296 Station Avenue, South Yarmouth, MA 02664"
+      "address": "296 Station Avenue, South Yarmouth, MA 02664",
+      "district_url": "https://www.dy-regional.k12.ma.us"
     },
     {
       "district": "Dighton-Rehoboth",
@@ -112,7 +123,8 @@
         "Dighton",
         "Rehoboth"
       ],
-      "address": "2700 Regional Road, North Dighton, MA 02764"
+      "address": "2700 Regional Road, North Dighton, MA 02764",
+      "district_url": "https://www.drregional.org"
     },
     {
       "district": "Dover-Sherborn",
@@ -121,7 +133,8 @@
         "Sherborn"
       ],
       "notes": "6–12",
-      "address": "157 Farm Street, Dover, MA 02030"
+      "address": "157 Farm Street, Dover, MA 02030",
+      "district_url": "http://www.doversherborn.org"
     },
     {
       "district": "Dudley-Charlton",
@@ -129,7 +142,8 @@
         "Charlton",
         "Dudley"
       ],
-      "address": "68 Dudley Oxford Rd, Dudley, MA 01571"
+      "address": "68 Dudley Oxford Rd, Dudley, MA 01571",
+      "district_url": "http://dcrsd.org"
     },
     {
       "district": "Farmington River",
@@ -139,7 +153,8 @@
         "Tyringham"
       ],
       "notes": "PK–6",
-      "address": "555 North Main Rd, Otis, MA 01253"
+      "address": "555 North Main Rd, Otis, MA 01253",
+      "district_url": "https://www.frrsd.org"
     },
     {
       "district": "Freetown-Lakeville",
@@ -147,7 +162,8 @@
         "Freetown",
         "Lakeville"
       ],
-      "address": "98 Howland Rd, Lakeville, MA 02347"
+      "address": "98 Howland Rd, Lakeville, MA 02347",
+      "district_url": "https://www.freelake.org"
     },
     {
       "district": "Frontier",
@@ -158,7 +174,8 @@
         "Whately"
       ],
       "notes": "7–12",
-      "address": "113 North Main Street, Office C101, South Deerfield, MA 01373"
+      "address": "113 North Main Street, Office C101, South Deerfield, MA 01373",
+      "district_url": "https://www.frsu38.org"
     },
     {
       "district": "Gateway",
@@ -170,7 +187,8 @@
         "Montgomery",
         "Russell"
       ],
-      "address": "12 Littleville Road, Huntington, MA 01050"
+      "address": "12 Littleville Road, Huntington, MA 01050",
+      "district_url": "https://www.grsd.org"
     },
     {
       "district": "Gill-Montague",
@@ -178,7 +196,8 @@
         "Gill",
         "Montague"
       ],
-      "address": "35 Crocker Avenue, Turners Falls, MA 01376"
+      "address": "35 Crocker Avenue, Turners Falls, MA 01376",
+      "district_url": "https://www.gmrsd.org"
     },
     {
       "district": "Groton-Dunstable",
@@ -186,7 +205,8 @@
         "Dunstable",
         "Groton"
       ],
-      "address": "344 Main Street, Groton, MA 01450"
+      "address": "344 Main Street, Groton, MA 01450",
+      "district_url": "https://www.gdrsd.org"
     },
     {
       "district": "Hamilton-Wenham",
@@ -194,7 +214,8 @@
         "Hamilton",
         "Wenham"
       ],
-      "address": "5 School Street, Wenham, MA 01984"
+      "address": "5 School Street, Wenham, MA 01984",
+      "district_url": "https://www.hwschools.net"
     },
     {
       "district": "Hampden-Wilbraham",
@@ -202,7 +223,8 @@
         "Hampden",
         "Wilbraham"
       ],
-      "address": "621 Main Street, Wilbraham, MA 01095"
+      "address": "621 Main Street, Wilbraham, MA 01095",
+      "district_url": "https://www.hwrsd.org"
     },
     {
       "district": "Hampshire",
@@ -214,7 +236,8 @@
         "Williamsburg"
       ],
       "notes": "7–12",
-      "address": "19 Stage Rd, Westhampton, MA 01027"
+      "address": "19 Stage Rd, Westhampton, MA 01027",
+      "district_url": "https://www.hr-k12.org"
     },
     {
       "district": "Hawlemont",
@@ -223,7 +246,8 @@
         "Hawley"
       ],
       "notes": "PK–6",
-      "address": "24 Ashfield Rd, Shelburne Falls, MA 01370"
+      "address": "24 Ashfield Rd, Shelburne Falls, MA 01370",
+      "district_url": "https://www.mtrsd.org/"
     },
     {
       "district": "Hoosac Valley",
@@ -231,7 +255,8 @@
         "Adams",
         "Cheshire"
       ],
-      "address": "49 Park Street, Adams, MA 01220"
+      "address": "49 Park Street, Adams, MA 01220",
+      "district_url": "http://www.nashobatech.net"
     },
     {
       "district": "King Philip",
@@ -241,7 +266,8 @@
         "Wrentham"
       ],
       "notes": "7–12",
-      "address": "18 King Street, Norfolk, MA 02056"
+      "address": "18 King Street, Norfolk, MA 02056",
+      "district_url": "http://www.kingphilip.org"
     },
     {
       "district": "Lincoln-Sudbury",
@@ -250,7 +276,8 @@
         "Sudbury"
       ],
       "notes": "9–12",
-      "address": "390 Lincoln Rd, Sudbury, MA 01776"
+      "address": "390 Lincoln Rd, Sudbury, MA 01776",
+      "district_url": "https://www.lsrhs.net"
     },
     {
       "district": "Manchester-Essex",
@@ -258,7 +285,8 @@
         "Essex",
         "Manchester-by-the-Sea"
       ],
-      "address": "36 Lincoln St, Manchester, MA 01944"
+      "address": "36 Lincoln St, Manchester, MA 01944",
+      "district_url": "https://www.mersd.org"
     },
     {
       "district": "Martha's Vineyard Regional",
@@ -271,7 +299,8 @@
         "West Tisbury"
       ],
       "notes": "9–12",
-      "address": "PO Box 1150, West Tisbury, MA 02575"
+      "address": "PO Box 1150, West Tisbury, MA 02575",
+      "district_url": "https://www.mvpcs.org"
     },
     {
       "district": "Masconomet",
@@ -281,7 +310,8 @@
         "Topsfield"
       ],
       "notes": "7–12",
-      "address": "20 Endicott Rd, Boxford, MA 01921"
+      "address": "20 Endicott Rd, Boxford, MA 01921",
+      "district_url": "https://www.masconomet.org"
     },
     {
       "district": "Mendon-Upton",
@@ -289,7 +319,8 @@
         "Mendon",
         "Upton"
       ],
-      "address": "150 North Ave, Mendon, MA 01756"
+      "address": "150 North Ave, Mendon, MA 01756",
+      "district_url": "https://www.mursd.org"
     },
     {
       "district": "Mohawk Trail",
@@ -302,7 +333,8 @@
         "Plainfield",
         "Shelburne"
       ],
-      "address": "24 Ashfield Rd, Shelburne Falls, MA 01370"
+      "address": "24 Ashfield Rd, Shelburne Falls, MA 01370",
+      "district_url": "https://www.mtrsd.org/"
     },
     {
       "district": "Monomoy",
@@ -310,7 +342,8 @@
         "Chatham",
         "Harwich"
       ],
-      "address": "425 Crowell Rd, Chatham, MA 02633"
+      "address": "425 Crowell Rd, Chatham, MA 02633",
+      "district_url": "https://www.monomoy.edu"
     },
     {
       "district": "Mount Greylock",
@@ -319,7 +352,8 @@
         "New Ashford",
         "Williamstown"
       ],
-      "address": "1781 Cold Spring Rd, Williamstown, MA 01267"
+      "address": "1781 Cold Spring Rd, Williamstown, MA 01267",
+      "district_url": "https://www.mgrsd.org"
     },
     {
       "district": "Narragansett",
@@ -327,7 +361,8 @@
         "Phillipston",
         "Templeton"
       ],
-      "address": "462 Baldwinville Rd, Baldwinville, MA 01436"
+      "address": "462 Baldwinville Rd, Baldwinville, MA 01436",
+      "district_url": "https://www.nrsd.org"
     },
     {
       "district": "Nashoba",
@@ -336,7 +371,8 @@
         "Lancaster",
         "Stow"
       ],
-      "address": "50 Mechanic Street, Bolton, MA 01740"
+      "address": "50 Mechanic Street, Bolton, MA 01740",
+      "district_url": "https://www.nrsd.net"
     },
     {
       "district": "Nauset",
@@ -347,7 +383,8 @@
         "Wellfleet"
       ],
       "notes": "6–12",
-      "address": "78 Eldredge Pkwy, Orleans, MA 02653"
+      "address": "78 Eldredge Pkwy, Orleans, MA 02653",
+      "district_url": "http://nausetschools.org"
     },
     {
       "district": "New Salem-Wendell",
@@ -356,7 +393,8 @@
         "Wendell"
       ],
       "notes": "PK–6",
-      "address": "PO Box 7, Erving, MA 01344"
+      "address": "PO Box 7, Erving, MA 01344",
+      "district_url": "https://www.union28.org"
     },
     {
       "district": "North Middlesex",
@@ -365,7 +403,8 @@
         "Pepperell",
         "Townsend"
       ],
-      "address": "66 Brookline Street, Towsend, MA 01469"
+      "address": "66 Brookline Street, Towsend, MA 01469",
+      "district_url": "https://www.KeefeTech.org"
     },
     {
       "district": "Northborough-Southborough",
@@ -374,7 +413,8 @@
         "Southborough"
       ],
       "notes": "9–12",
-      "address": "79 Bartlett St, Northborough, MA 01532"
+      "address": "79 Bartlett St, Northborough, MA 01532",
+      "district_url": "https://www.nsboro.k12.ma.us/"
     },
     {
       "district": "Old Rochester",
@@ -384,7 +424,8 @@
         "Rochester"
       ],
       "notes": "7–12",
-      "address": "135 Marion Rd, Mattapoisett, MA 02739"
+      "address": "135 Marion Rd, Mattapoisett, MA 02739",
+      "district_url": "https://www.oldrochester.org/"
     },
     {
       "district": "Pentucket",
@@ -393,7 +434,8 @@
         "Merrimac",
         "West Newbury"
       ],
-      "address": "22 Main Street, West Newbury, MA 01985"
+      "address": "22 Main Street, West Newbury, MA 01985",
+      "district_url": "https://www.prsd.org"
     },
     {
       "district": "Pioneer Valley",
@@ -403,7 +445,8 @@
         "Northfield",
         "Warwick"
       ],
-      "address": "97 F. Sumner Turner Road, Northfield, MA 01360"
+      "address": "97 F. Sumner Turner Road, Northfield, MA 01360",
+      "district_url": "https://www.pioneercss.org"
     },
     {
       "district": "Quabbin",
@@ -414,7 +457,8 @@
         "New Braintree",
         "Oakham"
       ],
-      "address": "872 South Street, Barre, MA 01005"
+      "address": "872 South Street, Barre, MA 01005",
+      "district_url": "https://www.qrsd.org"
     },
     {
       "district": "Quaboag",
@@ -422,7 +466,8 @@
         "Warren",
         "West Brookfield"
       ],
-      "address": "284 Old West Brookfield Road PO Box 1538, Warren, MA 01083"
+      "address": "284 Old West Brookfield Road PO Box 1538, Warren, MA 01083",
+      "district_url": "https://www.quaboagrsd.org"
     },
     {
       "district": "Ralph C. Mahar",
@@ -433,7 +478,8 @@
         "Wendell"
       ],
       "notes": "7–12",
-      "address": "507 South Main Street, Orange, MA 01364"
+      "address": "507 South Main Street, Orange, MA 01364",
+      "district_url": "https://www.rcmahar.org"
     },
     {
       "district": "Silver Lake",
@@ -443,7 +489,8 @@
         "Plympton"
       ],
       "notes": "PK & 7–12",
-      "address": "250 Pembroke Street, Kingston, MA 02364"
+      "address": "250 Pembroke Street, Kingston, MA 02364",
+      "district_url": "https://slrsd.org"
     },
     {
       "district": "Somerset-Berkley",
@@ -452,7 +499,8 @@
         "Somerset"
       ],
       "notes": "9–12",
-      "address": "625 County St, Somerset, MA 02726"
+      "address": "625 County St, Somerset, MA 02726",
+      "district_url": "https://somersetschools.org"
     },
     {
       "district": "Southern Berkshire",
@@ -464,7 +512,8 @@
         "New Marlborough",
         "Sheffield"
       ],
-      "address": "PO BOX 339, Sheffield, MA 01257"
+      "address": "PO BOX 339, Sheffield, MA 01257",
+      "district_url": "https://www.sbrsd.org"
     },
     {
       "district": "Southwick-Tolland-Granville",
@@ -473,7 +522,8 @@
         "Southwick",
         "Tolland"
       ],
-      "address": "86 Powder Mill Road, Southwick, MA 01077"
+      "address": "86 Powder Mill Road, Southwick, MA 01077",
+      "district_url": "https://www.stgrsd.org/"
     },
     {
       "district": "Spencer-East Brookfield",
@@ -481,7 +531,8 @@
         "East Brookfield",
         "Spencer"
       ],
-      "address": "306 Main St, Spencer, MA 01562"
+      "address": "306 Main St, Spencer, MA 01562",
+      "district_url": "https://www.sebrsd.org"
     },
     {
       "district": "Tantasqua",
@@ -493,7 +544,8 @@
         "Wales"
       ],
       "notes": "7–12",
-      "address": "320A Brookfield Rd, Fiskdale, MA 01518"
+      "address": "320A Brookfield Rd, Fiskdale, MA 01518",
+      "district_url": "https://www.tantasqua.org"
     },
     {
       "district": "Triton",
@@ -502,7 +554,8 @@
         "Rowley",
         "Salisbury"
       ],
-      "address": "112 Elm Street, Byfield, MA 01922"
+      "address": "112 Elm Street, Byfield, MA 01922",
+      "district_url": "http://www.tritonschools.org"
     },
     {
       "district": "Up-Island",
@@ -512,7 +565,8 @@
         "West Tisbury"
       ],
       "notes": "PK–8",
-      "address": "4 Pine Street, Vineyard Haven, MA 02568"
+      "address": "4 Pine Street, Vineyard Haven, MA 02568",
+      "district_url": "http://www.mvyps.org/"
     },
     {
       "district": "Wachusett",
@@ -523,7 +577,8 @@
         "Rutland",
         "Sterling"
       ],
-      "address": "1745 Main Street c/o Jefferson School, Jefferson, MA 01522"
+      "address": "1745 Main Street c/o Jefferson School, Jefferson, MA 01522",
+      "district_url": "https://www.wrsd.net"
     },
     {
       "district": "Whitman-Hanson",
@@ -531,7 +586,8 @@
         "Hanson",
         "Whitman"
       ],
-      "address": "610 Franklin Street, Whitman, MA 02382"
+      "address": "610 Franklin Street, Whitman, MA 02382",
+      "district_url": "https://whrsd.org"
     }
   ],
   "regional_vocational": [
@@ -546,7 +602,8 @@
         "Southborough",
         "Westborough"
       ],
-      "address": "215 Fitchburg St, Marlborough, MA 01752"
+      "address": "215 Fitchburg St, Marlborough, MA 01752",
+      "district_url": "https://www.assabet.org"
     },
     {
       "district": "Blackstone Valley Regional Vocational Technical",
@@ -567,7 +624,8 @@
         "Uxbridge"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.valleytech.k12.ma.us"
     },
     {
       "district": "Blue Hills",
@@ -582,7 +640,8 @@
         "Randolph",
         "Westwood"
       ],
-      "address": "800 Randolph St, Canton, MA 02021"
+      "address": "800 Randolph St, Canton, MA 02021",
+      "district_url": "https://www.bluehills.org"
     },
     {
       "district": "Bristol County Agricultural",
@@ -609,7 +668,8 @@
         "Westport"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.bristolaggie.org"
     },
     {
       "district": "Bristol-Plymouth",
@@ -622,7 +682,8 @@
         "Rehoboth",
         "Taunton"
       ],
-      "address": "207 Hart St, Taunton, MA 02780"
+      "address": "207 Hart St, Taunton, MA 02780",
+      "district_url": "https://www.bptech.org"
     },
     {
       "district": "Cape Cod Regional Vocational Technical",
@@ -642,7 +703,8 @@
         "Provincetown"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://capetech.us"
     },
     {
       "district": "Franklin County Technical",
@@ -667,7 +729,8 @@
         "Wendell",
         "Whately"
       ],
-      "address": "82 Industrial Blvd, Turners Falls, MA 01376"
+      "address": "82 Industrial Blvd, Turners Falls, MA 01376",
+      "district_url": "https://www.fcts.us"
     },
     {
       "district": "Greater Fall River",
@@ -677,7 +740,8 @@
         "Swansea",
         "Westport"
       ],
-      "address": "251 Stonehaven Rd, Fall River, MA 02723"
+      "address": "251 Stonehaven Rd, Fall River, MA 02723",
+      "district_url": "https://www.dimanregional.org"
     },
     {
       "district": "Greater Lawrence",
@@ -687,7 +751,8 @@
         "Methuen",
         "North Andover"
       ],
-      "address": "57 River Rd, Andover, MA 01810"
+      "address": "57 River Rd, Andover, MA 01810",
+      "district_url": "https://www.glts.net"
     },
     {
       "district": "Greater Lowell",
@@ -697,7 +762,8 @@
         "Lowell",
         "Tyngsborough"
       ],
-      "address": "250 Pawtucket Blvd, Tyngsborough, MA 01879"
+      "address": "250 Pawtucket Blvd, Tyngsborough, MA 01879",
+      "district_url": "http://www.gltech.org"
     },
     {
       "district": "Greater New Bedford",
@@ -706,7 +772,8 @@
         "Fairhaven",
         "New Bedford"
       ],
-      "address": "1121 Ashley Blvd, New Bedford, MA 02745"
+      "address": "1121 Ashley Blvd, New Bedford, MA 02745",
+      "district_url": "http://www.gnbvt.edu"
     },
     {
       "district": "Minuteman",
@@ -722,7 +789,8 @@
         "Needham",
         "Stow"
       ],
-      "address": "758 Marrett Rd, Lexington, MA 02421"
+      "address": "758 Marrett Rd, Lexington, MA 02421",
+      "district_url": "https://www.minuteman.org"
     },
     {
       "district": "Montachusett",
@@ -746,7 +814,8 @@
         "Westminster",
         "Winchendon"
       ],
-      "address": "1050 Westminster St, Fitchburg, MA 01420"
+      "address": "1050 Westminster St, Fitchburg, MA 01420",
+      "district_url": "http://www.montytech.net"
     },
     {
       "district": "Northeast Metro",
@@ -764,7 +833,8 @@
         "Winthrop",
         "Woburn"
       ],
-      "address": "100 Hemlock Rd, Wakefield, MA 01880"
+      "address": "100 Hemlock Rd, Wakefield, MA 01880",
+      "district_url": "https://northeastmetrotech.com"
     },
     {
       "district": "Northern Berkshire Regional Vocational Technical",
@@ -781,7 +851,8 @@
         "Monroe"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.mccanntech.org"
     },
     {
       "district": "Old Colony",
@@ -792,7 +863,8 @@
         "Mattapoisett",
         "Rochester"
       ],
-      "address": "476 North Ave, Rochester, MA 02770"
+      "address": "476 North Ave, Rochester, MA 02770",
+      "district_url": "https://www.oldcolony.us"
     },
     {
       "district": "Pathfinder",
@@ -807,7 +879,8 @@
         "Ware",
         "Warren"
       ],
-      "address": "240 Sykes St, Palmer, MA 01069"
+      "address": "240 Sykes St, Palmer, MA 01069",
+      "district_url": "https://pathfindertech.org"
     },
     {
       "district": "Shawsheen Valley",
@@ -818,7 +891,8 @@
         "Tewksbury",
         "Wilmington"
       ],
-      "address": "100 Cook St, Billerica, MA 01821"
+      "address": "100 Cook St, Billerica, MA 01821",
+      "district_url": "https://www.shawsheentech.org/"
     },
     {
       "district": "South Middlesex (Keefe Tech)",
@@ -829,7 +903,8 @@
         "Hopkinton",
         "Natick"
       ],
-      "address": "750 Winter St, Framingham, MA 01702"
+      "address": "750 Winter St, Framingham, MA 01702",
+      "district_url": "https://ashland.k12.ma.us"
     },
     {
       "district": "South Shore",
@@ -843,7 +918,8 @@
         "Scituate",
         "Whitman"
       ],
-      "address": "476 Webster St, Hanover, MA 02339"
+      "address": "476 Webster St, Hanover, MA 02339",
+      "district_url": "https://southshore.tech"
     },
     {
       "district": "Southeastern Regional",
@@ -858,7 +934,8 @@
         "Stoughton",
         "West Bridgewater"
       ],
-      "address": "250 Foundry St, South Easton, MA 02375"
+      "address": "250 Foundry St, South Easton, MA 02375",
+      "district_url": "https://www.sersd.org"
     },
     {
       "district": "Southern Worcester County (Bay Path)",
@@ -874,7 +951,8 @@
         "Spencer",
         "Webster"
       ],
-      "address": "57 Old Muggett Hill Rd, Charlton, MA 01507"
+      "address": "57 Old Muggett Hill Rd, Charlton, MA 01507",
+      "district_url": "https://www.baypath.net"
     },
     {
       "district": "Tri-County",
@@ -891,7 +969,8 @@
         "Walpole",
         "Wrentham"
       ],
-      "address": "147 Pond St, Franklin, MA 02038"
+      "address": "147 Pond St, Franklin, MA 02038",
+      "district_url": "https://www.tri-county.us"
     },
     {
       "district": "Upper Cape Cod",
@@ -902,7 +981,8 @@
         "Sandwich",
         "Wareham"
       ],
-      "address": "220 Sandwich Rd, Bourne, MA 02532"
+      "address": "220 Sandwich Rd, Bourne, MA 02532",
+      "district_url": "https://www.uppercapetech.com"
     },
     {
       "district": "Whittier",
@@ -919,7 +999,8 @@
         "Salisbury",
         "West Newbury"
       ],
-      "address": "115 Amesbury Line Rd, Haverhill, MA 01830"
+      "address": "115 Amesbury Line Rd, Haverhill, MA 01830",
+      "district_url": "https://www.whittiertech.org"
     }
   ],
   "county_agricultural": [
@@ -947,7 +1028,8 @@
         "Taunton",
         "Westport"
       ],
-      "address": "135 Center St, Dighton, MA 02715"
+      "address": "135 Center St, Dighton, MA 02715",
+      "district_url": "https://www.publicschoolreview.com/massachusetts/bristol-county-agricultural-school-district/2503070-school-district"
     },
     {
       "district": "Norfolk County Agricultural HS",
@@ -981,7 +1063,8 @@
         "Weymouth",
         "Wrentham"
       ],
-      "address": "400 Main St, Walpole, MA 02081"
+      "address": "400 Main St, Walpole, MA 02081",
+      "district_url": "https://www.norfolkaggie.org"
     },
     {
       "district": "Essex North Shore Agricultural & Technical",
@@ -1004,7 +1087,8 @@
         "Topsfield",
         "Wenham"
       ],
-      "address": "565 Maple St, Danvers, MA 01923"
+      "address": "565 Maple St, Danvers, MA 01923",
+      "district_url": "https://essexnorthshore.org"
     },
     {
       "district": "Northampton-Smith Vocational Agricultural",
@@ -1013,7 +1097,8 @@
         "Northampton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.smithtec.org"
     }
   ],
   "other_districts": [
@@ -1024,7 +1109,8 @@
         "Abington"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.abingtonps.org"
     },
     {
       "district": "Acushnet",
@@ -1033,7 +1119,8 @@
         "Acushnet"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.acushnetschools.us"
     },
     {
       "district": "Agawam",
@@ -1042,7 +1129,8 @@
         "Agawam"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.agawamed.org/"
     },
     {
       "district": "Amesbury",
@@ -1051,7 +1139,8 @@
         "Amesbury"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://schools.amesburyma.gov/"
     },
     {
       "district": "Amherst",
@@ -1060,7 +1149,8 @@
         "Amherst"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://arps.org"
     },
     {
       "district": "Andover",
@@ -1069,7 +1159,8 @@
         "Andover"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.aps1.net"
     },
     {
       "district": "Arlington",
@@ -1078,7 +1169,8 @@
         "Arlington"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.arlington.k12.ma.us/"
     },
     {
       "district": "Ashland",
@@ -1087,7 +1179,8 @@
         "Ashland"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.ashland.k12.ma.us"
     },
     {
       "district": "Attleboro",
@@ -1096,7 +1189,8 @@
         "Attleboro"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.attleboroschools.com"
     },
     {
       "district": "Auburn",
@@ -1105,7 +1199,8 @@
         "Auburn"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.auburn.k12.ma.us"
     },
     {
       "district": "Avon",
@@ -1114,7 +1209,8 @@
         "Avon"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://avon.k12.ma.us"
     },
     {
       "district": "Barnstable",
@@ -1123,7 +1219,8 @@
         "Barnstable"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.barnstable.k12.ma.us/"
     },
     {
       "district": "Bedford",
@@ -1132,7 +1229,8 @@
         "Bedford"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://bedfordps.org"
     },
     {
       "district": "Belchertown",
@@ -1141,7 +1239,8 @@
         "Belchertown"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.belchertownps.org"
     },
     {
       "district": "Bellingham",
@@ -1150,7 +1249,8 @@
         "Bellingham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.bellinghamk12.org"
     },
     {
       "district": "Belmont",
@@ -1159,7 +1259,8 @@
         "Belmont"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.belmont.k12.ma.us"
     },
     {
       "district": "Berkley",
@@ -1168,7 +1269,8 @@
         "Berkley"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.BerkleyPublicSchools.org"
     },
     {
       "district": "Beverly",
@@ -1177,7 +1279,8 @@
         "Beverly"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.beverlyschools.org"
     },
     {
       "district": "Billerica",
@@ -1186,7 +1289,8 @@
         "Billerica"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.billericak12.com"
     },
     {
       "district": "Blackstone-Millville",
@@ -1196,7 +1300,8 @@
         "Millville"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.bmrsd.net"
     },
     {
       "district": "Boston",
@@ -1205,7 +1310,8 @@
         "Boston"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.bostonprep.org"
     },
     {
       "district": "Bourne",
@@ -1214,7 +1320,8 @@
         "Bourne"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.bourneps.org/"
     },
     {
       "district": "Boxford",
@@ -1223,7 +1330,8 @@
         "Boxford"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.tritownschoolunion.com"
     },
     {
       "district": "Braintree",
@@ -1232,7 +1340,8 @@
         "Braintree"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.braintreeschools.org"
     },
     {
       "district": "Brewster",
@@ -1241,7 +1350,8 @@
         "Brewster"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://nausetschools.org"
     },
     {
       "district": "Bridgewater-Raynham",
@@ -1251,7 +1361,8 @@
         "Raynham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://bridge-rayn.org"
     },
     {
       "district": "Brimfield",
@@ -1260,7 +1371,8 @@
         "Brimfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.tantasqua.org"
     },
     {
       "district": "Brockton",
@@ -1269,7 +1381,8 @@
         "Brockton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.bpsma.org"
     },
     {
       "district": "Brookfield",
@@ -1278,7 +1391,8 @@
         "Brookfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.tantasqua.org"
     },
     {
       "district": "Brookline",
@@ -1287,7 +1401,8 @@
         "Brookline"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.brookline.k12.ma.us/"
     },
     {
       "district": "Burlington",
@@ -1296,7 +1411,8 @@
         "Burlington"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.burlingtonpublicschools.org"
     },
     {
       "district": "Cambridge",
@@ -1305,7 +1421,8 @@
         "Cambridge"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.cpsd.us/"
     },
     {
       "district": "Canton",
@@ -1314,7 +1431,8 @@
         "Canton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.cantonma.org/"
     },
     {
       "district": "Carlisle",
@@ -1323,7 +1441,8 @@
         "Carlisle"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.carlisle.k12.ma.us"
     },
     {
       "district": "Carver",
@@ -1332,7 +1451,8 @@
         "Carver"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.carver.org"
     },
     {
       "district": "Chelmsford",
@@ -1341,7 +1461,8 @@
         "Chelmsford"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.chelmsford.k12.ma.us"
     },
     {
       "district": "Chelsea",
@@ -1350,7 +1471,8 @@
         "Chelsea"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.chelseaschools.com/"
     },
     {
       "district": "Chicopee",
@@ -1359,7 +1481,8 @@
         "Chicopee"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.chicopeeps.org"
     },
     {
       "district": "Clarksburg",
@@ -1368,7 +1491,8 @@
         "Clarksburg"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.clarksburgschool.org"
     },
     {
       "district": "Clinton",
@@ -1377,7 +1501,8 @@
         "Clinton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.clinton.k12.ma.us"
     },
     {
       "district": "Cohasset",
@@ -1386,7 +1511,8 @@
         "Cohasset"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.cohassetk12.org"
     },
     {
       "district": "Concord",
@@ -1395,7 +1521,8 @@
         "Concord"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.concordpublicschools.net"
     },
     {
       "district": "Conway",
@@ -1404,7 +1531,8 @@
         "Conway"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.frsu38.org"
     },
     {
       "district": "Danvers",
@@ -1413,7 +1541,8 @@
         "Danvers"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://danverspublicschools.org"
     },
     {
       "district": "Dartmouth",
@@ -1422,7 +1551,8 @@
         "Dartmouth"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.dartmouth.school"
     },
     {
       "district": "Dedham",
@@ -1431,7 +1561,8 @@
         "Dedham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.dedham.k12.ma.us"
     },
     {
       "district": "Deerfield",
@@ -1440,7 +1571,8 @@
         "Deerfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.frsu38.org"
     },
     {
       "district": "Douglas",
@@ -1449,7 +1581,8 @@
         "Douglas"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.douglasps.net"
     },
     {
       "district": "Dover",
@@ -1458,7 +1591,8 @@
         "Dover"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.doversherborn.org"
     },
     {
       "district": "Dracut",
@@ -1467,7 +1601,8 @@
         "Dracut"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://dracutps.org"
     },
     {
       "district": "Duxbury",
@@ -1476,7 +1611,8 @@
         "Duxbury"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.duxbury.k12.ma.us"
     },
     {
       "district": "East Bridgewater",
@@ -1485,7 +1621,8 @@
         "East Bridgewater"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.ebps.net"
     },
     {
       "district": "East Longmeadow",
@@ -1494,7 +1631,8 @@
         "East Longmeadow"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.eastlongmeadowma.gov/378/Schools"
     },
     {
       "district": "Eastham",
@@ -1503,7 +1641,8 @@
         "Eastham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://nausetschools.org"
     },
     {
       "district": "Easthampton",
@@ -1512,7 +1651,8 @@
         "Easthampton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.epsd.us"
     },
     {
       "district": "Easton",
@@ -1521,7 +1661,8 @@
         "Easton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://eastonmaschools.org"
     },
     {
       "district": "Edgartown",
@@ -1530,7 +1671,8 @@
         "Edgartown"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://mvyps.org"
     },
     {
       "district": "Erving",
@@ -1539,7 +1681,8 @@
         "Erving"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.union28.org"
     },
     {
       "district": "Everett",
@@ -1548,7 +1691,8 @@
         "Everett"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.everettpublicschools.org/"
     },
     {
       "district": "Fairhaven",
@@ -1557,7 +1701,8 @@
         "Fairhaven"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.fairhavenps.org/"
     },
     {
       "district": "Fall River",
@@ -1566,7 +1711,8 @@
         "Fall River"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.fallriverschools.org"
     },
     {
       "district": "Falmouth",
@@ -1575,7 +1721,8 @@
         "Falmouth"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.falmouth.k12.ma.us"
     },
     {
       "district": "Fitchburg",
@@ -1584,7 +1731,8 @@
         "Fitchburg"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.fitchburgschools.org"
     },
     {
       "district": "Florida",
@@ -1594,7 +1742,8 @@
         "Monroe"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.abbottmemorial.org"
     },
     {
       "district": "Foxborough",
@@ -1603,7 +1752,8 @@
         "Foxborough"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.foxboroughrcs.org/"
     },
     {
       "district": "Framingham",
@@ -1612,7 +1762,8 @@
         "Framingham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://framingham.k12.ma.us/23249_1"
     },
     {
       "district": "Franklin",
@@ -1621,7 +1772,8 @@
         "Franklin"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.fcts.us"
     },
     {
       "district": "Gardner",
@@ -1630,7 +1782,8 @@
         "Gardner"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.gardnerk12.org"
     },
     {
       "district": "Georgetown",
@@ -1639,7 +1792,8 @@
         "Georgetown"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://georgetown.k12.ma.us"
     },
     {
       "district": "Gloucester",
@@ -1648,7 +1802,8 @@
         "Gloucester"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.gloucesterschools.com"
     },
     {
       "district": "Gosnold",
@@ -1657,7 +1812,8 @@
         "Gosnold"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.townofgosnold.org/school"
     },
     {
       "district": "Grafton",
@@ -1666,7 +1822,8 @@
         "Grafton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://graftonps.org/Domain/11"
     },
     {
       "district": "Granby",
@@ -1675,7 +1832,8 @@
         "Granby"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.granbyschoolsma.org/"
     },
     {
       "district": "Greenfield",
@@ -1684,7 +1842,8 @@
         "Greenfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://gpsk12.org/"
     },
     {
       "district": "Hadley",
@@ -1693,7 +1852,8 @@
         "Hadley"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.hadleyschools.org"
     },
     {
       "district": "Halifax",
@@ -1702,7 +1862,8 @@
         "Halifax"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://hes.slrsd.org"
     },
     {
       "district": "Hancock",
@@ -1711,7 +1872,8 @@
         "Hancock"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.hancockschool.org"
     },
     {
       "district": "Hanover",
@@ -1720,7 +1882,8 @@
         "Hanover"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://hanoverschools.org"
     },
     {
       "district": "Harvard",
@@ -1729,7 +1892,8 @@
         "Harvard"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.psharvard.org"
     },
     {
       "district": "Hatfield",
@@ -1738,7 +1902,8 @@
         "Hatfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.hatfieldps.net"
     },
     {
       "district": "Haverhill",
@@ -1747,7 +1912,8 @@
         "Haverhill"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.haverhill-ps.org"
     },
     {
       "district": "Hingham",
@@ -1756,7 +1922,8 @@
         "Hingham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.hinghamschools.org"
     },
     {
       "district": "Holbrook",
@@ -1765,7 +1932,8 @@
         "Holbrook"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.holbrook.k12.ma.us"
     },
     {
       "district": "Holland",
@@ -1774,7 +1942,8 @@
         "Holland"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.tantasqua.org"
     },
     {
       "district": "Holliston",
@@ -1783,7 +1952,8 @@
         "Holliston"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.holliston.k12.ma.us"
     },
     {
       "district": "Holyoke",
@@ -1792,7 +1962,8 @@
         "Holyoke"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.hps.holyoke.ma.us/"
     },
     {
       "district": "Hopedale",
@@ -1801,7 +1972,8 @@
         "Hopedale"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.hopedaleschools.org"
     },
     {
       "district": "Hopkinton",
@@ -1810,7 +1982,8 @@
         "Hopkinton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.hopkinton.k12.ma.us"
     },
     {
       "district": "Hudson",
@@ -1819,7 +1992,8 @@
         "Hudson"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.hudson.k12.ma.us/"
     },
     {
       "district": "Hull",
@@ -1828,7 +2002,8 @@
         "Hull"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.hullpublicschools.org/"
     },
     {
       "district": "Ipswich",
@@ -1837,7 +2012,8 @@
         "Ipswich"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.ipsk12.net"
     },
     {
       "district": "Kingston",
@@ -1846,7 +2022,8 @@
         "Kingston"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://slrsd.org"
     },
     {
       "district": "Lawrence",
@@ -1855,7 +2032,8 @@
         "Lawrence"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.lawrence.k12.ma.us"
     },
     {
       "district": "Lee",
@@ -1865,7 +2043,8 @@
         "Tyringham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.leepublicschools.net"
     },
     {
       "district": "Leicester",
@@ -1874,7 +2053,8 @@
         "Leicester"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.leicester.k12.ma.us"
     },
     {
       "district": "Lenox",
@@ -1883,7 +2063,8 @@
         "Lenox"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.lenoxps.org"
     },
     {
       "district": "Leominster",
@@ -1892,7 +2073,8 @@
         "Leominster"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.leominsterps.org"
     },
     {
       "district": "Leverett",
@@ -1901,7 +2083,8 @@
         "Leverett"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.union28.org"
     },
     {
       "district": "Lexington",
@@ -1910,7 +2093,8 @@
         "Lexington"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.lexingtonma.org/"
     },
     {
       "district": "Lincoln",
@@ -1919,7 +2103,8 @@
         "Lincoln"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.lincnet.org"
     },
     {
       "district": "Littleton",
@@ -1928,7 +2113,8 @@
         "Littleton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.littletonps.org"
     },
     {
       "district": "Longmeadow",
@@ -1937,7 +2123,8 @@
         "Longmeadow"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.longmeadow.k12.ma.us"
     },
     {
       "district": "Lowell",
@@ -1946,7 +2133,8 @@
         "Lowell"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.lowell.k12.ma.us/"
     },
     {
       "district": "Ludlow",
@@ -1955,7 +2143,8 @@
         "Ludlow"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://ludlowps.org"
     },
     {
       "district": "Lunenburg",
@@ -1964,7 +2153,8 @@
         "Lunenburg"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.lunenburgschools.net"
     },
     {
       "district": "Lynn",
@@ -1973,7 +2163,8 @@
         "Lynn"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.lynnschools.org"
     },
     {
       "district": "Lynnfield",
@@ -1982,7 +2173,8 @@
         "Lynnfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.lynnfield.k12.ma.us"
     },
     {
       "district": "Malden",
@@ -1991,7 +2183,8 @@
         "Malden"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.maldenps.org/"
     },
     {
       "district": "Mansfield",
@@ -2000,7 +2193,8 @@
         "Mansfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.mansfieldschools.com"
     },
     {
       "district": "Marblehead",
@@ -2009,7 +2203,8 @@
         "Marblehead"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.marbleheadschools.org/"
     },
     {
       "district": "Marion",
@@ -2018,7 +2213,8 @@
         "Marion"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.oldrochester.org"
     },
     {
       "district": "Marlborough",
@@ -2027,7 +2223,8 @@
         "Marlborough"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.mps-edu.org"
     },
     {
       "district": "Marshfield",
@@ -2036,7 +2233,8 @@
         "Marshfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.mpsd.org"
     },
     {
       "district": "Martha's Vineyard",
@@ -2045,7 +2243,8 @@
         "Martha's Vineyard"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.mvpcs.org"
     },
     {
       "district": "Mashpee",
@@ -2054,7 +2253,8 @@
         "Mashpee"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.mpspk12.org"
     },
     {
       "district": "Mattapoisett",
@@ -2063,7 +2263,8 @@
         "Mattapoisett"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.oldrochester.org"
     },
     {
       "district": "Maynard",
@@ -2072,7 +2273,8 @@
         "Maynard"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.maynard.k12.ma.us"
     },
     {
       "district": "Medfield",
@@ -2081,7 +2283,8 @@
         "Medfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.medfield.net"
     },
     {
       "district": "Medford",
@@ -2090,7 +2293,8 @@
         "Medford"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.mps02155.org/"
     },
     {
       "district": "Medway",
@@ -2099,7 +2303,8 @@
         "Medway"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.medwayschools.org"
     },
     {
       "district": "Melrose",
@@ -2108,7 +2313,8 @@
         "Melrose"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.melroseschools.com"
     },
     {
       "district": "Methuen",
@@ -2117,7 +2323,8 @@
         "Methuen"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.methuen.k12.ma.us"
     },
     {
       "district": "Middleborough",
@@ -2126,7 +2333,8 @@
         "Middleborough"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.middleboro.k12.ma.us"
     },
     {
       "district": "Middleton",
@@ -2135,7 +2343,8 @@
         "Middleton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.tritownschoolunion.com"
     },
     {
       "district": "Milford",
@@ -2144,7 +2353,8 @@
         "Milford"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.milfordpublicschools.com"
     },
     {
       "district": "Millbury",
@@ -2153,7 +2363,8 @@
         "Millbury"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.millburyschools.org"
     },
     {
       "district": "Millis",
@@ -2162,7 +2373,8 @@
         "Millis"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.millisps.org"
     },
     {
       "district": "Milton",
@@ -2171,7 +2383,8 @@
         "Milton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.miltonps.org"
     },
     {
       "district": "Monson",
@@ -2180,7 +2393,8 @@
         "Monson"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.monsonschools.com"
     },
     {
       "district": "Nahant",
@@ -2189,7 +2403,8 @@
         "Nahant"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.johnsonschool.org"
     },
     {
       "district": "Nantucket",
@@ -2198,7 +2413,8 @@
         "Nantucket"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.npsk.org"
     },
     {
       "district": "Natick",
@@ -2207,7 +2423,8 @@
         "Natick"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.natickps.org"
     },
     {
       "district": "Needham",
@@ -2216,7 +2433,8 @@
         "Needham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.needham.k12.ma.us"
     },
     {
       "district": "New Bedford",
@@ -2225,7 +2443,8 @@
         "New Bedford"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.newbedfordschools.org"
     },
     {
       "district": "Newburyport",
@@ -2234,7 +2453,8 @@
         "Newburyport"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.newburyport.k12.ma.us"
     },
     {
       "district": "Newton",
@@ -2243,7 +2463,8 @@
         "Newton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.newton.k12.ma.us"
     },
     {
       "district": "Norfolk",
@@ -2252,7 +2473,8 @@
         "Norfolk"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.norfolkaggie.org"
     },
     {
       "district": "North Adams",
@@ -2261,7 +2483,8 @@
         "North Adams"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.napsk12.org"
     },
     {
       "district": "North Andover",
@@ -2270,7 +2493,8 @@
         "North Andover"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.northandoverpublicschools.com"
     },
     {
       "district": "North Attleborough",
@@ -2279,7 +2503,8 @@
         "North Attleborough"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.naschools.net"
     },
     {
       "district": "North Brookfield",
@@ -2288,7 +2513,8 @@
         "North Brookfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.nbschools.org"
     },
     {
       "district": "North Reading",
@@ -2297,7 +2523,8 @@
         "North Reading"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.north-reading.k12.ma.us/Pages/index"
     },
     {
       "district": "Northampton",
@@ -2306,7 +2533,8 @@
         "Northampton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://northamptonschools.org"
     },
     {
       "district": "Northboro-Southboro",
@@ -2315,7 +2543,8 @@
         "Northboro-Southboro"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.nsboro.k12.ma.us"
     },
     {
       "district": "Northborough",
@@ -2324,7 +2553,8 @@
         "Northborough"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.nsboro.k12.ma.us"
     },
     {
       "district": "Northbridge",
@@ -2333,7 +2563,8 @@
         "Northbridge"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.nps.org"
     },
     {
       "district": "Norton",
@@ -2342,7 +2573,8 @@
         "Norton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.norton.k12.ma.us"
     },
     {
       "district": "Norwell",
@@ -2351,7 +2583,8 @@
         "Norwell"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.norwellschools.org"
     },
     {
       "district": "Norwood",
@@ -2360,7 +2593,8 @@
         "Norwood"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.norwood.k12.ma.us"
     },
     {
       "district": "Oak Bluffs",
@@ -2369,7 +2603,8 @@
         "Oak Bluffs"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.mvyps.org/"
     },
     {
       "district": "Orange",
@@ -2378,7 +2613,8 @@
         "Orange"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.orange-elem.org/"
     },
     {
       "district": "Orleans",
@@ -2387,7 +2623,8 @@
         "Orleans"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://nausetschools.org"
     },
     {
       "district": "Oxford",
@@ -2396,7 +2633,8 @@
         "Oxford"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.oxps.org"
     },
     {
       "district": "Palmer",
@@ -2405,7 +2643,8 @@
         "Palmer"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.palmerschools.org"
     },
     {
       "district": "Peabody",
@@ -2414,7 +2653,8 @@
         "Peabody"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.peabody.k12.ma.us"
     },
     {
       "district": "Pelham",
@@ -2423,7 +2663,8 @@
         "Pelham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://arps.org"
     },
     {
       "district": "Pembroke",
@@ -2432,7 +2673,8 @@
         "Pembroke"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.pembrokek12.org"
     },
     {
       "district": "Petersham",
@@ -2441,7 +2683,8 @@
         "Petersham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.petershamcenterschool.org"
     },
     {
       "district": "Pittsfield",
@@ -2450,7 +2693,8 @@
         "Pittsfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.pittsfield.net"
     },
     {
       "district": "Plainville",
@@ -2459,7 +2703,8 @@
         "Plainville"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.plainville.k12.ma.us"
     },
     {
       "district": "Plymouth",
@@ -2468,7 +2713,8 @@
         "Plymouth"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.plymouth.k12.ma.us"
     },
     {
       "district": "Plympton",
@@ -2477,7 +2723,8 @@
         "Plympton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://des.slrsd.org"
     },
     {
       "district": "Provincetown",
@@ -2486,7 +2733,8 @@
         "Provincetown"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.provincetownschools.com"
     },
     {
       "district": "Quincy",
@@ -2495,7 +2743,8 @@
         "Quincy"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://QuincyPublicSchools.com"
     },
     {
       "district": "Randolph",
@@ -2504,7 +2753,8 @@
         "Randolph"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.randolph.k12.ma.us"
     },
     {
       "district": "Reading",
@@ -2513,7 +2763,8 @@
         "Reading"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.reading.k12.ma.us"
     },
     {
       "district": "Revere",
@@ -2522,7 +2773,8 @@
         "Revere"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.reverek12.org"
     },
     {
       "district": "Richmond",
@@ -2531,7 +2783,8 @@
         "Richmond"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.richmondconsolidated.org"
     },
     {
       "district": "Rochester",
@@ -2540,7 +2793,8 @@
         "Rochester"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.oldrochester.org"
     },
     {
       "district": "Rockland",
@@ -2549,7 +2803,8 @@
         "Rockland"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.rocklandschools.org"
     },
     {
       "district": "Rockport",
@@ -2558,7 +2813,8 @@
         "Rockport"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.rpk12.org"
     },
     {
       "district": "Rowe",
@@ -2567,7 +2823,8 @@
         "Rowe"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://Roweschool.com"
     },
     {
       "district": "Salem",
@@ -2576,7 +2833,8 @@
         "Salem"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.salemacademycs.org"
     },
     {
       "district": "Sandwich",
@@ -2585,7 +2843,8 @@
         "Sandwich"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.sandwichk12.org/"
     },
     {
       "district": "Saugus",
@@ -2594,7 +2853,8 @@
         "Saugus"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.saugus.k12.ma.us"
     },
     {
       "district": "Savoy",
@@ -2603,7 +2863,8 @@
         "Savoy"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://Savoyelementary.com"
     },
     {
       "district": "Scituate",
@@ -2612,7 +2873,8 @@
         "Scituate"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://scit.org/"
     },
     {
       "district": "Seekonk",
@@ -2621,7 +2883,8 @@
         "Seekonk"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.seekonkschools.org"
     },
     {
       "district": "Sharon",
@@ -2630,7 +2893,8 @@
         "Sharon"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.sharonschools.net"
     },
     {
       "district": "Sherborn",
@@ -2639,7 +2903,8 @@
         "Sherborn"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.doversherborn.org"
     },
     {
       "district": "Shrewsbury",
@@ -2648,7 +2913,8 @@
         "Shrewsbury"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://schools.shrewsburyma.gov/"
     },
     {
       "district": "Shutesbury",
@@ -2657,7 +2923,8 @@
         "Shutesbury"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.union28.org"
     },
     {
       "district": "Somerset",
@@ -2666,7 +2933,8 @@
         "Somerset"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.somersetschools.org"
     },
     {
       "district": "Somerville",
@@ -2675,7 +2943,8 @@
         "Somerville"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.somerville.k12.ma.us"
     },
     {
       "district": "South Hadley",
@@ -2684,7 +2953,8 @@
         "South Hadley"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.southhadleyschools.org"
     },
     {
       "district": "Southampton",
@@ -2693,7 +2963,8 @@
         "Southampton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.hr-k12.org"
     },
     {
       "district": "Southborough",
@@ -2702,7 +2973,8 @@
         "Southborough"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.nsboro.k12.ma.us"
     },
     {
       "district": "Southbridge",
@@ -2711,7 +2983,8 @@
         "Southbridge"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.southbridgepublic.org/"
     },
     {
       "district": "Springfield",
@@ -2720,7 +2993,8 @@
         "Springfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.springfieldpublicschools.com"
     },
     {
       "district": "Stoneham",
@@ -2729,7 +3003,8 @@
         "Stoneham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.stonehamschools.org"
     },
     {
       "district": "Stoughton",
@@ -2738,7 +3013,8 @@
         "Stoughton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.stoughtonschools.org"
     },
     {
       "district": "Sturbridge",
@@ -2747,7 +3023,8 @@
         "Sturbridge"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.osacps.org"
     },
     {
       "district": "Sudbury",
@@ -2756,7 +3033,8 @@
         "Sudbury"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.sudbury.k12.ma.us"
     },
     {
       "district": "Sunderland",
@@ -2765,7 +3043,8 @@
         "Sunderland"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.frsu38.org"
     },
     {
       "district": "Sutton",
@@ -2774,7 +3053,8 @@
         "Sutton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.suttonschools.net"
     },
     {
       "district": "Swampscott",
@@ -2783,7 +3063,8 @@
         "Swampscott"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.swampscottps.org"
     },
     {
       "district": "Swansea",
@@ -2792,7 +3073,8 @@
         "Swansea"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.swanseaschools.org"
     },
     {
       "district": "Taunton",
@@ -2801,7 +3083,8 @@
         "Taunton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.tauntonschools.org"
     },
     {
       "district": "Tewksbury",
@@ -2810,7 +3093,8 @@
         "Tewksbury"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.tewksbury.k12.ma.us"
     },
     {
       "district": "Tisbury",
@@ -2819,7 +3103,8 @@
         "Tisbury"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.mvyps.org/"
     },
     {
       "district": "Topsfield",
@@ -2828,7 +3113,8 @@
         "Topsfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.tritownschoolunion.com"
     },
     {
       "district": "Truro",
@@ -2837,7 +3123,8 @@
         "Truro"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.truromass.org"
     },
     {
       "district": "Tyngsborough",
@@ -2846,7 +3133,8 @@
         "Tyngsborough"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.tyngsboroughps.org"
     },
     {
       "district": "Uxbridge",
@@ -2855,7 +3143,8 @@
         "Uxbridge"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.uxbridgeschools.com"
     },
     {
       "district": "Wakefield",
@@ -2864,7 +3153,8 @@
         "Wakefield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.wakefieldpublicschools.org"
     },
     {
       "district": "Wales",
@@ -2873,7 +3163,8 @@
         "Wales"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.tantasqua.org"
     },
     {
       "district": "Walpole",
@@ -2882,7 +3173,8 @@
         "Walpole"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.walpole.k12.ma.us/"
     },
     {
       "district": "Waltham",
@@ -2891,7 +3183,8 @@
         "Waltham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.walthampublicschools.org/"
     },
     {
       "district": "Ware",
@@ -2900,7 +3193,8 @@
         "Ware"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.wareps.org"
     },
     {
       "district": "Wareham",
@@ -2909,7 +3203,8 @@
         "Wareham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://warehamps.schoolblocks.com"
     },
     {
       "district": "Warwick",
@@ -2918,7 +3213,8 @@
         "Warwick"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://warwick-k12.us/"
     },
     {
       "district": "Watertown",
@@ -2927,7 +3223,8 @@
         "Watertown"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.watertown.k12.ma.us"
     },
     {
       "district": "Wayland",
@@ -2936,7 +3233,8 @@
         "Wayland"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.wayland.k12.ma.us"
     },
     {
       "district": "Webster",
@@ -2945,7 +3243,8 @@
         "Webster"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.webster-schools.org"
     },
     {
       "district": "Wellesley",
@@ -2954,7 +3253,8 @@
         "Wellesley"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://wellesleyps.org"
     },
     {
       "district": "Wellfleet",
@@ -2963,7 +3263,8 @@
         "Wellfleet"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://nausetschools.org"
     },
     {
       "district": "West Boylston",
@@ -2972,7 +3273,8 @@
         "West Boylston"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.wbschools.com/"
     },
     {
       "district": "West Bridgewater",
@@ -2981,7 +3283,8 @@
         "West Bridgewater"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.wbridgewaterschools.org/"
     },
     {
       "district": "West Springfield",
@@ -2990,7 +3293,8 @@
         "West Springfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.wsps.org"
     },
     {
       "district": "Westborough",
@@ -2999,7 +3303,8 @@
         "Westborough"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.westboroughk12.org"
     },
     {
       "district": "Westfield",
@@ -3008,7 +3313,8 @@
         "Westfield"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.schoolsofwestfield.org"
     },
     {
       "district": "Westford",
@@ -3017,7 +3323,8 @@
         "Westford"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://westfordk12.us/Pages/index"
     },
     {
       "district": "Westhampton",
@@ -3026,7 +3333,8 @@
         "Westhampton"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.hr-k12.org"
     },
     {
       "district": "Weston",
@@ -3035,7 +3343,8 @@
         "Weston"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.westonschools.org"
     },
     {
       "district": "Westport",
@@ -3044,7 +3353,8 @@
         "Westport"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.westportschools.org"
     },
     {
       "district": "Westwood",
@@ -3053,7 +3363,8 @@
         "Westwood"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.westwood.k12.ma.us"
     },
     {
       "district": "Weymouth",
@@ -3062,7 +3373,8 @@
         "Weymouth"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.weymouthschools.org/"
     },
     {
       "district": "Whately",
@@ -3071,7 +3383,8 @@
         "Whately"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.frsu38.org"
     },
     {
       "district": "Williamsburg",
@@ -3080,7 +3393,8 @@
         "Williamsburg"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "http://www.hr-k12.org"
     },
     {
       "district": "Wilmington",
@@ -3089,7 +3403,8 @@
         "Wilmington"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.wpsk12.com"
     },
     {
       "district": "Winchendon",
@@ -3098,7 +3413,8 @@
         "Winchendon"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.winchendonk12.org"
     },
     {
       "district": "Winchester",
@@ -3107,7 +3423,8 @@
         "Winchester"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.winchesterps.org"
     },
     {
       "district": "Winthrop",
@@ -3116,7 +3433,8 @@
         "Winthrop"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.winthrop.k12.ma.us/"
     },
     {
       "district": "Woburn",
@@ -3125,7 +3443,8 @@
         "Woburn"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.woburnpublicschools.com"
     },
     {
       "district": "Worcester",
@@ -3134,7 +3453,8 @@
         "Worcester"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.wcacps.org/"
     },
     {
       "district": "Worthington",
@@ -3143,7 +3463,8 @@
         "Worthington"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://www.rhconwell.org/"
     },
     {
       "district": "Wrentham",
@@ -3152,44 +3473,50 @@
         "Wrentham"
       ],
       "type": "municipal",
-      "notes": "Municipal (single-town) district."
+      "notes": "Municipal (single-town) district.",
+      "district_url": "https://wrentham.k12.ma.us"
     }
   ],
- "charter": [
+  "charter": [
     {
       "district": "Alma del Mar Charter School: Frederick Douglass Campus",
       "members": [
         "New Bedford"
       ],
-      "address": "145 Davis St New Bedford MA"
+      "address": "145 Davis St New Bedford MA",
+      "district_url": "https://www.almadelmar.org/"
     },
     {
       "district": "Alma del Mar Charter School: Sarah D. Ottiwell Campus",
       "members": [
         "New Bedford"
       ],
-      "address": "515 Belleville Avenue New Bedford MA"
+      "address": "515 Belleville Avenue New Bedford MA",
+      "district_url": "https://www.almadelmar.org/apps/pages/index.jsp?uREC_ID=4390550&type=d"
     },
     {
       "district": "Global Learning Charter Public School",
       "members": [
         "New Bedford"
       ],
-      "address": "190 Ashley Blvd New Bedford MA"
+      "address": "190 Ashley Blvd New Bedford MA",
+      "district_url": "https://www.glcps.org/"
     },
     {
       "district": "Atlantis Charter School",
       "members": [
         "Fall River"
       ],
-      "address": "37 Park St Fall River MA"
+      "address": "37 Park St Fall River MA",
+      "district_url": "https://www.atlantiscs.org"
     },
     {
       "district": "Argosy Collegiate Charter School",
       "members": [
         "Fall River"
       ],
-      "address": "Fall River MA"
+      "address": "Fall River MA",
+      "district_url": "https://www.mcsao.org/argosy"
     },
     {
       "district": "Sturgis Charter Public School: East Campus",
@@ -3210,7 +3537,8 @@
         "Wellfleet",
         "Yarmouth"
       ],
-      "address": "427 Main St Hyannis MA"
+      "address": "427 Main St Hyannis MA",
+      "district_url": "https://barnstable.k12.ma.us"
     },
     {
       "district": "Sturgis Charter Public School: West Campus",
@@ -3231,7 +3559,8 @@
         "Wellfleet",
         "Yarmouth"
       ],
-      "address": "105 West Main St Hyannis MA"
+      "address": "105 West Main St Hyannis MA",
+      "district_url": "https://barnstable.k12.ma.us"
     },
     {
       "district": "Cape Cod Lighthouse Charter School",
@@ -3252,7 +3581,8 @@
         "Wellfleet",
         "Yarmouth"
       ],
-      "address": "195 Rt 137 East Harwich MA"
+      "address": "195 Rt 137 East Harwich MA",
+      "district_url": "http://www.cclighthouseschool.org"
     },
     {
       "district": "Martha's Vineyard Charter School",
@@ -3264,7 +3594,8 @@
         "Tisbury",
         "West Tisbury"
       ],
-      "address": "424 State Rd West Tisbury MA"
+      "address": "424 State Rd West Tisbury MA",
+      "district_url": "https://www.mvpcs.org"
     },
     {
       "district": "South Shore Charter Public School",
@@ -3298,7 +3629,8 @@
         "Weymouth",
         "Whitman"
       ],
-      "address": "100 Longwater Cir Norwell MA"
+      "address": "100 Longwater Cir Norwell MA",
+      "district_url": "https://southshore.tech"
     },
     {
       "district": "Rising Tide Charter Public School",
@@ -3322,126 +3654,144 @@
         "Scituate",
         "Wareham"
       ],
-      "address": "59 Armstrong Rd Plymouth MA"
+      "address": "59 Armstrong Rd Plymouth MA",
+      "district_url": "https://www.risingtide.org"
     },
     {
       "district": "Map Academy Charter School",
       "members": [
         "Plymouth"
       ],
-      "address": "11 Resnik Rd Plymouth MA"
+      "address": "11 Resnik Rd Plymouth MA",
+      "district_url": "https://themapacademy.org/"
     },
     {
       "district": "Academy of the Pacific Rim Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "1 Westinghouse Plaza Boston MA"
+      "address": "1 Westinghouse Plaza Boston MA",
+      "district_url": "https://www.pacrim.org"
     },
     {
       "district": "Boston Collegiate Charter School",
       "members": [
         "Boston"
       ],
-      "address": "215 Sydney St Dorchester MA"
+      "address": "215 Sydney St Dorchester MA",
+      "district_url": "https://www.bostoncollegiate.org"
     },
     {
       "district": "Boston Preparatory Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "885 River St Hyde Park MA"
+      "address": "885 River St Hyde Park MA",
+      "district_url": "https://www.bostonprep.org"
     },
     {
       "district": "Boston Renaissance Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "1415 Hyde Park Ave Hyde Park MA"
+      "address": "1415 Hyde Park Ave Hyde Park MA",
+      "district_url": "https://www.bostonrenaissance.org"
     },
     {
       "district": "Bridge Boston Charter School",
       "members": [
         "Boston"
       ],
-      "address": "435 Warren St Roxbury MA"
+      "address": "435 Warren St Roxbury MA",
+      "district_url": "https://bridgebostoncharterschool.org"
     },
     {
       "district": "Brooke Charter School: Roslindale",
       "members": [
         "Boston"
       ],
-      "address": "190 Cummins Hwy Roslindale MA"
+      "address": "190 Cummins Hwy Roslindale MA",
+      "district_url": "https://www.ebrooke.org/ourschools/our-campuses/brooke-roslindale/"
     },
     {
       "district": "Brooke Charter School: Mattapan",
       "members": [
         "Boston"
       ],
-      "address": "150 American Legion Hwy Mattapan MA"
+      "address": "150 American Legion Hwy Mattapan MA",
+      "district_url": "https://www.ebrooke.org/ourschools/our-campuses/brooke-mattapan/"
     },
     {
       "district": "Brooke Charter School: East Boston",
       "members": [
         "Boston"
       ],
-      "address": "94 Horace St East Boston MA"
+      "address": "94 Horace St East Boston MA",
+      "district_url": "https://www.ebrooke.org/ourschools/our-campuses/brooke-east-boston/"
     },
     {
       "district": "Brooke High School",
       "members": [
         "Boston"
       ],
-      "address": "200 American Legion Hwy Mattapan MA"
+      "address": "200 American Legion Hwy Mattapan MA",
+      "district_url": "https://www.ebrooke.org"
     },
     {
       "district": "Codman Academy Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "14 Eustis St Dorchester MA"
+      "address": "14 Eustis St Dorchester MA",
+      "district_url": "https://www.codmanacademy.org"
     },
     {
       "district": "Conservatory Lab Charter School",
       "members": [
         "Boston"
       ],
-      "address": "395 Columbia Rd Dorchester MA"
+      "address": "395 Columbia Rd Dorchester MA",
+      "district_url": "https://www.conservatorylab.org"
     },
     {
       "district": "Helen Y. Davis Leadership Academy Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "23 Leonard St Dorchester MA"
+      "address": "23 Leonard St Dorchester MA",
+      "district_url": "https://www.publicschoolreview.com/massachusetts/helen-y-davis-leadership-academy-charter-public-school-district/2500077-school-district"
     },
     {
       "district": "KIPP Academy Boston Charter School",
       "members": [
         "Boston"
       ],
-      "address": "37 Babson St Mattapan MA"
+      "address": "37 Babson St Mattapan MA",
+      "district_url": "https://kippma.org/our-schools/boston-district/kipp-academy-boston-elementary/"
     },
     {
       "district": "Match Charter Public School",
       "members": [
         "Boston"
       ],
-      "address": "1001 Commonwealth Ave Boston MA"
+      "address": "1001 Commonwealth Ave Boston MA",
+      "district_url": "https://www.matchschool.org/"
     },
     {
       "district": "Neighborhood House Charter School",
       "members": [
         "Boston"
       ],
-      "address": "21 Queen St Dorchester MA"
+      "address": "21 Queen St Dorchester MA",
+      "district_url": "https://www.thenhcs.org"
     },
     {
       "district": "Roxbury Preparatory Charter School",
       "members": [
         "Boston"
       ],
-      "address": "120 Fisher Ave Roxbury MA"
+      "address": "120 Fisher Ave Roxbury MA",
+      "district_url": "https://roxburyprep.uncommonschools.org/"
     },
     {
       "district": "Excel Academy Charter High School",
@@ -3449,63 +3799,72 @@
         "Boston",
         "Chelsea"
       ],
-      "address": "401 Bremen St East Boston MA"
+      "address": "401 Bremen St East Boston MA",
+      "district_url": "https://www.excelacademy.org"
     },
     {
       "district": "Excel Academy Charter School: East Boston",
       "members": [
         "Boston"
       ],
-      "address": "58 Moore St East Boston MA"
+      "address": "58 Moore St East Boston MA",
+      "district_url": "https://www.excelacademy.org/massachusetts-schools-east-boston/"
     },
     {
       "district": "Excel Academy Charter School: Chelsea",
       "members": [
         "Chelsea"
       ],
-      "address": "180 Second St Chelsea MA"
+      "address": "180 Second St Chelsea MA",
+      "district_url": "https://www.excelacademy.org/massachusetts-schools-chelsea/"
     },
     {
       "district": "Boston Day and Evening Academy (Horace Mann)",
       "members": [
         "Boston"
       ],
-      "address": "20 Kearsarge Ave Roxbury MA"
+      "address": "20 Kearsarge Ave Roxbury MA",
+      "district_url": "https://www.bdea.com"
     },
     {
       "district": "Boston Green Academy (Horace Mann)",
       "members": [
         "Boston"
       ],
-      "address": "20 Warren St Brighton MA"
+      "address": "20 Warren St Brighton MA",
+      "district_url": "https://www.bostongreenacademy.org"
     },
     {
       "district": "Dudley Street Neighborhood Charter School (Horace Mann)",
       "members": [
         "Boston"
       ],
-      "address": "6 Shirley St Roxbury MA"
+      "address": "6 Shirley St Roxbury MA",
+      "district_url": "http://www.dudleystreetschool.org/"
     },
     {
       "district": "Edward M. Kennedy Academy for Health Careers (Horace Mann)",
       "members": [
         "Boston"
       ],
-      "address": "173 Ipswich St Boston MA"
+      "address": "173 Ipswich St Boston MA",
+      "district_url": "https://www.kennedyacademy.org"
     },
     {
       "district": "UP Academy Boston (Horace Mann)",
       "members": [
         "Boston"
       ],
-      "address": "215 Dorchester St South Boston MA"
+      "address": "215 Dorchester St South Boston MA",
+      "district_url": "https://www.bostonpublicschools.org/schools-container/school-profile/up-academy-boston"
     },
     {
       "district": "UP Academy Dorchester (Horace Mann)",
       "members": [
         "Boston"
       ],
-      "address": "35 Westville St Dorchester MA"
+      "address": "35 Westville St Dorchester MA",
+      "district_url": "https://www.upacademydorchester.org"
     },
     {
       "district": "Mystic Valley Regional Charter School",
@@ -3517,7 +3876,8 @@
         "Stoneham",
         "Wakefield"
       ],
-      "address": "770 Salem St Malden MA"
+      "address": "770 Salem St Malden MA",
+      "district_url": "https://www.mvrcs.com"
     },
     {
       "district": "Pioneer Charter School of Science I (Everett)",
@@ -3526,7 +3886,8 @@
         "Everett",
         "Revere"
       ],
-      "address": "51-59 Summer St Everett MA"
+      "address": "51-59 Summer St Everett MA",
+      "district_url": "https://www.pioneercss.org/"
     },
     {
       "district": "Pioneer Charter School of Science II (Saugus)",
@@ -3537,56 +3898,64 @@
         "Salem",
         "Saugus"
       ],
-      "address": "97 Main St Saugus MA"
+      "address": "97 Main St Saugus MA",
+      "district_url": "https://saugus.pioneercss.org/"
     },
     {
       "district": "KIPP Academy Lynn Charter School",
       "members": [
         "Lynn"
       ],
-      "address": "20 Wheeler St Lynn MA"
+      "address": "20 Wheeler St Lynn MA",
+      "district_url": "https://www.kippma.org"
     },
     {
       "district": "Marblehead Community Charter Public School",
       "members": [
         "Marblehead"
       ],
-      "address": "17 Lime St Marblehead MA"
+      "address": "17 Lime St Marblehead MA",
+      "district_url": "https://marbleheadcharter.org"
     },
     {
       "district": "Salem Academy Charter School",
       "members": [
         "Salem"
       ],
-      "address": "45 Congress St Salem MA"
+      "address": "45 Congress St Salem MA",
+      "district_url": "https://www.salemacademycs.org"
     },
     {
       "district": "Lawrence Family Development Charter School",
       "members": [
         "Lawrence"
       ],
-      "address": "34 West St Lawrence MA"
+      "address": "34 West St Lawrence MA",
+      "district_url": "https://lfdcs.org"
     },
     {
       "district": "Community Day Charter Public School: Prospect",
       "members": [
         "Lawrence"
       ],
-      "address": "190 Hampshire St Lawrence MA"
+      "address": "190 Hampshire St Lawrence MA",
+      "district_url": "https://www.cdcps.org"
     },
     {
       "district": "Community Day Charter Public School: Gateway",
       "members": [
         "Lawrence"
       ],
-      "address": "50 Lawrence St Lawrence MA"
+      "address": "50 Lawrence St Lawrence MA",
+      "district_url": "https://masscharterschools.org/schools/"
     },
     {
       "district": "Community Day Charter Public School: Webster",
       "members": [
         "Lawrence"
       ],
-      "address": "404 Haverhill St Lawrence MA"
+      "address": "404 Haverhill St Lawrence MA",
+      "district_url": "https://masscharterschools.org/schools/community-day-charter-public-school-r-kingman-webster-lower-school/"
     },
     {
       "district": "River Valley Charter School",
@@ -3600,7 +3969,8 @@
         "Rowley",
         "Salisbury"
       ],
-      "address": "2 Perry Way Newburyport MA"
+      "address": "2 Perry Way Newburyport MA",
+      "district_url": "https://www.rivervalleycharter.org"
     },
     {
       "district": "Prospect Hill Academy Charter School",
@@ -3608,7 +3978,8 @@
         "Cambridge",
         "Somerville"
       ],
-      "address": "50 Essex St Cambridge MA"
+      "address": "50 Essex St Cambridge MA",
+      "district_url": "https://www.phacs.org"
     },
     {
       "district": "Community Charter School of Cambridge",
@@ -3616,28 +3987,32 @@
         "Cambridge",
         "Somerville"
       ],
-      "address": "245 Bent St Cambridge MA"
+      "address": "245 Bent St Cambridge MA",
+      "district_url": "https://www.ccscambridge.org/"
     },
     {
       "district": "Greater Lowell Charter Public School",
       "members": [
         "Lowell"
       ],
-      "address": "101 Jackson St Lowell MA"
+      "address": "101 Jackson St Lowell MA",
+      "district_url": "http://www.gltech.org"
     },
     {
       "district": "Lowell Community Charter Public School",
       "members": [
         "Lowell"
       ],
-      "address": "206 Jackson St Lowell MA"
+      "address": "206 Jackson St Lowell MA",
+      "district_url": "https://www.lccps.org"
     },
     {
       "district": "Collegiate Charter School of Lowell",
       "members": [
         "Lowell"
       ],
-      "address": "1857 Middlesex St Lowell MA"
+      "address": "1857 Middlesex St Lowell MA",
+      "district_url": "https://www.lowell.k12.ma.us"
     },
     {
       "district": "Innovation Academy Charter School",
@@ -3651,7 +4026,8 @@
         "Tyngsborough",
         "Westford"
       ],
-      "address": "72 Tyng Rd Tyngsborough MA"
+      "address": "72 Tyng Rd Tyngsborough MA",
+      "district_url": "https://www.innovationcharter.org"
     },
     {
       "district": "Francis W. Parker Charter Essential School",
@@ -3663,14 +4039,16 @@
         "Lunenburg",
         "Worcester"
       ],
-      "address": "49 Antietam St Devens MA"
+      "address": "49 Antietam St Devens MA",
+      "district_url": "https://www.theparkerschool.org"
     },
     {
       "district": "Sizer School: A North Central Charter Essential School",
       "members": [
         "Fitchburg"
       ],
-      "address": "500 Rindge Rd Fitchburg MA"
+      "address": "500 Rindge Rd Fitchburg MA",
+      "district_url": "http://www.sizerschool.org"
     },
     {
       "district": "Advanced Math and Science Academy Charter School",
@@ -3681,7 +4059,8 @@
         "Clinton",
         "Berlin"
       ],
-      "address": "201 Forest St Marlborough MA"
+      "address": "201 Forest St Marlborough MA",
+      "district_url": "https://www.massacademy.org"
     },
     {
       "district": "Benjamin Franklin Classical Charter Public School",
@@ -3702,7 +4081,8 @@
         "Walpole",
         "Wrentham"
       ],
-      "address": "500 Financial Park Franklin MA"
+      "address": "500 Financial Park Franklin MA",
+      "district_url": "https://www.bfccps.org"
     },
     {
       "district": "Christa McAuliffe Charter School",
@@ -3716,7 +4096,8 @@
         "Southborough",
         "Sudbury"
       ],
-      "address": "139 Newbury St Framingham MA"
+      "address": "139 Newbury St Framingham MA",
+      "district_url": "https://ashland.k12.ma.us"
     },
     {
       "district": "Foxborough Regional Charter School",
@@ -3749,7 +4130,8 @@
         "Weymouth",
         "Wrentham"
       ],
-      "address": "131 Central St Foxborough MA"
+      "address": "131 Central St Foxborough MA",
+      "district_url": "https://www.foxboroughrcs.org/"
     },
     {
       "district": "Abby Kelley Foster Charter Public School",
@@ -3768,70 +4150,80 @@
         "West Boylston",
         "Worcester"
       ],
-      "address": "10 New Bond St Worcester MA"
+      "address": "10 New Bond St Worcester MA",
+      "district_url": "https://www.akfcs.org"
     },
     {
       "district": "Learning First Charter Public School (formerly Seven Hills)",
       "members": [
         "Worcester"
       ],
-      "address": "51 Gage St Worcester MA"
+      "address": "51 Gage St Worcester MA",
+      "district_url": "https://worcester.ma.us"
     },
     {
       "district": "Baystate Academy Charter Public School",
       "members": [
         "Springfield"
       ],
-      "address": "170 Pine St Springfield MA"
+      "address": "170 Pine St Springfield MA",
+      "district_url": "https://bacps.net/"
     },
     {
       "district": "Holyoke Community Charter School",
       "members": [
         "Holyoke"
       ],
-      "address": "2200 Northampton St Holyoke MA"
+      "address": "2200 Northampton St Holyoke MA",
+      "district_url": "https://www.hccs-sabis.net"
     },
     {
       "district": "Libertas Academy Charter School",
       "members": [
         "Springfield"
       ],
-      "address": "262 Liberty St Springfield MA"
+      "address": "262 Liberty St Springfield MA",
+      "district_url": "https://libertasacademy.org/"
     },
     {
       "district": "Martin Luther King Jr. Charter School of Excellence",
       "members": [
         "Springfield"
       ],
-      "address": "285 Dorset St Springfield MA"
+      "address": "285 Dorset St Springfield MA",
+      "district_url": "https://www.mlkcs.org"
     },
     {
       "district": "Springfield International Charter School",
       "members": [
         "Springfield"
       ],
-      "address": "160 Joan St Springfield MA"
+      "address": "160 Joan St Springfield MA",
+      "district_url": "https://www.sics.org"
     },
     {
       "district": "Springfield Preparatory Charter School",
       "members": [
         "Springfield"
       ],
-      "address": "2071 Roosevelt Ave Springfield MA"
+      "address": "2071 Roosevelt Ave Springfield MA",
+      "district_url": "https://www.springfieldprep.org/"
     },
     {
       "district": "Veritas Preparatory Charter School (Springfield)",
       "members": [
         "Springfield"
       ],
-      "address": "370 Pine St Springfield MA"
+      "address": "370 Pine St Springfield MA",
+      "district_url": "https://www.greatschools.org/massachusetts/springfield/5416-Veritas-Preparatory-Charter-School/"
     },
     {
       "district": "Veritas Preparatory Charter School (Holyoke)",
       "members": [
         "Holyoke"
       ],
-      "address": "401 Beech St Holyoke MA"
+      "address": "401 Beech St Holyoke MA",
+      "district_url": "https://www.publicschoolreview.com/veritas-prep-holyoke-profile"
     },
     {
       "district": "Pioneer Valley Performing Arts Charter Public School",
@@ -3861,7 +4253,8 @@
         "Orange",
         "Palmer"
       ],
-      "address": "15 Mulligan Dr South Hadley MA"
+      "address": "15 Mulligan Dr South Hadley MA",
+      "district_url": "https://www.pvpa.org"
     },
     {
       "district": "Pioneer Valley Chinese Immersion Charter School",
@@ -3877,7 +4270,8 @@
         "Hatfield",
         "Whately"
       ],
-      "address": "317 Russell St Hadley MA"
+      "address": "317 Russell St Hadley MA",
+      "district_url": "https://www.pvcics.org"
     },
     {
       "district": "Hilltown Cooperative Charter Public School",
@@ -3906,7 +4300,8 @@
         "Williamsburg",
         "Worthington"
       ],
-      "address": "1 Industrial Way Easthampton MA"
+      "address": "1 Industrial Way Easthampton MA",
+      "district_url": "https://hilltowncharter.org"
     },
     {
       "district": "Four Rivers Charter Public School",
@@ -3935,7 +4330,8 @@
         "Hawley",
         "Conway"
       ],
-      "address": "248 Colrain Rd Greenfield MA"
+      "address": "248 Colrain Rd Greenfield MA",
+      "district_url": "https://www.fourriverscharter.org"
     },
     {
       "district": "Berkshire Arts and Technology Charter Public School (BART)",
@@ -3951,7 +4347,8 @@
         "Savoy",
         "Williamstown"
       ],
-      "address": "1 Commercial St Adams MA"
+      "address": "1 Commercial St Adams MA",
+      "district_url": "https://www.bartcharter.org"
     },
     {
       "district": "Phoenix Charter Academy Chelsea",
@@ -3961,21 +4358,24 @@
         "Everett",
         "Revere"
       ],
-      "address": "35 Broadway Chelsea MA"
+      "address": "35 Broadway Chelsea MA",
+      "district_url": "https://www.phoenixcharteracademy.org"
     },
     {
       "district": "Phoenix Charter Academy Lawrence",
       "members": [
         "Lawrence"
       ],
-      "address": "15 Union St Lawrence MA"
+      "address": "15 Union St Lawrence MA",
+      "district_url": "http://www.phoenixcharteracademy.org"
     },
     {
       "district": "Phoenix Charter Academy Springfield",
       "members": [
         "Springfield"
       ],
-      "address": "65 Jamaica St Springfield MA"
+      "address": "65 Jamaica St Springfield MA",
+      "district_url": "https://www.phoenixcharteracademy.org"
     }
   ]
 }
