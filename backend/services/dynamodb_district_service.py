@@ -158,16 +158,36 @@ class DynamoDBDistrictService:
 
     @staticmethod
     def _scan_by_name(table, name: str, limit: int, offset: int) -> Tuple[List[dict], int]:
-        """Scan districts by name"""
-        # Limit scan to prevent DoS
-        max_items_to_fetch = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
-
-        response = table.scan(
-            FilterExpression=Attr('entity_type').eq('district') & Attr('name_lower').eq(name.lower()),
-            Limit=max_items_to_fetch
-        )
-
-        districts = [DynamoDBDistrictService._item_to_dict(item) for item in response.get('Items', [])]
+        """Scan districts by name (exact match, case-insensitive)"""
+        districts = []
+        last_evaluated_key = None
+        
+        # For exact name match, we need to scan all items since DynamoDB Limit
+        # limits items examined, not items returned after filtering
+        while True:
+            scan_kwargs = {
+                'FilterExpression': Attr('entity_type').eq('district') & Attr('name_lower').eq(name.lower()),
+            }
+            
+            if last_evaluated_key:
+                scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
+            
+            response = table.scan(**scan_kwargs)
+            
+            districts.extend([
+                DynamoDBDistrictService._item_to_dict(item) 
+                for item in response.get('Items', [])
+            ])
+            
+            # Check if there are more items to scan
+            last_evaluated_key = response.get('LastEvaluatedKey')
+            if not last_evaluated_key:
+                break
+            
+            # Safety check - if we found a match for exact name, we can stop
+            # (assuming unique names)
+            if len(districts) > 0:
+                break
 
         total = len(districts)
         districts = districts[offset:offset + limit]
