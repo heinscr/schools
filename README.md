@@ -75,6 +75,7 @@ school/
 │
 ├── deploy.sh                     # Main deployment script
 ├── deploy-simple.sh              # Legacy deployment
+├── recreate.sh                   # Full recreation script (one command)
 ├── LICENSE
 └── README.md
 ```
@@ -102,6 +103,21 @@ npm run dev
 Website available at `http://localhost:5173`
 
 ### AWS Deployment
+
+**Quick Recreation (One Command)**
+
+For recreating the entire infrastructure from scratch:
+```bash
+./recreate.sh
+```
+
+This script will:
+1. Initialize and apply Terraform configuration
+2. Optionally create an admin Cognito user (with prompts for email/password)
+3. Deploy the application (backend + frontend)
+4. Import district and salary data
+
+**Manual Deployment (Step by Step)**
 
 **Step 1: Initialize Terraform**
 ```bash
