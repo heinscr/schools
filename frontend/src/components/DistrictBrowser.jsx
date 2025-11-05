@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 import ChoroplethMap from './ChoroplethMap';
 import DistrictEditor from './DistrictEditor';
@@ -7,6 +7,7 @@ import SalaryComparison from './SalaryComparison';
 import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
 import './DistrictBrowser.css';
+import { DataCacheContext } from '../contexts/DataCacheContext';
 
 function DistrictBrowser({ user }) {
   const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'salaries'
@@ -52,6 +53,8 @@ function DistrictBrowser({ user }) {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all', 'name', 'town'
+
+  const { getDistrictUrl } = useContext(DataCacheContext);
 
   // Do not auto-load districts on mount
 
@@ -294,6 +297,29 @@ function DistrictBrowser({ user }) {
                     }`}
                     onClick={() => handleDistrictClick(district)}
                   >
+                    {/* external link icon (top-right) */}
+                    {(() => {
+                      const url = (getDistrictUrl && getDistrictUrl(district.id)) || district.district_url;
+                      if (!url) return null;
+                      return (
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="external-link-btn"
+                          title={`Open ${district.name} website`}
+                          aria-label={`Open ${district.name} website`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                          </svg>
+                        </a>
+                      );
+                    })()}
+
                     {isAdmin && (
                       <button
                         className="edit-district-btn"

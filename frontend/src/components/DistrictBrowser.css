@@ -394,7 +394,7 @@
   align-items: center;
   justify-content: center;
   position: absolute;
-  top: 8px;
+  bottom: 8px;
   right: 8px;
   line-height: 1;
 }
@@ -403,6 +403,30 @@
   background: #e0e7ff;
   border-color: #3b82f6;
   transform: scale(1.1);
+}
+
+/* External link button positioned top-right of district item */
+.external-link-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e3a5f;
+  cursor: pointer;
+}
+
+.external-link-btn svg {
+  display: inline-block;
+}
+
+.external-link-btn:hover {
+  color: #2563eb;
+  transform: scale(1.05);
 }
 
 .edit-district-btn:active {
