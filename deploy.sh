@@ -248,6 +248,11 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
     # Get API key from Terraform output (managed by Terraform)
     API_KEY=$(cd infrastructure/terraform && terraform output -raw api_key 2>/dev/null || echo "")
 
+    # Get Cognito configuration from Terraform
+    COGNITO_USER_POOL_ID=$(cd infrastructure/terraform && terraform output -raw cognito_user_pool_id 2>/dev/null || echo "")
+    COGNITO_CLIENT_ID=$(cd infrastructure/terraform && terraform output -raw cognito_client_id 2>/dev/null || echo "")
+    COGNITO_REGION=$(cd infrastructure/terraform && terraform output -raw region 2>/dev/null || echo "")
+
     # Get CUSTOM_DOMAIN from backend/.env if it exists
     CUSTOM_DOMAIN=""
     if [ -f "backend/.env" ]; then
@@ -259,6 +264,12 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
         ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
     else
         ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN,API_KEY=$API_KEY"
+    fi
+
+    # Add Cognito configuration if available
+    if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
+        ENV_VARS="$ENV_VARS,COGNITO_USER_POOL_ID=$COGNITO_USER_POOL_ID,COGNITO_CLIENT_ID=$COGNITO_CLIENT_ID,COGNITO_REGION=$COGNITO_REGION"
+        echo "  Using Cognito User Pool: $COGNITO_USER_POOL_ID"
     fi
 
     # Add CUSTOM_DOMAIN if it exists
@@ -281,6 +292,11 @@ else
     # Get API key from Terraform output (managed by Terraform)
     API_KEY=$(cd infrastructure/terraform && terraform output -raw api_key 2>/dev/null || echo "")
 
+    # Get Cognito configuration from Terraform
+    COGNITO_USER_POOL_ID=$(cd infrastructure/terraform && terraform output -raw cognito_user_pool_id 2>/dev/null || echo "")
+    COGNITO_CLIENT_ID=$(cd infrastructure/terraform && terraform output -raw cognito_client_id 2>/dev/null || echo "")
+    COGNITO_REGION=$(cd infrastructure/terraform && terraform output -raw region 2>/dev/null || echo "")
+
     # Get CUSTOM_DOMAIN from backend/.env if it exists
     CUSTOM_DOMAIN=""
     if [ -f "backend/.env" ]; then
@@ -292,6 +308,12 @@ else
         ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
     else
         ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN,API_KEY=$API_KEY"
+    fi
+
+    # Add Cognito configuration if available
+    if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
+        ENV_VARS="$ENV_VARS,COGNITO_USER_POOL_ID=$COGNITO_USER_POOL_ID,COGNITO_CLIENT_ID=$COGNITO_CLIENT_ID,COGNITO_REGION=$COGNITO_REGION"
+        echo "  Using Cognito User Pool: $COGNITO_USER_POOL_ID"
     fi
 
     # Add CUSTOM_DOMAIN if it exists
