@@ -196,17 +196,41 @@ class DynamoDBDistrictService:
 
     @staticmethod
     def _get_all_districts(table, limit: int, offset: int) -> Tuple[List[dict], int]:
-        """Get all districts"""
-        # Limit scan to prevent DoS
-        max_items_to_fetch = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
+        """Get all districts with proper DynamoDB pagination"""
+        districts = []
+        last_evaluated_key = None
+        items_scanned = 0
 
-        response = table.scan(
-            FilterExpression=Attr('entity_type').eq('district'),
-            Limit=max_items_to_fetch
-        )
+        # Scan all districts, handling DynamoDB pagination
+        while True:
+            scan_kwargs = {
+                'FilterExpression': Attr('entity_type').eq('district'),
+                'Limit': MAX_DYNAMODB_FETCH_LIMIT  # Scan in chunks
+            }
 
-        districts = [DynamoDBDistrictService._item_to_dict(item) for item in response.get('Items', [])]
+            if last_evaluated_key:
+                scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
 
+            response = table.scan(**scan_kwargs)
+
+            # Add items from this scan
+            districts.extend([
+                DynamoDBDistrictService._item_to_dict(item)
+                for item in response.get('Items', [])
+            ])
+
+            items_scanned += len(response.get('Items', []))
+
+            # Check if there are more items to scan
+            last_evaluated_key = response.get('LastEvaluatedKey')
+            if not last_evaluated_key:
+                break
+
+            # Safety check to prevent infinite loops in case of data issues
+            if items_scanned >= MAX_DYNAMODB_FETCH_LIMIT:
+                break
+
+        # Apply offset and limit to the complete result set
         total = len(districts)
         districts = districts[offset:offset + limit]
 

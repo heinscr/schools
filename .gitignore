@@ -90,3 +90,17 @@ data/salary_data.json
 infrastructure/.terraform.lock.hcl
 data/generate_municipal_salaries.py
 data/generate_sample_salaries.py
+scripts/.district_url_progress.pkl
+scripts/fill_district_urls_improved.py
+scripts/fill_district_urls.py
+scripts/get_doe_orgcodes.py
+scripts/get_web_doe.py
+scripts/ma_district_orgcodes.json
+scripts/ma_district_websites.csv
+scripts/ma_district_websites.json
+scripts/org_search.py
+scripts/README_URL_FINDER.md
+scripts/debug_html/contact_01770000.html
+scripts/debug_html/contact_01890000.html
+scripts/debug_html/contact_02660000.html
+scripts/doe_orgcodes.json
