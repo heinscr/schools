@@ -78,6 +78,13 @@ aws cognito-idp admin-create-user \
   --temporary-password "TempPassword123!" \
   --message-action SUPPRESS
 
+# Make pwd permanent
+aws cognito-idp admin-set-user-password \
+  --user-pool-id $USER_POOL_ID \
+  --username admin@example.com \
+  --password "YourPermanentPassword123!" \
+  --permanent
+
 # Add user to admins group
 aws cognito-idp admin-add-user-to-group \
   --user-pool-id <USER_POOL_ID> \
