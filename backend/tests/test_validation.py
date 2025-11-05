@@ -10,13 +10,6 @@ from fastapi.testclient import TestClient
 import pytest
 import main as backend_main
 
-# Test API key for authenticated requests
-TEST_API_KEY = "test-api-key-for-unit-tests"
-
-# Mock the API key in the environment
-os.environ["API_KEY"] = TEST_API_KEY
-
-
 def _resp_district(**overrides):
     base = {
         'id': 'DISTRICT#abc',

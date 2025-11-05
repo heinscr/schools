@@ -13,12 +13,6 @@ load_dotenv(BACKEND_DIR / ".env")
 from fastapi.testclient import TestClient
 import main as backend_main
 
-# Test API key for authenticated requests
-TEST_API_KEY = "test-api-key-for-unit-tests"
-
-# Mock the API key in the environment
-os.environ["API_KEY"] = TEST_API_KEY
-
 # Get custom domain from environment
 CUSTOM_DOMAIN = os.getenv("CUSTOM_DOMAIN")
 CUSTOM_ORIGIN = f"https://{CUSTOM_DOMAIN}"
@@ -59,7 +53,6 @@ def test_cors_preflight_allowed_origin():
     headers = {
         "Origin": CUSTOM_ORIGIN,
         "Access-Control-Request-Method": "POST",
-        "Access-Control-Request-Headers": "Content-Type,X-API-Key"
     }
 
     r = client.options("/api/districts", headers=headers)
@@ -114,7 +107,6 @@ def test_cors_allowed_headers():
     headers = {
         "Origin": CUSTOM_ORIGIN,
         "Access-Control-Request-Method": "POST",
-        "Access-Control-Request-Headers": "Content-Type,X-API-Key"
     }
 
     r = client.options("/api/districts", headers=headers)
@@ -124,7 +116,6 @@ def test_cors_allowed_headers():
 
     # Should include our whitelisted headers
     assert "content-type" in allowed_headers
-    assert "x-api-key" in allowed_headers
 
 
 def test_cors_localhost_allowed():

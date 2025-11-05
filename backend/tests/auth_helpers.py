@@ -34,10 +34,3 @@ def get_auth_headers(token='mock-jwt-token'):
     return {
         'Authorization': f'Bearer {token}'
     }
-
-
-def get_api_key_headers(api_key='test-api-key-for-unit-tests'):
-    """Get API key headers for backward compatibility tests"""
-    return {
-        'X-API-Key': api_key
-    }

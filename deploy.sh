@@ -245,9 +245,6 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
     # Update environment variables
     echo "Updating Lambda configuration..."
 
-    # Get API key from Terraform output (managed by Terraform)
-    API_KEY=$(cd infrastructure/terraform && terraform output -raw api_key 2>/dev/null || echo "")
-
     # Get Cognito configuration from Terraform
     COGNITO_USER_POOL_ID=$(cd infrastructure/terraform && terraform output -raw cognito_user_pool_id 2>/dev/null || echo "")
     COGNITO_CLIENT_ID=$(cd infrastructure/terraform && terraform output -raw cognito_client_id 2>/dev/null || echo "")
@@ -259,12 +256,7 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
         CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
     fi
 
-    if [ -z "$API_KEY" ]; then
-        echo -e "${YELLOW}Warning: API_KEY not found in Terraform. Write operations will be disabled.${NC}"
-        ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
-    else
-        ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN,API_KEY=$API_KEY"
-    fi
+    ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
 
     # Add Cognito configuration if available
     if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
@@ -289,9 +281,6 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
 else
     echo "Creating new Lambda function..."
 
-    # Get API key from Terraform output (managed by Terraform)
-    API_KEY=$(cd infrastructure/terraform && terraform output -raw api_key 2>/dev/null || echo "")
-
     # Get Cognito configuration from Terraform
     COGNITO_USER_POOL_ID=$(cd infrastructure/terraform && terraform output -raw cognito_user_pool_id 2>/dev/null || echo "")
     COGNITO_CLIENT_ID=$(cd infrastructure/terraform && terraform output -raw cognito_client_id 2>/dev/null || echo "")
@@ -303,13 +292,8 @@ else
         CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
     fi
 
-    if [ -z "$API_KEY" ]; then
-        echo -e "${YELLOW}Warning: API_KEY not found in Terraform. Write operations will be disabled.${NC}"
-        ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
-    else
-        ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN,API_KEY=$API_KEY"
-    fi
-
+    ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
+    
     # Add Cognito configuration if available
     if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
         ENV_VARS="$ENV_VARS,COGNITO_USER_POOL_ID=$COGNITO_USER_POOL_ID,COGNITO_CLIENT_ID=$COGNITO_CLIENT_ID,COGNITO_REGION=$COGNITO_REGION"

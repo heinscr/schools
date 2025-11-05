@@ -13,13 +13,6 @@ from pydantic import ValidationError
 from schemas import DistrictCreate, DistrictUpdate
 from auth_helpers import mock_admin_user
 
-# Test API key for authenticated requests (backward compatibility)
-TEST_API_KEY = "test-api-key-for-unit-tests"
-
-# Mock the API key in the environment
-os.environ["API_KEY"] = TEST_API_KEY
-
-
 def mock_require_admin_role():
     """Mock admin authentication dependency"""
     async def _mock():

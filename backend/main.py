@@ -23,7 +23,6 @@ from config import (
     MIN_QUERY_LIMIT,
     DEFAULT_OFFSET
 )
-from auth import require_api_key  # Deprecated - keeping for backward compatibility
 from cognito_auth import require_admin_role, get_current_user_optional
 from validation import validate_search_query, validate_name_filter, validate_town_filter, validate_district_id
 from error_handlers import (
@@ -94,7 +93,6 @@ allowed_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 allowed_headers = [
     "Content-Type",
     "Authorization",
-    "X-API-Key",  # Our custom API key header
     "Accept",
     "Origin",
     "User-Agent",

@@ -159,14 +159,6 @@ curl -X PUT \
 - **Refresh**: Access tokens can be refreshed using refresh tokens (valid for 30 days)
 - **HTTPS Only**: Tokens should only be transmitted over HTTPS in production
 
-## Migrating from API Key
-
-The old API key authentication is deprecated but still supported for backward compatibility:
-
-- API key authentication still works for existing scripts/tools
-- New applications should use Cognito authentication
-- To fully remove API key support, remove `require_api_key` dependency and `API_KEY` environment variable
-
 ## Troubleshooting
 
 ### "Invalid token" errors

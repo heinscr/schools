@@ -177,14 +177,6 @@ cd ../infrastructure/scripts
 
 6. Test editing a district to verify authentication works
 
-## Backward Compatibility
-
-The API key authentication is still supported:
-
-- Existing scripts/tools using `X-API-Key` header will continue to work
-- To get the API key: `terraform output -raw api_key`
-- This allows gradual migration of integrations
-
 ## Rollback Plan
 
 If issues arise, you can rollback by:
@@ -204,19 +196,6 @@ If issues arise, you can rollback by:
 
 3. **Keep Cognito Resources**: Cognito resources don't interfere with API key authentication, so they can remain deployed
 
-## Removing API Key Support (Future)
-
-When ready to fully deprecate API keys:
-
-1. Update `backend/main.py`:
-   - Remove `from auth import require_api_key`
-   - Remove backward compatibility comments
-
-2. Update `infrastructure/terraform/main.tf`:
-   - Remove `API_KEY` environment variable
-
-3. Update `infrastructure/terraform/api_key.tf`:
-   - Remove or comment out the API key generation
 
 ## Monitoring
 

@@ -13,10 +13,6 @@ terraform {
       source  = "hashicorp/archive"
       version = "~> 2.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.0"
-    }
   }
 
   # Optional: Uncomment to use S3 backend for state
@@ -314,13 +310,10 @@ resource "aws_lambda_function" "api" {
     variables = {
       DYNAMODB_DISTRICTS_TABLE = aws_dynamodb_table.districts.name
       CLOUDFRONT_DOMAIN        = aws_cloudfront_distribution.frontend.domain_name
-      CUSTOM_DOMAIN            = var.cloudfront_domain_name
       # Cognito configuration for JWT validation
       COGNITO_USER_POOL_ID     = aws_cognito_user_pool.main.id
       COGNITO_CLIENT_ID        = aws_cognito_user_pool_client.frontend.id
       COGNITO_REGION           = var.aws_region
-      # Keep API_KEY for backward compatibility during migration
-      API_KEY                  = random_password.api_key.result
     }
   }
 

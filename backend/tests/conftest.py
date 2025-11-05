@@ -11,7 +11,6 @@ os.environ["DYNAMODB_DISTRICTS_TABLE"] = "test-districts"
 os.environ["SALARIES_TABLE_NAME"] = "test-salaries"
 os.environ["SCHEDULES_TABLE_NAME"] = "test-schedules"
 os.environ["DISTRICTS_TABLE_NAME"] = "test-districts"
-os.environ["API_KEY"] = "test-api-key-for-unit-tests"
 
 # Set high rate limits for testing to avoid hitting limits during test runs
 os.environ["RATE_LIMIT_GENERAL"] = "1000/minute"
