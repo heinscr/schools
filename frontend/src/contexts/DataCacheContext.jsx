@@ -126,6 +126,16 @@ export function DataCacheProvider({ children, autoLoad = true }) {
   }, [districts]);
 
   /**
+   * Get the district_url for a given district id (or null if not available)
+   */
+  const getDistrictUrl = useCallback((districtId) => {
+    const d = districts.get(districtId);
+    if (!d) return null;
+    // Support different possible field names used by API
+    return d.district_url || d.url || d.website || null;
+  }, [districts]);
+
+  /**
    * Get all districts for a given town
    */
   const getDistrictsByTown = useCallback((townName) => {
@@ -246,6 +256,7 @@ export function DataCacheProvider({ children, autoLoad = true }) {
 
     // Data access methods
     getDistrictById,
+  getDistrictUrl,
     getDistrictsByTown,
     getAllDistricts,
     searchDistrictsByName,

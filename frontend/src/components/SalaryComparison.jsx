@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import api from '../services/api';
+import { DataCacheContext } from '../contexts/DataCacheContext';
 import SalaryComparisonMap from './SalaryComparisonMap';
 import { DISTRICT_TYPE_OPTIONS } from '../constants/districtTypes';
 import { formatCurrency } from '../utils/formatters';
@@ -16,6 +17,7 @@ function SalaryComparison() {
   const [filteredResults, setFilteredResults] = useState(null); // Filtered by district type
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { getDistrictUrl } = useContext(DataCacheContext);
 
   const handleTypeChange = (type) => {
     setSelectedTypes(prev => {
@@ -224,6 +226,7 @@ function SalaryComparison() {
                 <thead>
                   <tr>
                     <th className="rank-col">Rank</th>
+                    <th className="link-col" aria-label="Website"></th>
                     <th className="district-col">District</th>
                     <th className="type-col">Type</th>
                     <th className="year-col">Year</th>
@@ -232,11 +235,44 @@ function SalaryComparison() {
                 </thead>
                 <tbody>
                   {filteredResults.results.map((result, index) => (
-                    <tr key={result.district_id} className="result-row">
+                      <tr key={result.district_id} className="result-row">
                       <td className="rank-cell">
                         <span className={`rank-badge ${index < 3 ? 'top-rank' : ''}`}>
                           {result.rank}
                         </span>
+                      </td>
+                      <td className="link-cell">
+                        {(() => {
+                          const districtUrl = (getDistrictUrl && getDistrictUrl(result.district_id)) || result.district_url;
+                          if (!districtUrl) return null;
+                          return (
+                            <a
+                              href={districtUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="external-link"
+                              title={`Open ${result.district_name} website`}
+                              aria-label={`Open ${result.district_name} website in a new tab`}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{ verticalAlign: 'middle' }}
+                              >
+                                <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                <polyline points="15 3 21 3 21 9" />
+                                <line x1="10" y1="14" x2="21" y2="3" />
+                              </svg>
+                            </a>
+                          );
+                        })()}
                       </td>
                       <td className="district-cell">
                         <strong>{result.district_name}</strong>

@@ -257,8 +257,25 @@
 }
 
 .rank-col {
-  width: 80px;
+  width: 30px;
   text-align: center !important;
+}
+
+.link-col {
+  width: 20px;
+  text-align: center !important;
+}
+
+.link-cell {
+  width: 20px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.external-link svg {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
 }
 
 .district-col {
@@ -294,6 +311,13 @@
 
 .results-table td {
   padding: 16px 20px;
+}
+
+/* Narrow the link cell padding so the column stays just slightly larger than the icon */
+.results-table td.link-cell {
+  padding: 6px 6px; /* smaller horizontal padding than default */
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .rank-cell {
@@ -462,6 +486,11 @@
   .district-type-count {
     margin-left: 0;
     font-size: 0.85em;
+  }
+
+  /* Slightly reduce link column on small screens */
+  .link-col {
+    width: 30px;
   }
 
   .results-stats {
