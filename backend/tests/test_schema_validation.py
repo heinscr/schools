@@ -172,9 +172,8 @@ def test_create_district_valid_district_types(monkeypatch):
         'municipal',
         'regional_academic',
         'regional_vocational',
+        'county_agricultural',
         'charter',
-        'collaborative',
-        'virtual',
         'other',
     ]
 

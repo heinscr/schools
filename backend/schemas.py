@@ -11,9 +11,8 @@ VALID_DISTRICT_TYPES = {
     'municipal',
     'regional_academic',
     'regional_vocational',
+    'county_agricultural',
     'charter',
-    'collaborative',
-    'virtual',
     'other'
 }
 MAX_TOWNS_PER_DISTRICT = 50
