@@ -138,7 +138,6 @@ function DistrictEditor({ district, onClose, onSave }) {
               required
               className="form-select"
             >
-              <option value="">Select a type...</option>
               {districtTypeOptions.map(opt => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
