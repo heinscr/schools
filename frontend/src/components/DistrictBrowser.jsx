@@ -54,7 +54,8 @@ function DistrictBrowser({ user }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all', 'name', 'town'
 
-  const { getDistrictUrl } = useContext(DataCacheContext);
+  const _dataCache = useContext(DataCacheContext);
+  const getDistrictUrl = _dataCache?.getDistrictUrl;
 
   // Do not auto-load districts on mount
 

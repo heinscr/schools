@@ -17,7 +17,8 @@ function SalaryComparison() {
   const [filteredResults, setFilteredResults] = useState(null); // Filtered by district type
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { getDistrictUrl } = useContext(DataCacheContext);
+  const _dataCache = useContext(DataCacheContext);
+  const getDistrictUrl = _dataCache?.getDistrictUrl;
 
   const handleTypeChange = (type) => {
     setSelectedTypes(prev => {

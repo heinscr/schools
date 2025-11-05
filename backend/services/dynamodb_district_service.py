@@ -163,11 +163,15 @@ class DynamoDBDistrictService:
         districts = []
         last_evaluated_key = None
         
-        # For exact name match, we need to scan all items since DynamoDB Limit
-        # limits items examined, not items returned after filtering
+        # For exact name match, we need to scan with a safety Limit to avoid DoS.
+        # Fetch a bounded number of items computed from offset+limit with a small buffer,
+        # and cap by MAX_DYNAMODB_FETCH_LIMIT.
+        max_items_to_fetch = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
+
         while True:
             scan_kwargs = {
                 'FilterExpression': Attr('entity_type').eq('district') & Attr('name_lower').eq(name.lower()),
+                'Limit': max_items_to_fetch
             }
             
             if last_evaluated_key:
