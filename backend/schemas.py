@@ -5,7 +5,7 @@ import re
 
 # Validation constants
 # Allow alphanumeric, spaces, hyphens (including em dash), apostrophes, periods, ampersands, commas, parentheses, colons, and hash
-SAFE_TEXT_PATTERN = re.compile(r'^[a-zA-Z0-9\s\-\'.&,():#—]+$')
+SAFE_TEXT_PATTERN = re.compile(r'^[a-zA-Z0-9\s\-\'.&,():#—/]+$')
 DISTRICT_TYPE_PATTERN = re.compile(r'^[a-z_]+$')
 VALID_DISTRICT_TYPES = {
     'municipal',
@@ -57,7 +57,7 @@ class DistrictBase(BaseModel):
             raise ValueError(
                 'District name contains invalid characters. '
                 'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
-                'ampersands, commas, parentheses, and hash symbols are allowed.'
+                'ampersands, commas, parentheses, forward slashes, and hash symbols are allowed.'
             )
 
         return v
@@ -77,11 +77,10 @@ class DistrictBase(BaseModel):
             raise ValueError(
                 'Main address contains invalid characters. '
                 'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
-                'ampersands, commas, parentheses, and hash symbols are allowed.'
+                'ampersands, commas, parentheses, forward slashes, and hash symbols are allowed.'
             )
 
         return v
-
 
 class DistrictCreate(DistrictBase):
     """Schema for creating a district"""
@@ -160,7 +159,7 @@ class DistrictUpdate(BaseModel):
             raise ValueError(
                 'District name contains invalid characters. '
                 'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
-                'ampersands, commas, parentheses, and hash symbols are allowed.'
+                'ampersands, commas, parentheses, forward slashes, and hash symbols are allowed.'
             )
 
         return v
@@ -180,7 +179,7 @@ class DistrictUpdate(BaseModel):
             raise ValueError(
                 'Main address contains invalid characters. '
                 'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
-                'ampersands, commas, parentheses, and hash symbols are allowed.'
+                'ampersands, commas, parentheses, forward slashes, and hash symbols are allowed.'
             )
 
         return v
