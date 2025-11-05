@@ -3,10 +3,17 @@
  * Handles user login, token storage, and authentication state
  */
 
+import {
+  CognitoUserPool,
+  CognitoUser,
+  AuthenticationDetails,
+} from 'amazon-cognito-identity-js';
+
 class AuthService {
   constructor() {
     this.tokenKey = 'cognito_id_token';
     this.userKey = 'cognito_user';
+    this.userPool = null;
   }
 
   /**
@@ -41,6 +48,9 @@ class AuthService {
       // Also store the API URL from config
       this.apiBaseUrl = config.apiUrl;
 
+      // Initialize Cognito User Pool
+      this.initUserPool();
+
       console.log('Loaded Cognito configuration from /config.json');
       return this.cognitoConfig;
     } catch (error) {
@@ -63,7 +73,22 @@ class AuthService {
       // Also use API URL from environment for local dev
       this.apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
+      // Initialize Cognito User Pool
+      this.initUserPool();
+
       return this.cognitoConfig;
+    }
+  }
+
+  /**
+   * Initialize the Cognito User Pool
+   */
+  initUserPool() {
+    if (this.cognitoConfig?.userPoolId && this.cognitoConfig?.clientId) {
+      this.userPool = new CognitoUserPool({
+        UserPoolId: this.cognitoConfig.userPoolId,
+        ClientId: this.cognitoConfig.clientId,
+      });
     }
   }
 
@@ -76,6 +101,46 @@ class AuthService {
       this.cognitoConfig?.clientId &&
       this.cognitoConfig?.domain
     );
+  }
+
+  /**
+   * Authenticate user with email and password (direct authentication)
+   */
+  async authenticateUser(email, password) {
+    return new Promise((resolve, reject) => {
+      if (!this.userPool) {
+        reject(new Error('User pool not initialized'));
+        return;
+      }
+
+      const authenticationDetails = new AuthenticationDetails({
+        Username: email,
+        Password: password,
+      });
+
+      const cognitoUser = new CognitoUser({
+        Username: email,
+        Pool: this.userPool,
+      });
+
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: (result) => {
+          const idToken = result.getIdToken().getJwtToken();
+          
+          // Store the token
+          this.setToken(idToken);
+          
+          resolve({ success: true, idToken });
+        },
+        onFailure: (err) => {
+          reject(err);
+        },
+        newPasswordRequired: (userAttributes, requiredAttributes) => {
+          // Handle new password required scenario
+          reject(new Error('New password required. Please contact administrator.'));
+        },
+      });
+    });
   }
 
   /**
