@@ -16,9 +16,16 @@ class AuthService {
     try {
       // Try to load runtime config from production deployment
       const configUrl = `${window.location.origin}/config.json`;
-      const response = await fetch(configUrl);
+      const response = await fetch(configUrl, {
+        // Don't show fetch errors in console for 404 (normal in dev)
+        cache: 'no-cache'
+      });
 
       if (!response.ok) {
+        // In development, config.json won't exist - this is expected
+        if (response.status === 404) {
+          throw new Error('Config file not found (expected in local development)');
+        }
         throw new Error(`Failed to load config: ${response.status}`);
       }
 
@@ -31,16 +38,31 @@ class AuthService {
         domain: config.cognitoDomain,
       };
 
+      // Also store the API URL from config
+      this.apiBaseUrl = config.apiUrl;
+
+      console.log('Loaded Cognito configuration from /config.json');
       return this.cognitoConfig;
     } catch (error) {
-      console.warn('Failed to load Cognito configuration from /config.json, using environment variables:', error.message);
       // Fallback to environment variables for local development
+      // This is the expected path when running locally
+      const isDev = import.meta.env.DEV;
+      if (isDev || error.message.includes('not found')) {
+        console.log('Using Cognito configuration from environment variables (local development)');
+      } else {
+        console.warn('Failed to load /config.json, using environment variables:', error.message);
+      }
+
       this.cognitoConfig = {
         userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
         clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
         region: import.meta.env.VITE_COGNITO_REGION || 'us-east-1',
         domain: import.meta.env.VITE_COGNITO_DOMAIN,
       };
+
+      // Also use API URL from environment for local dev
+      this.apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
       return this.cognitoConfig;
     }
   }
@@ -219,14 +241,22 @@ class AuthService {
   /**
    * Get current user from backend
    */
-  async getCurrentUser(apiBaseUrl) {
+  async getCurrentUser() {
     const token = this.getToken();
     if (!token) {
       return { authenticated: false, user: null };
     }
 
+    // Ensure we have initialized
+    if (!this.cognitoConfig) {
+      await this.init();
+    }
+
+    // Use stored API URL from config
+    const apiUrl = this.apiBaseUrl || import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
     try {
-      const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
+      const response = await fetch(`${apiUrl}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

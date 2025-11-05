@@ -46,8 +46,7 @@ function Login({ onAuthChange }) {
 
   const fetchUserDetails = async () => {
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const authData = await authService.getCurrentUser(apiBaseUrl);
+      const authData = await authService.getCurrentUser();
 
       if (authData.authenticated) {
         setUser(authData.user);

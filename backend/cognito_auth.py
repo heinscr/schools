@@ -120,7 +120,10 @@ def verify_cognito_token(token: str) -> Dict:
             algorithms=["RS256"],
             audience=config["client_id"],
             issuer=issuer,
-            options={"verify_exp": True}
+            options={
+                "verify_exp": True,
+                "verify_at_hash": False  # Skip at_hash verification since we only have ID token
+            }
         )
 
         return claims
