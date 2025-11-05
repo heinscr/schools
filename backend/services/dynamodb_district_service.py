@@ -29,6 +29,7 @@ class DynamoDBDistrictService:
             'name': district_data.name,
             'name_lower': district_data.name.lower(),  # For case-insensitive search
             'main_address': district_data.main_address or '',
+            'district_url': district_data.district_url or '',
             'towns': district_data.towns,
             'district_type': getattr(district_data, 'district_type', ''),
             'created_at': now,
@@ -265,6 +266,10 @@ class DynamoDBDistrictService:
                 update_expr_parts.append('main_address = :address')
                 expr_attr_values[':address'] = district_data.main_address
 
+            if district_data.district_url is not None:
+                update_expr_parts.append('district_url = :district_url')
+                expr_attr_values[':district_url'] = district_data.district_url
+
             if district_data.district_type is not None:
                 update_expr_parts.append('district_type = :district_type')
                 expr_attr_values[':district_type'] = district_data.district_type
@@ -397,6 +402,7 @@ class DynamoDBDistrictService:
             'id': item['district_id'],
             'name': item['name'],
             'main_address': item.get('main_address', ''),
+            'district_url': item.get('district_url', ''),
             'towns': item.get('towns', []),
             'district_type': item.get('district_type', ''),
             'created_at': item['created_at'],

@@ -42,7 +42,8 @@ class DistrictBase(BaseModel):
     """Base schema for district"""
     name: str = Field(..., min_length=1, max_length=255)
     main_address: Optional[str] = Field(None, max_length=500)
-
+    district_url: Optional[str] = Field(None, max_length=500)
+    
     @field_validator('name')
     @classmethod
     def validate_name(cls, v: str) -> str:
@@ -78,6 +79,23 @@ class DistrictBase(BaseModel):
                 'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
                 'ampersands, commas, parentheses, forward slashes, and hash symbols are allowed.'
             )
+
+        return v
+
+    @field_validator('district_url')
+    @classmethod
+    def validate_district_url(cls, v: Optional[str]) -> Optional[str]:
+        """Validate district URL is a valid URL format"""
+        if v is None:
+            return v
+
+        v = v.strip()
+        if not v:
+            return None
+
+        # Basic URL validation - must start with http:// or https://
+        if not (v.startswith('http://') or v.startswith('https://')):
+            raise ValueError('District URL must start with http:// or https://')
 
         return v
 
@@ -139,6 +157,7 @@ class DistrictUpdate(BaseModel):
     """Schema for updating a district"""
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     main_address: Optional[str] = Field(None, max_length=500)
+    district_url: Optional[str] = Field(None, max_length=500)
     towns: Optional[List[str]] = Field(None, description="List of town names")
     district_type: Optional[str] = Field(None, description="Type of district (e.g. municipal, regional_academic, etc.)")
 
@@ -180,6 +199,23 @@ class DistrictUpdate(BaseModel):
                 'Only alphanumeric, spaces, hyphens, apostrophes, periods, colons, '
                 'ampersands, commas, parentheses, forward slashes, and hash symbols are allowed.'
             )
+
+        return v
+
+    @field_validator('district_url')
+    @classmethod
+    def validate_district_url(cls, v: Optional[str]) -> Optional[str]:
+        """Validate district URL is a valid URL format"""
+        if v is None:
+            return v
+
+        v = v.strip()
+        if not v:
+            return None
+
+        # Basic URL validation - must start with http:// or https://
+        if not (v.startswith('http://') or v.startswith('https://')):
+            raise ValueError('District URL must start with http:// or https://')
 
         return v
 

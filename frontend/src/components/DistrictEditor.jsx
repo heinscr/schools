@@ -5,6 +5,7 @@ function DistrictEditor({ district, onClose, onSave }) {
   const [formData, setFormData] = useState({
     name: '',
     main_address: '',
+    district_url: '',
     towns: [],
     district_type: ''
   });
@@ -25,6 +26,7 @@ function DistrictEditor({ district, onClose, onSave }) {
       setFormData({
         name: district.name || '',
         main_address: district.main_address || '',
+        district_url: district.district_url || '',
         towns: district.towns || [],
         district_type: district.district_type || ''
       });
@@ -155,6 +157,19 @@ function DistrictEditor({ district, onClose, onSave }) {
               onChange={handleInputChange}
               rows="3"
               className="form-textarea"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="district_url">District URL</label>
+            <input
+              type="url"
+              id="district_url"
+              name="district_url"
+              value={formData.district_url}
+              onChange={handleInputChange}
+              placeholder="https://example.com"
+              className="form-input"
             />
           </div>
 

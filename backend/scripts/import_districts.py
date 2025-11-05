@@ -72,6 +72,7 @@ def import_districts(json_filepath: str, dry_run: bool = False):
             # Extract fields
             name = district_data.get('district', '').strip()
             address = district_data.get('address', '').strip()
+            district_url = district_data.get('district_url', '').strip()
             members = district_data.get('members', [])
 
             # Determine district_type
@@ -90,6 +91,7 @@ def import_districts(json_filepath: str, dry_run: bool = False):
             district_create = DistrictCreate(
                 name=name,
                 main_address=address if address else None,
+                district_url=district_url if district_url else None,
                 towns=members if members else [],
                 district_type=district_type
             )
@@ -97,6 +99,7 @@ def import_districts(json_filepath: str, dry_run: bool = False):
             if dry_run:
                 print(f"  [DRY RUN] Would import/update: {name}")
                 print(f"    Address: {address or 'N/A'}")
+                print(f"    URL: {district_url or 'N/A'}")
                 print(f"    Towns: {', '.join(members) if members else 'N/A'}")
                 print(f"    Type: {district_type}")
                 stats['success'] += 1
@@ -113,6 +116,7 @@ def import_districts(json_filepath: str, dry_run: bool = False):
                         update_data = DistrictUpdate(
                             name=name,
                             main_address=address if address else None,
+                            district_url=district_url if district_url else None,
                             towns=members if members else [],
                             district_type=district_type
                         )
