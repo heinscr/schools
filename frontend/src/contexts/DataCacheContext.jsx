@@ -9,7 +9,7 @@ import { logger } from '../utils/logger';
  * Cache Structure:
  * {
  *   districts: Map<districtId, DistrictMetadata>,
- *   townToDistricts: Map<townName, districtId[]>,
+ *   townToDistricts: Map<normalizedTownName, {original: string, districtIds: number[]}>,
  *   municipalitiesGeojson: GeoJSON object,
  *   lastFetched: timestamp,
  *   status: 'idle' | 'loading' | 'ready' | 'error'
@@ -38,9 +38,12 @@ export function DataCacheProvider({ children, autoLoad = true }) {
         district.towns.forEach(town => {
           const normalizedTown = town.trim().toLowerCase();
           if (!townMap.has(normalizedTown)) {
-            townMap.set(normalizedTown, []);
+            townMap.set(normalizedTown, {
+              original: town.trim(),
+              districtIds: []
+            });
           }
-          townMap.get(normalizedTown).push(district.id);
+          townMap.get(normalizedTown).districtIds.push(district.id);
         });
       }
     });
@@ -175,8 +178,9 @@ export function DataCacheProvider({ children, autoLoad = true }) {
    */
   const getDistrictsByTown = useCallback((townName) => {
     const normalizedTown = townName.trim().toLowerCase();
-    const districtIds = townToDistricts.get(normalizedTown) || [];
-    return districtIds.map(id => districts.get(id)).filter(Boolean);
+    const townData = townToDistricts.get(normalizedTown);
+    if (!townData) return [];
+    return townData.districtIds.map(id => districts.get(id)).filter(Boolean);
   }, [districts, townToDistricts]);
 
   /**
@@ -204,7 +208,9 @@ export function DataCacheProvider({ children, autoLoad = true }) {
    * Get all unique town names
    */
   const getAllTowns = useCallback(() => {
-    return Array.from(townToDistricts.keys()).sort();
+    return Array.from(townToDistricts.values())
+      .map(townData => townData.original)
+      .sort();
   }, [townToDistricts]);
 
   /**

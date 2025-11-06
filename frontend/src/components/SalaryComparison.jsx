@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import api from '../services/api';
 import { DataCacheContext } from '../contexts/DataCacheContext';
 import SalaryComparisonMap from './SalaryComparisonMap';
+import CustomSalaryFilter from './CustomSalaryFilter';
 import { DISTRICT_TYPE_OPTIONS } from '../constants/districtTypes';
 import { formatCurrency } from '../utils/formatters';
 import './SalaryComparison.css';
@@ -17,6 +18,9 @@ function SalaryComparison() {
   const [filteredResults, setFilteredResults] = useState(null); // Filtered by district type
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showCustomFilter, setShowCustomFilter] = useState(false);
+  const [selectedDistricts, setSelectedDistricts] = useState(new Set());
+  const [selectedTowns, setSelectedTowns] = useState(new Set());
   const _dataCache = useContext(DataCacheContext);
   const getDistrictUrl = _dataCache?.getDistrictUrl;
 
@@ -35,16 +39,43 @@ function SalaryComparison() {
     });
   };
 
-  const applyFilters = (data, types) => {
+  const applyFilters = (data, types, districts = selectedDistricts, towns = selectedTowns) => {
     if (!data || !data.results) {
       setFilteredResults(null);
       return;
     }
 
-    // Filter results by selected district types
-    const filtered = data.results.filter(result =>
-      types.includes(result.district_type)
-    );
+    // Filter results by selected district types, districts, and towns
+    const filtered = data.results.filter(result => {
+      // Check district type (required)
+      const matchesType = types.includes(result.district_type);
+      if (!matchesType) {
+        return false;
+      }
+
+      // If no custom filters are selected, include all districts (that match type)
+      const hasCustomFilters = districts.size > 0 || towns.size > 0;
+      if (!hasCustomFilters) {
+        return true;
+      }
+
+      // Check if district is specifically selected
+      const matchesDistrict = districts.has(result.district_id);
+
+      // Check if district contains any selected town
+      let matchesTown = false;
+      if (towns.size > 0) {
+        const district = _dataCache?.getDistrictById(result.district_id);
+        if (district && district.towns && Array.isArray(district.towns)) {
+          matchesTown = district.towns.some(town =>
+            towns.has(town.trim().toLowerCase())
+          );
+        }
+      }
+
+      // Include district if it matches either the district filter OR the town filter
+      return matchesDistrict || matchesTown;
+    });
 
     // Re-rank filtered results
     const rankedFiltered = filtered.map((result, index) => ({
@@ -90,6 +121,61 @@ function SalaryComparison() {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleCustomFilterApply = (districts, towns) => {
+    setSelectedDistricts(districts);
+    setSelectedTowns(towns);
+    setShowCustomFilter(false);
+
+    // Re-apply filters with new districts and towns
+    if (cachedResults) {
+      applyFilters(cachedResults, selectedTypes, districts, towns);
+    }
+  };
+
+  const handleCustomFilterClear = () => {
+    setSelectedDistricts(new Set());
+    setSelectedTowns(new Set());
+
+    // Re-apply filters without districts and towns filters
+    if (cachedResults) {
+      applyFilters(cachedResults, selectedTypes, new Set(), new Set());
+    }
+  };
+
+  const hasActiveCustomFilters = selectedDistricts.size > 0 || selectedTowns.size > 0;
+
+  // Count how many districts (from the latest cachedResults) match the current custom filters
+  const getCustomIndicatorCount = () => {
+    // If there's no cachedResults yet, fall back to the number of selected items
+    if (!cachedResults || !cachedResults.results) {
+      return selectedDistricts.size + selectedTowns.size;
+    }
+
+    const results = cachedResults.results;
+    const townsLower = new Set(Array.from(selectedTowns).map(t => String(t).toLowerCase()));
+    const matched = new Set();
+
+    for (const r of results) {
+      if (selectedDistricts.has(r.district_id)) {
+        matched.add(r.district_id);
+        continue;
+      }
+      if (townsLower.size > 0) {
+        const district = _dataCache?.getDistrictById(r.district_id);
+        if (district && Array.isArray(district.towns)) {
+          for (const t of district.towns) {
+            if (townsLower.has(String(t).trim().toLowerCase())) {
+              matched.add(r.district_id);
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    return matched.size;
   };
 
   return (
@@ -176,8 +262,34 @@ function SalaryComparison() {
               </button>
             );
           })}
+
+          {/* Custom Filter Button */}
+          <button
+            type="button"
+            className={`district-type-toggle custom-filter-button${hasActiveCustomFilters ? ' active' : ''}`}
+            onClick={() => setShowCustomFilter(true)}
+            disabled={!cachedResults}
+            title="Filter by Districts and Towns"
+          >
+            <span className="custom-filter-icon">🎯</span>
+            <span className="custom-filter-label">Custom</span>
+            {hasActiveCustomFilters && (
+              <span className="custom-filter-indicator">{getCustomIndicatorCount()}</span>
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Custom Filter Modal */}
+      {showCustomFilter && (
+        <CustomSalaryFilter
+          onClose={() => setShowCustomFilter(false)}
+          onApply={handleCustomFilterApply}
+          onClear={handleCustomFilterClear}
+          selectedDistricts={selectedDistricts}
+          selectedTowns={selectedTowns}
+        />
+      )}
 
       {error && (
         <div className="comparison-error">

@@ -1,0 +1,250 @@
+import { useState, useEffect, useContext } from 'react';
+import { DataCacheContext } from '../contexts/DataCacheContext';
+import './CustomSalaryFilter.css';
+
+function CustomSalaryFilter({ onClose, onApply, onClear, selectedDistricts, selectedTowns }) {
+  const cache = useContext(DataCacheContext);
+  const [localDistricts, setLocalDistricts] = useState(new Set(selectedDistricts));
+  const [localTowns, setLocalTowns] = useState(new Set(selectedTowns));
+  const [searchQuery, setSearchQuery] = useState('');
+  const [townSearchQuery, setTownSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'towns'
+
+  // Get all districts and towns from cache
+  const allDistricts = cache?.getAllDistricts() || [];
+  const allTowns = cache?.getAllTowns() || [];
+
+  // Filter districts based on search query
+  const filteredDistricts = allDistricts.filter(district =>
+    district.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Filter towns based on search query
+  const filteredTowns = allTowns.filter(town =>
+    town.toLowerCase().includes(townSearchQuery.toLowerCase())
+  );
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleDistrictToggle = (districtId) => {
+    setLocalDistricts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(districtId)) {
+        newSet.delete(districtId);
+      } else {
+        newSet.add(districtId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleTownToggle = (townName) => {
+    const normalizedTown = townName.trim().toLowerCase();
+    setLocalTowns(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(normalizedTown)) {
+        newSet.delete(normalizedTown);
+      } else {
+        newSet.add(normalizedTown);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAllDistricts = () => {
+    if (localDistricts.size === filteredDistricts.length) {
+      // Deselect all
+      setLocalDistricts(new Set());
+    } else {
+      // Select all filtered
+      setLocalDistricts(new Set(filteredDistricts.map(d => d.id)));
+    }
+  };
+
+  const handleSelectAllTowns = () => {
+    if (localTowns.size === filteredTowns.length) {
+      // Deselect all
+      setLocalTowns(new Set());
+    } else {
+      // Select all filtered
+      setLocalTowns(new Set(filteredTowns.map(t => t.trim().toLowerCase())));
+    }
+  };
+
+  const handleApply = () => {
+    onApply(localDistricts, localTowns);
+  };
+
+  const handleClearAll = () => {
+    setLocalDistricts(new Set());
+    setLocalTowns(new Set());
+    onClear();
+    onClose();
+  };
+
+  return (
+    <div className="custom-filter-backdrop" onClick={handleBackdropClick}>
+      <div className="custom-filter-modal">
+        <div className="custom-filter-header">
+          <h2>Custom Filter</h2>
+          <button className="close-button" onClick={onClose} type="button">
+            ×
+          </button>
+        </div>
+
+        <div className="custom-filter-tabs">
+          <button
+            className={`filter-tab ${activeTab === 'districts' ? 'active' : ''}`}
+            onClick={() => setActiveTab('districts')}
+            type="button"
+          >
+            Districts
+            {localDistricts.size > 0 && (
+              <span className="tab-badge">{localDistricts.size}</span>
+            )}
+          </button>
+          <button
+            className={`filter-tab ${activeTab === 'towns' ? 'active' : ''}`}
+            onClick={() => setActiveTab('towns')}
+            type="button"
+          >
+            Towns
+            {localTowns.size > 0 && (
+              <span className="tab-badge">{localTowns.size}</span>
+            )}
+          </button>
+        </div>
+
+        <div className="custom-filter-content">
+          {activeTab === 'districts' && (
+            <div className="filter-section">
+              <div className="filter-section-header">
+                <div className="search-box">
+                  <input
+                    type="text"
+                    placeholder="Search districts..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="filter-search-input"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSelectAllDistricts}
+                  className="select-all-btn"
+                >
+                  {localDistricts.size === filteredDistricts.length && filteredDistricts.length > 0
+                    ? 'Deselect All'
+                    : 'Select All'}
+                </button>
+              </div>
+
+              <div className="filter-list">
+                {filteredDistricts.length === 0 ? (
+                  <div className="no-results">No districts found</div>
+                ) : (
+                  filteredDistricts.map(district => (
+                    <label key={district.id} className="filter-item">
+                      <input
+                        type="checkbox"
+                        checked={localDistricts.has(district.id)}
+                        onChange={() => handleDistrictToggle(district.id)}
+                      />
+                      <span className="filter-item-label">{district.name}</span>
+                      {district.district_type && (
+                        <span className="filter-item-type">
+                          {district.district_type.replace('_', ' ')}
+                        </span>
+                      )}
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'towns' && (
+            <div className="filter-section">
+              <div className="filter-section-header">
+                <div className="search-box">
+                  <input
+                    type="text"
+                    placeholder="Search towns..."
+                    value={townSearchQuery}
+                    onChange={(e) => setTownSearchQuery(e.target.value)}
+                    className="filter-search-input"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSelectAllTowns}
+                  className="select-all-btn"
+                >
+                  {localTowns.size === filteredTowns.length && filteredTowns.length > 0
+                    ? 'Deselect All'
+                    : 'Select All'}
+                </button>
+              </div>
+
+              <div className="filter-list">
+                {filteredTowns.length === 0 ? (
+                  <div className="no-results">No towns found</div>
+                ) : (
+                  filteredTowns.map(town => {
+                    const normalizedTown = town.trim().toLowerCase();
+                    const districts = cache?.getDistrictsByTown(town) || [];
+                    return (
+                      <label key={normalizedTown} className="filter-item">
+                        <input
+                          type="checkbox"
+                          checked={localTowns.has(normalizedTown)}
+                          onChange={() => handleTownToggle(town)}
+                        />
+                        <span className="filter-item-label">{town}</span>
+                        <span className="filter-item-count">
+                          {districts.length} {districts.length === 1 ? 'district' : 'districts'}
+                        </span>
+                      </label>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="custom-filter-footer">
+          <div className="filter-summary">
+            {localDistricts.size > 0 && (
+              <span className="summary-item">
+                {localDistricts.size} {localDistricts.size === 1 ? 'district' : 'districts'}
+              </span>
+            )}
+            {localTowns.size > 0 && (
+              <span className="summary-item">
+                {localTowns.size} {localTowns.size === 1 ? 'town' : 'towns'}
+              </span>
+            )}
+            {localDistricts.size === 0 && localTowns.size === 0 && (
+              <span className="summary-item empty">No filters selected</span>
+            )}
+          </div>
+          <div className="filter-actions">
+            <button type="button" onClick={handleClearAll} className="btn btn-clear">
+              Clear All
+            </button>
+            <button type="button" onClick={handleApply} className="btn btn-apply">
+              Apply Filter
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default CustomSalaryFilter;
