@@ -17,7 +17,12 @@ start() {
 
   echo "Starting backend..."
   cd "$BACKEND_DIR"
-  nohup uvicorn main:app --reload > "$BACKEND_DIR/backend.log" 2>&1 &
+  # Prefer venv-installed uvicorn when available to ensure the project's venv is used
+  if [ -x "$BACKEND_DIR/venv/bin/uvicorn" ]; then
+    nohup "$BACKEND_DIR/venv/bin/uvicorn" main:app --reload > "$BACKEND_DIR/backend.log" 2>&1 &
+  else
+    nohup uvicorn main:app --reload > "$BACKEND_DIR/backend.log" 2>&1 &
+  fi
   BACKEND_PID=$!
   echo $BACKEND_PID > "$BACKEND_PID_FILE"
   echo "Backend started with PID $BACKEND_PID (log: $BACKEND_DIR/backend.log)"
