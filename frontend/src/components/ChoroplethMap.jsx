@@ -66,17 +66,29 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
     return () => container.removeEventListener('mouseleave', handleMouseLeave);
   }, []);
 
-  // Load GeoJSON data
+  // Load GeoJSON data from cache
   useEffect(() => {
-    fetch('/ma_municipalities.geojson')
-      .then((res) => res.json())
-      .then((geojson) => {
-        logger.log('Loaded GeoJSON:', geojson);
-        logger.log('Number of features:', geojson.features?.length);
-        setGeojson(geojson);
-      })
-      .catch((err) => logger.error('Error loading GeoJSON:', err));
-  }, []);
+    const loadGeoData = async () => {
+      try {
+        // Try to get from cache first
+        let geojsonData = cache.getMunicipalitiesGeojson();
+
+        // If not in cache, load it
+        if (!geojsonData) {
+          await cache.loadMunicipalitiesGeojson();
+          geojsonData = cache.getMunicipalitiesGeojson();
+        }
+
+        logger.log('Loaded GeoJSON:', geojsonData);
+        logger.log('Number of features:', geojsonData?.features?.length);
+        setGeojson(geojsonData);
+      } catch (err) {
+        logger.error('Error loading GeoJSON:', err);
+      }
+    };
+
+    loadGeoData();
+  }, [cache]);
 
   // Update panRef when pan changes
   useEffect(() => { panRef.current = pan; }, [pan]);

@@ -2,19 +2,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { formatCurrency } from '../utils/formatters';
 import { logger } from '../utils/logger';
+import { useDataCache } from '../hooks/useDataCache';
 
 const SalaryComparisonMap = ({ results = [] }) => {
   const containerRef = useRef(null);
+  const cache = useDataCache();
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // Load geo data
+  // Load geo data from cache
   useEffect(() => {
     const loadGeoData = async () => {
       try {
-        const response = await fetch('/ma_municipalities.geojson');
-        const geoJsonData = await response.json();
+        // Try to get from cache first
+        let geoJsonData = cache.getMunicipalitiesGeojson();
+
+        // If not in cache, load it
+        if (!geoJsonData) {
+          await cache.loadMunicipalitiesGeojson();
+          geoJsonData = cache.getMunicipalitiesGeojson();
+        }
 
         setGeoData(geoJsonData);
         setLoading(false);
@@ -25,7 +33,7 @@ const SalaryComparisonMap = ({ results = [] }) => {
     };
 
     loadGeoData();
-  }, []);
+  }, [cache]);
 
   // Handle window resize
   useEffect(() => {

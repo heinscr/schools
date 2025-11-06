@@ -4,12 +4,13 @@ import api from '../services/api';
 import { logger } from '../utils/logger';
 
 /**
- * DataCacheContext - Provides app-wide caching for district data
+ * DataCacheContext - Provides app-wide caching for district data and geojson
  *
  * Cache Structure:
  * {
  *   districts: Map<districtId, DistrictMetadata>,
  *   townToDistricts: Map<townName, districtId[]>,
+ *   municipalitiesGeojson: GeoJSON object,
  *   lastFetched: timestamp,
  *   status: 'idle' | 'loading' | 'ready' | 'error'
  * }
@@ -21,6 +22,7 @@ export function DataCacheProvider({ children, autoLoad = true }) {
   // Cache state
   const [districts, setDistricts] = useState(new Map());
   const [townToDistricts, setTownToDistricts] = useState(new Map());
+  const [municipalitiesGeojson, setMunicipalitiesGeojson] = useState(null);
   const [lastFetched, setLastFetched] = useState(null);
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState(null);
@@ -47,6 +49,34 @@ export function DataCacheProvider({ children, autoLoad = true }) {
   }, []);
 
   /**
+   * Load municipalities geojson data
+   */
+  const loadMunicipalitiesGeojson = useCallback(async () => {
+    try {
+      logger.info('Loading municipalities geojson...');
+      const response = await fetch('/ma_municipalities.geojson');
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch geojson: ${response.status} ${response.statusText}`);
+      }
+
+      const geojsonData = await response.json();
+
+      if (!geojsonData || !geojsonData.features) {
+        throw new Error('Invalid geojson data: missing features');
+      }
+
+      setMunicipalitiesGeojson(geojsonData);
+      logger.info(`Municipalities geojson loaded: ${geojsonData.features.length} features`);
+
+      return geojsonData;
+    } catch (err) {
+      logger.error('Failed to load municipalities geojson:', err);
+      throw err;
+    }
+  }, []);
+
+  /**
    * Load all districts from the API and populate cache
    */
   const loadAllDistricts = useCallback(async (force = false) => {
@@ -68,7 +98,9 @@ export function DataCacheProvider({ children, autoLoad = true }) {
 
       logger.info('Loading all districts into cache...');
 
-      
+      // Load geojson and districts in parallel
+      const geojsonPromise = municipalitiesGeojson ? Promise.resolve(municipalitiesGeojson) : loadMunicipalitiesGeojson();
+
       const BATCH_SIZE = 100;
       let allDistricts = [];
       let offset = 0;
@@ -105,6 +137,9 @@ export function DataCacheProvider({ children, autoLoad = true }) {
       // Build town map: townName -> [districtId1, districtId2, ...]
       const townMap = buildTownMap(districtsArray);
 
+      // Wait for geojson to complete
+      await geojsonPromise;
+
       setDistricts(districtMap);
       setTownToDistricts(townMap);
       setLastFetched(Date.now());
@@ -116,7 +151,7 @@ export function DataCacheProvider({ children, autoLoad = true }) {
       setError(err.message);
       setStatus('error');
     }
-  }, [status, buildTownMap]);
+  }, [status, buildTownMap, municipalitiesGeojson, loadMunicipalitiesGeojson]);
 
   /**
    * Get a district by ID
@@ -173,12 +208,20 @@ export function DataCacheProvider({ children, autoLoad = true }) {
   }, [townToDistricts]);
 
   /**
+   * Get municipalities geojson
+   */
+  const getMunicipalitiesGeojson = useCallback(() => {
+    return municipalitiesGeojson;
+  }, [municipalitiesGeojson]);
+
+  /**
    * Invalidate cache (force reload on next access)
    */
   const invalidateCache = useCallback(() => {
     logger.info('Invalidating cache...');
     setDistricts(new Map());
     setTownToDistricts(new Map());
+    setMunicipalitiesGeojson(null);
     setLastFetched(null);
     setStatus('idle');
     setError(null);
@@ -242,14 +285,16 @@ export function DataCacheProvider({ children, autoLoad = true }) {
 
     // Data access methods
     getDistrictById,
-  getDistrictUrl,
+    getDistrictUrl,
     getDistrictsByTown,
     getAllDistricts,
     searchDistrictsByName,
     getAllTowns,
+    getMunicipalitiesGeojson,
 
     // Cache management methods
     loadAllDistricts,
+    loadMunicipalitiesGeojson,
     invalidateCache,
     updateDistrictInCache,
     addDistrictToCache,
