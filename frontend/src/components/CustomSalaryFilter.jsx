@@ -86,6 +86,25 @@ function CustomSalaryFilter({ onClose, onApply, onClear, selectedDistricts, sele
     onClose();
   };
 
+  // helper to force checkbox visuals (unchecked white, checked accent with checkmark svg)
+  const getCheckboxStyle = (checked) => ({
+    width: '18px',
+    height: '18px',
+    cursor: 'pointer',
+    boxSizing: 'border-box',
+    border: '2px solid #dcdcdc',
+    borderRadius: '4px',
+    backgroundColor: checked ? '#4a90e2' : 'white',
+    backgroundImage: checked
+      ? "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'><path fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M1 5.2l3.1 3L11 1'/></svg>\")"
+      : 'none',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    appearance: 'none',
+  });
+
   return (
     <div className="custom-filter-backdrop" onClick={handleBackdropClick}>
       <div className="custom-filter-modal">
@@ -153,6 +172,7 @@ function CustomSalaryFilter({ onClose, onApply, onClear, selectedDistricts, sele
                         type="checkbox"
                         checked={localDistricts.has(district.id)}
                         onChange={() => handleDistrictToggle(district.id)}
+                        style={getCheckboxStyle(localDistricts.has(district.id))}
                       />
                       <span className="filter-item-label">{district.name}</span>
                       {district.district_type && (
@@ -199,11 +219,12 @@ function CustomSalaryFilter({ onClose, onApply, onClear, selectedDistricts, sele
                     const districts = cache?.getDistrictsByTown(town) || [];
                     return (
                       <label key={normalizedTown} className="filter-item">
-                        <input
-                          type="checkbox"
-                          checked={localTowns.has(normalizedTown)}
-                          onChange={() => handleTownToggle(town)}
-                        />
+                          <input
+                            type="checkbox"
+                            checked={localTowns.has(normalizedTown)}
+                            onChange={() => handleTownToggle(town)}
+                            style={getCheckboxStyle(localTowns.has(normalizedTown))}
+                          />
                         <span className="filter-item-label">{town}</span>
                         <span className="filter-item-count">
                           {districts.length} {districts.length === 1 ? 'district' : 'districts'}

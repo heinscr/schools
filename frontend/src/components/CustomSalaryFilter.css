@@ -209,11 +209,15 @@
   border-color: #d0d0d0;
 }
 
-.filter-item input[type="checkbox"] {
+.custom-filter-modal .filter-list .filter-item input[type="checkbox"] {
+  /* Size and basic behavior only; visuals are applied inline from the component */
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #4a90e2;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .filter-item-label {
