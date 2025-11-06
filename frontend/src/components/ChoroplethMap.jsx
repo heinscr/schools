@@ -4,9 +4,13 @@ import api from '../services/api';
 import { DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
 import { logger } from '../utils/logger';
+import { useDataCache } from '../hooks/useDataCache';
 import './ChoroplethMap.css';
 
 const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTypeOptions }) => {
+  // Data cache for districts
+  const cache = useDataCache();
+
   // Detect mobile devices
   const [isMobile, setIsMobile] = useState(false);
 
@@ -213,12 +217,12 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
           clearTimeout(hoverTimerRef.current);
         }
         // Start new timer
-        hoverTimerRef.current = setTimeout(async () => {
-          // Fetch districts for this town (cached)
+        hoverTimerRef.current = setTimeout(() => {
+          // Fetch districts for this town from cache
           let districts = [];
           try {
-            const response = await api.getDistricts({ town: townName });
-            districts = response.data.map(d => ({ name: d.name, type: d.district_type }));
+            const cachedDistricts = cache.getDistrictsByTown(townName);
+            districts = cachedDistricts.map(d => ({ name: d.name, type: d.district_type }));
             // Sort by custom type order, then name
             districts = districts.slice().sort((a, b) => {
               const typeA = DISTRICT_TYPE_ORDER[a.type] ?? 99;
@@ -333,7 +337,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         }
       });
 
-  }, [geojson, selectedDistrict, clickedTown, onTownClick, zoom, dimensions, pan, isMobile]);
+    }, [geojson, selectedDistrict, clickedTown, onTownClick, zoom, dimensions, pan, isMobile, cache]);
 
   // Zoom controls
   const handleZoomIn = () => {
