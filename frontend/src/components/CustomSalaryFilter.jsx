@@ -19,6 +19,11 @@ function CustomSalaryFilter({ onClose, onApply, onClear, selectedDistricts, sele
     district.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Sort the filtered districts alphabetically by name (case-insensitive)
+  const sortedFilteredDistricts = [...filteredDistricts].sort((a, b) =>
+    a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+  );
+
   // Filter towns based on search query
   const filteredTowns = allTowns.filter(town =>
     town.toLowerCase().includes(townSearchQuery.toLowerCase())
@@ -56,12 +61,12 @@ function CustomSalaryFilter({ onClose, onApply, onClear, selectedDistricts, sele
   };
 
   const handleSelectAllDistricts = () => {
-    if (localDistricts.size === filteredDistricts.length) {
+    if (localDistricts.size === sortedFilteredDistricts.length) {
       // Deselect all
       setLocalDistricts(new Set());
     } else {
       // Select all filtered
-      setLocalDistricts(new Set(filteredDistricts.map(d => d.id)));
+      setLocalDistricts(new Set(sortedFilteredDistricts.map(d => d.id)));
     }
   };
 
@@ -163,10 +168,10 @@ function CustomSalaryFilter({ onClose, onApply, onClear, selectedDistricts, sele
               </div>
 
               <div className="filter-list">
-                {filteredDistricts.length === 0 ? (
+                {sortedFilteredDistricts.length === 0 ? (
                   <div className="no-results">No districts found</div>
                 ) : (
-                  filteredDistricts.map(district => (
+                  sortedFilteredDistricts.map(district => (
                     <label key={district.id} className="filter-item">
                       <input
                         type="checkbox"
