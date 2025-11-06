@@ -111,11 +111,16 @@ function CustomSalaryFilter({ onClose, onApply, onClear, selectedDistricts, sele
   });
 
   return (
-    <div className="custom-filter-backdrop" onClick={handleBackdropClick}>
-      <div className="custom-filter-modal">
+    <div className="custom-filter-backdrop" onClick={handleBackdropClick} role="presentation">
+      <div
+        className="custom-filter-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="custom-filter-title"
+      >
         <div className="custom-filter-header">
-          <h2>Custom Filter</h2>
-          <button className="close-button" onClick={onClose} type="button">
+          <h2 id="custom-filter-title">Custom Filter</h2>
+          <button className="close-button" onClick={onClose} type="button" aria-label="Close filter modal">
             ×
           </button>
         </div>

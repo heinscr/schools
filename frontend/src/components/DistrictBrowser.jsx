@@ -1,14 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import api from '../services/api';
-import ChoroplethMap from './ChoroplethMap';
 import DistrictEditor from './DistrictEditor';
-import SalaryTable from './SalaryTable';
-import SalaryComparison from './SalaryComparison';
 import ErrorBoundary from './ErrorBoundary';
 import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
+import { sortDistrictsByTypeAndName } from '../utils/sortDistricts';
 import './DistrictBrowser.css';
 import { useDataCache } from '../hooks/useDataCache';
+
+// Lazy load heavy components for better performance
+const ChoroplethMap = lazy(() => import('./ChoroplethMap'));
+const SalaryTable = lazy(() => import('./SalaryTable'));
+const SalaryComparison = lazy(() => import('./SalaryComparison'));
 
 function DistrictBrowser({ user }) {
   const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'salaries'
@@ -30,15 +33,9 @@ function DistrictBrowser({ user }) {
 
   const [districts, setDistricts] = useState([]);
   // Filter districts by selected types and sort by custom type order
-  const filteredDistricts = districts
-    .filter(d => selectedTypes.includes(d.district_type))
-    .slice()
-    .sort((a, b) => {
-      const typeA = DISTRICT_TYPE_ORDER[a.district_type] ?? 99;
-      const typeB = DISTRICT_TYPE_ORDER[b.district_type] ?? 99;
-      if (typeA !== typeB) return typeA - typeB;
-      return a.name.localeCompare(b.name);
-    });
+  const filteredDistricts = sortDistrictsByTypeAndName(
+    districts.filter(d => selectedTypes.includes(d.district_type))
+  );
 
   // Get total count for each type
   const typeCounts = DISTRICT_TYPE_OPTIONS.reduce((acc, opt) => {
@@ -218,6 +215,7 @@ function DistrictBrowser({ user }) {
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               className="filter-select"
+              aria-label="Filter search by type"
             >
               <option value="all">Search All</option>
               <option value="name">District Name</option>
@@ -236,6 +234,7 @@ function DistrictBrowser({ user }) {
                   : 'Search districts or towns...'
               }
               className="search-input"
+              aria-label="Search districts or towns"
             />
 
             <button type="submit" className="btn btn-primary">
@@ -361,18 +360,22 @@ function DistrictBrowser({ user }) {
             errorMessage="There was a problem loading the map. Try refreshing the page."
             showDetails={false}
           >
-            <ChoroplethMap
-              selectedDistrict={selectedDistrict}
-              clickedTown={clickedTown}
-              onTownClick={handleTownClick}
-              districtTypeOptions={DISTRICT_TYPE_OPTIONS}
-            />
+            <Suspense fallback={<div className="loading">Loading map...</div>}>
+              <ChoroplethMap
+                selectedDistrict={selectedDistrict}
+                clickedTown={clickedTown}
+                onTownClick={handleTownClick}
+                districtTypeOptions={DISTRICT_TYPE_OPTIONS}
+              />
+            </Suspense>
           </ErrorBoundary>
         </div>
 
         {selectedDistrict && (
           <div className="salary-section">
-            <SalaryTable districtId={selectedDistrict.id} />
+            <Suspense fallback={<div className="loading">Loading salary table...</div>}>
+              <SalaryTable districtId={selectedDistrict.id} />
+            </Suspense>
           </div>
         )}
       </div>
@@ -391,7 +394,9 @@ function DistrictBrowser({ user }) {
             errorMessage="There was a problem loading salary comparisons. Try refreshing the page."
             showDetails={false}
           >
-            <SalaryComparison />
+            <Suspense fallback={<div className="loading">Loading salary comparison...</div>}>
+              <SalaryComparison />
+            </Suspense>
           </ErrorBoundary>
         </div>
       )}

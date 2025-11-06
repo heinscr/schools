@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useMemo, useCallback } from 'react';
 import api from '../services/api';
 import { DataCacheContext } from '../contexts/DataCacheContext';
 import SalaryComparisonMap from './SalaryComparisonMap';
@@ -84,7 +84,7 @@ function SalaryComparison() {
     });
   };
 
-  const applyFilters = (data, types, districts = selectedDistricts, towns = selectedTowns) => {
+  const applyFilters = useCallback((data, types, districts = selectedDistricts, towns = selectedTowns) => {
     if (!data || !data.results) {
       setFilteredResults(null);
       return;
@@ -133,10 +133,10 @@ function SalaryComparison() {
         results: rankedFiltered,
         total: rankedFiltered.length
       });
-    };
+    }, [selectedDistricts, selectedTowns, _dataCache]);
 
     // Count how many districts (from the latest cachedResults) match the current custom filters
-    const getCustomIndicatorCount = () => {
+    const customIndicatorCount = useMemo(() => {
       // If there's no cachedResults yet, fall back to the number of selected items
       if (!cachedResults || !cachedResults.results) {
         return selectedDistricts.size + selectedTowns.size;
@@ -165,7 +165,7 @@ function SalaryComparison() {
       }
 
       return matched.size;
-    };
+    }, [cachedResults, selectedDistricts, selectedTowns, _dataCache]);
 
     // Input change helper
     const handleInputChange = (field, value) => {
@@ -316,7 +316,7 @@ function SalaryComparison() {
             <span className="custom-filter-icon">🎯</span>
             <span className="custom-filter-label">Custom</span>
             {hasActiveCustomFilters && (
-              <span className="custom-filter-indicator">{getCustomIndicatorCount()}</span>
+              <span className="custom-filter-indicator">{customIndicatorCount}</span>
             )}
           </button>
         </div>

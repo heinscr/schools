@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import * as d3 from 'd3';
 import api from '../services/api';
-import { DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
+import { sortDistrictInfosByType } from '../utils/sortDistricts';
 import { logger } from '../utils/logger';
 import { useDataCache } from '../hooks/useDataCache';
 import './ChoroplethMap.css';
@@ -19,7 +19,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
   // Pan state: x/y offset in SVG coordinates
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const panRef = useRef(pan);
-  const dragRef = useRef({ dragging: false, startX: 0, startY: 0, origX: 0, origY: 0 });
+  const dragRef = useRef({ dragging: false, startX: 0, startY: 0, origX: 0, origY: 0, hasMoved: false });
   // Debounce timer for hover
   const hoverTimerRef = useRef(null);
   const containerRef = useRef(null);
@@ -110,10 +110,10 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
 
   // Memoize town click handler
   const handleTownClickCallback = useCallback((townName) => {
-    if (onTownClick && !isMobile) {
+    if (onTownClick) {
       onTownClick(townName);
     }
-  }, [onTownClick, isMobile]);
+  }, [onTownClick]);
 
   // Remove initialPan/reset logic
 
@@ -159,6 +159,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         .style('cursor', 'grab')
         .on('mousedown', function(event) {
           dragRef.current.dragging = true;
+          dragRef.current.hasMoved = false;
           dragRef.current.startX = event.clientX;
           dragRef.current.startY = event.clientY;
           dragRef.current.origX = panRef.current.x;
@@ -169,6 +170,10 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
           if (dragRef.current.dragging) {
             const dx = event.clientX - dragRef.current.startX;
             const dy = event.clientY - dragRef.current.startY;
+            // Track if we've moved more than a small threshold (5px)
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+              dragRef.current.hasMoved = true;
+            }
             // Move by dx/dy scaled to SVG units
             setPan({
               x: dragRef.current.origX - dx * (zoom),
@@ -178,6 +183,10 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         })
         .on('mouseup', function() {
           dragRef.current.dragging = false;
+          // Reset hasMoved after a short delay to allow click event to check it
+          setTimeout(() => {
+            dragRef.current.hasMoved = false;
+          }, 10);
           d3.select(this).style('cursor', 'grab');
         })
         .on('mouseleave', function() {
@@ -246,14 +255,9 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
           let districts = [];
           try {
             const cachedDistricts = cache.getDistrictsByTown(townName);
-            districts = cachedDistricts.map(d => ({ name: d.name, type: d.district_type }));
+            const districtInfos = cachedDistricts.map(d => ({ name: d.name, type: d.district_type }));
             // Sort by custom type order, then name
-            districts = districts.slice().sort((a, b) => {
-              const typeA = DISTRICT_TYPE_ORDER[a.type] ?? 99;
-              const typeB = DISTRICT_TYPE_ORDER[b.type] ?? 99;
-              if (typeA !== typeB) return typeA - typeB;
-              return a.name.localeCompare(b.name);
-            });
+            districts = sortDistrictInfosByType(districtInfos);
           } catch (err) {
             districts = [];
           }
@@ -378,14 +382,19 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         tooltip.style('opacity', 0);
       })
       .on('click', function(event, d) {
-        // Disable clicks on mobile
-        event.stopPropagation();
-        const props = d.properties;
-        const townName = props.TOWN || props.NAME || props.TOWN_NAME || 'Unknown';
-        handleTownClickCallback(townName);
+        // Only handle click if not dragging (prevents clicks during pan)
+        if (dragRef.current.hasMoved) {
+          return;
+        }
+        if (!isMobile && onTownClick) {
+          event.stopPropagation();
+          const props = d.properties;
+          const townName = props.TOWN || props.NAME || props.TOWN_NAME || 'Unknown';
+          handleTownClickCallback(townName);
+        }
       });
 
-    }, [geojson, selectedTowns, normalizedClickedTown, handleTownClickCallback, zoom, dimensions, pan, isMobile, cache, districtTypeOptions]);
+    }, [geojson, selectedTowns, normalizedClickedTown, handleTownClickCallback, zoom, dimensions, pan, isMobile, cache, districtTypeOptions, onTownClick]);
 
   // Zoom controls - memoize to prevent recreation on every render
   const handleZoomIn = useCallback(() => {
