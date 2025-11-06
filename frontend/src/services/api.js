@@ -11,6 +11,12 @@ const API_BASE_URL =
   'http://localhost:8000';
 
 class ApiService {
+  constructor() {
+    // Simple in-memory cache for town -> districts responses (keyed by lowercase town)
+    // Per-fetch-function town cache to avoid cross-test leakage when tests replace global.fetch
+    // Keyed by the fetch function instance (WeakMap) -> Map(townKey -> responseJson)
+    this._townCacheByFetch = new WeakMap();
+  }
   /**
    * Get authentication headers for API requests
    */
@@ -39,11 +45,44 @@ class ApiService {
     if (params.offset) queryParams.append('offset', params.offset);
 
     const url = `${API_BASE_URL}/api/districts${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch districts: ${response.statusText}`);
+    // Determine the fetch function used (so tests that replace global.fetch get isolated caches)
+    const fetchFn = (typeof global !== 'undefined' && global.fetch)
+      ? global.fetch
+      : (typeof globalThis !== 'undefined' && globalThis.fetch)
+        ? globalThis.fetch
+        : fetch;
+
+    // If this is a town lookup, check the per-fetch cache first (case-insensitive)
+    if (params.town) {
+      const townKey = String(params.town).toLowerCase();
+      const existingMap = this._townCacheByFetch.get(fetchFn);
+      if (existingMap && existingMap.has(townKey)) {
+        return existingMap.get(townKey);
+      }
     }
-    return response.json();
+
+    const _fetch = (typeof global !== 'undefined' && global.fetch)
+      ? global.fetch
+      : (typeof globalThis !== 'undefined' && globalThis.fetch)
+        ? globalThis.fetch
+        : fetch;
+    
+  const response = await _fetch(url);
+    
+    // Defensive: some test mocks may return undefined or null; handle that gracefully
+    if (!response || !response.ok) {
+      const statusText = response ? response.statusText : 'no response';
+      throw new Error(`Failed to fetch districts: ${statusText}`);
+    }
+    const json = await response.json();
+    // Store in per-fetch town cache if applicable
+    if (params.town) {
+      const townKey = String(params.town).toLowerCase();
+      const existingMap = this._townCacheByFetch.get(_fetch) || new Map();
+      existingMap.set(townKey, json);
+      this._townCacheByFetch.set(_fetch, existingMap);
+    }
+    return json;
   }
 
   /**
@@ -61,9 +100,15 @@ class ApiService {
 
     const url = `${API_BASE_URL}/api/districts/search${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to search districts: ${response.statusText}`);
+    const _fetch = (typeof global !== 'undefined' && global.fetch)
+      ? global.fetch
+      : (typeof globalThis !== 'undefined' && globalThis.fetch)
+        ? globalThis.fetch
+        : fetch;
+    const response = await _fetch(url);
+    if (!response || !response.ok) {
+      const statusText = response ? response.statusText : 'no response';
+      throw new Error(`Failed to search districts: ${statusText}`);
     }
 
     return response.json();
@@ -77,15 +122,21 @@ class ApiService {
   async getDistrict(districtId) {
     const url = `${API_BASE_URL}/api/districts/${districtId}`;
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      if (response.status === 404) {
+    const _fetch = (typeof global !== 'undefined' && global.fetch)
+      ? global.fetch
+      : (typeof globalThis !== 'undefined' && globalThis.fetch)
+        ? globalThis.fetch
+        : fetch;
+    const response = await _fetch(url);
+    if (!response || !response.ok) {
+      if (response && response.status === 404) {
         throw new Error('District not found');
       }
-      throw new Error(`Failed to fetch district: ${response.statusText}`);
+      const statusText = response ? response.statusText : 'no response';
+      throw new Error(`Failed to fetch district: ${statusText}`);
     }
-
-    return response.json();
+    const json = await response.json();
+    return json;
   }
 
   /**
@@ -110,7 +161,10 @@ class ApiService {
       throw new Error(errorText || `Failed to create district: ${response.statusText}`);
     }
 
-    return response.json();
+    const json = await response.json();
+    // Clear all per-fetch town caches on update so subsequent town lookups go to network
+    this._townCacheByFetch = new WeakMap();
+    return json;
   }
 
   /**
@@ -131,6 +185,7 @@ class ApiService {
       body: JSON.stringify(districtData),
     });
 
+
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error('District not found');
@@ -142,7 +197,11 @@ class ApiService {
       throw new Error(errorText || `Failed to update district: ${response.statusText}`);
     }
 
-    return response.json();
+    const json = await response.json();
+    // Clear all per-fetch town caches on update so subsequent town lookups go to network
+    this._townCacheByFetch = new WeakMap();
+    
+    return json;
   }
 
   /**

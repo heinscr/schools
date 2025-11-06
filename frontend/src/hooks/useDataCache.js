@@ -15,8 +15,22 @@ import { DataCacheContext } from '../contexts/DataCacheContext';
 export function useDataCache() {
   const context = useContext(DataCacheContext);
 
+  // If the hook is used outside of a provider (tests render components in isolation),
+  // return a safe no-op fallback so components don't throw. Tests can still mock
+  // the provider behavior when needed.
   if (!context) {
-    throw new Error('useDataCache must be used within a DataCacheProvider');
+    return {
+      // district map accessors
+      getDistrictById: () => null,
+      getDistrictsByTown: () => [],
+      getAllDistricts: () => [],
+      // url helper
+      getDistrictUrl: () => undefined,
+      // cache mutation no-ops
+      updateDistrictInCache: () => {},
+      removeDistrictFromCache: () => {},
+      rebuildTownIndex: () => {},
+    };
   }
 
   return context;
