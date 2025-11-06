@@ -191,23 +191,13 @@ export function DataCacheProvider({ children, autoLoad = true }) {
     setDistricts(prev => {
       const newMap = new Map(prev);
       newMap.set(updatedDistrict.id, updatedDistrict);
+      // Rebuild town map from the updated districts map
+      setTownToDistricts(buildTownMap(Array.from(newMap.values())));
       return newMap;
     });
 
-    // Rebuild town map with all districts
-    setTownToDistricts(prev => {
-      const allDistricts = Array.from(districts.values());
-      const districtIndex = allDistricts.findIndex(d => d.id === updatedDistrict.id);
-      if (districtIndex >= 0) {
-        allDistricts[districtIndex] = updatedDistrict;
-      } else {
-        allDistricts.push(updatedDistrict);
-      }
-      return buildTownMap(allDistricts);
-    });
-
     logger.info(`Updated district ${updatedDistrict.id} in cache`);
-  }, [districts, buildTownMap]);
+  }, [buildTownMap]);
 
   /**
    * Add a new district to the cache
@@ -224,17 +214,13 @@ export function DataCacheProvider({ children, autoLoad = true }) {
     setDistricts(prev => {
       const newMap = new Map(prev);
       newMap.delete(districtId);
+      // Rebuild town map from remaining districts
+      setTownToDistricts(buildTownMap(Array.from(newMap.values())));
       return newMap;
     });
 
-    // Rebuild town map
-    setTownToDistricts(prev => {
-      const allDistricts = Array.from(districts.values()).filter(d => d.id !== districtId);
-      return buildTownMap(allDistricts);
-    });
-
     logger.info(`Removed district ${districtId} from cache`);
-  }, [districts, buildTownMap]);
+  }, [buildTownMap]);
 
   /**
    * Auto-load on mount if enabled

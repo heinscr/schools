@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import './DistrictEditor.css';
+import api from '../services/api';
+import { DataCacheContext } from '../contexts/DataCacheContext';
 
 function DistrictEditor({ district, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -12,6 +14,8 @@ function DistrictEditor({ district, onClose, onSave }) {
   const [newTownInput, setNewTownInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const _cache = useContext(DataCacheContext);
+  const updateDistrictInCache = _cache?.updateDistrictInCache;
 
   const districtTypeOptions = [
     { value: 'municipal', label: 'Municipal' },
@@ -79,7 +83,31 @@ function DistrictEditor({ district, onClose, onSave }) {
     setSaving(true);
 
     try {
+      // call onSave (which will persist changes server-side)
       await onSave(formData);
+
+      // After save, fetch the fresh district data from API to ensure cache consistency
+      try {
+        const fresh = await api.getDistrict(district.id);
+        // Compare towns before/after
+        const beforeTowns = new Set(district.towns || []);
+        const afterTowns = new Set(fresh.towns || []);
+        const added = [...afterTowns].filter(t => !beforeTowns.has(t));
+        const removed = [...beforeTowns].filter(t => !afterTowns.has(t));
+
+        // Update cache using context helper (if available)
+        if (updateDistrictInCache) {
+          updateDistrictInCache(fresh);
+        }
+
+        if (added.length > 0 || removed.length > 0) {
+          console.debug(`Towns changed for ${district.id}: added=${JSON.stringify(added)}, removed=${JSON.stringify(removed)}`);
+        }
+      } catch (err) {
+        // Non-fatal: log and continue — still close editor
+        console.debug('Failed to refresh district after save:', err?.message || err);
+      }
+
       onClose();
     } catch (err) {
       setError(err.message);
