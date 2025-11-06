@@ -72,6 +72,12 @@ resource "aws_dynamodb_table" "teacher_salaries" {
 }
 
 # Cache Table: Aggregated salary schedules (one item per schedule)
+# Items include a 'salary_metadata' field with computed aggregates for fast querying:
+# - education_levels: List of available education levels (B, M, D)
+# - credits_by_education: Map of education level to available credits
+# - steps_by_education: Map of education level to min/max steps
+# - min/max_salary: Salary range for the schedule
+# This metadata enables efficient fallback matching for salary queries
 resource "aws_dynamodb_table" "teacher_salary_schedules" {
   name           = "${var.project_name}-teacher-salary-schedules"
   billing_mode   = "PAY_PER_REQUEST"

@@ -171,6 +171,63 @@ def create_normalized_items(salary_records, district_map, districts_table_name):
 
     return items
 
+def compute_salary_metadata(salaries):
+    """
+    Compute metadata tracking max step for each credit level within each education.
+
+    Returns:
+    {
+        "max_education": "M",
+        "max_by_education": {
+            "B": {
+                "0": 5,   // B+0 has max step 5
+                "15": 5   // B+15 has max step 5
+            },
+            "M": {
+                "0": 9,   // M+0 has max step 9
+                "15": 10, // M+15 has max step 10
+                "30": 10  // M+30 has max step 10
+            }
+        }
+    }
+    """
+    if not salaries:
+        return {
+            'max_education': None,
+            'max_by_education': {}
+        }
+
+    edu_order = {'B': 1, 'M': 2, 'D': 3}
+
+    # Group by education and credit level, track max step
+    by_education = defaultdict(lambda: defaultdict(int))
+
+    for s in salaries:
+        edu = s['education']
+        credit = s['credits']
+        step = s['step']
+
+        # Track max step for this education+credit combination
+        by_education[edu][credit] = max(by_education[edu][credit], step)
+
+    # Find max education (highest in B < M < D order)
+    max_education = max(by_education.keys(), key=lambda e: edu_order.get(e, 0))
+
+    # Convert to final structure: map credit -> max_step for each education
+    max_by_education = {}
+    for edu, credit_map in by_education.items():
+        # Convert credit keys to strings for JSON compatibility
+        max_by_education[edu] = {
+            str(credit): max_step
+            for credit, max_step in credit_map.items()
+        }
+
+    return {
+        'max_education': max_education,
+        'max_by_education': max_by_education
+    }
+
+
 def create_aggregated_items(salary_records, district_map, districts_table_name):
     """
     Create aggregated DynamoDB items (one per schedule)
@@ -190,7 +247,7 @@ def create_aggregated_items(salary_records, district_map, districts_table_name):
     for record in salary_records:
         district_name = record['district_name']
         district_id, matched = match_district_name_to_id(district_name, district_map)
-        
+
         key = f"{district_id}#{record['school_year']}#{record['period']}"
 
         schedule = schedules[key]
@@ -218,6 +275,9 @@ def create_aggregated_items(salary_records, district_map, districts_table_name):
             key=lambda x: (x['step'], edu_order.get(x['education'], 99), x['credits'])
         )
 
+        # Compute metadata for this schedule
+        salary_metadata = compute_salary_metadata(sorted_salaries)
+
         item = {
             'district_id': schedule['district_id'],
             'schedule_key': f"{schedule['school_year']}#{schedule['period']}",
@@ -226,6 +286,9 @@ def create_aggregated_items(salary_records, district_map, districts_table_name):
             'school_year': schedule['school_year'],
             'period': schedule['period'],
             'salaries': sorted_salaries,
+            # Flatten metadata fields to top level
+            'max_education': salary_metadata.get('max_education'),
+            'max_by_education': salary_metadata.get('max_by_education', {}),
             'contract_term': None,  # To be filled in later
             'contract_expiration': None,  # To be filled in later
             'notes': None  # To be filled in later

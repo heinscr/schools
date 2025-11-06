@@ -92,6 +92,7 @@ resource "aws_iam_role_policy" "salary_lambda_dynamodb" {
         Effect = "Allow"
         Action = [
           "dynamodb:Query",
+          "dynamodb:Scan",
           "dynamodb:GetItem",
           "dynamodb:BatchGetItem"
         ]
