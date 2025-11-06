@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../services/api';
 import ChoroplethMap from './ChoroplethMap';
 import DistrictEditor from './DistrictEditor';
@@ -7,7 +7,7 @@ import SalaryComparison from './SalaryComparison';
 import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
 import './DistrictBrowser.css';
-import { DataCacheContext } from '../contexts/DataCacheContext';
+import { useDataCache } from '../hooks/useDataCache';
 
 function DistrictBrowser({ user }) {
   const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'salaries'
@@ -54,8 +54,8 @@ function DistrictBrowser({ user }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all', 'name', 'town'
 
-  const _dataCache = useContext(DataCacheContext);
-  const getDistrictUrl = _dataCache?.getDistrictUrl;
+  const cache = useDataCache();
+  const getDistrictUrl = cache.getDistrictUrl;
 
   // Do not auto-load districts on mount
 
@@ -123,8 +123,8 @@ function DistrictBrowser({ user }) {
       setError(null);
       try {
         // Use cache if available
-        let districtsList = api._districtsByTownCache[townKey];
-        if (!districtsList) {
+        let districtsList = cache.getDistrictsByTown(townName);
+        if (!districtsList || districtsList.length === 0) {
           const response = await api.getDistricts({ town: townName });
           districtsList = response.data;
         }
@@ -168,6 +168,9 @@ function DistrictBrowser({ user }) {
   const handleSaveDistrict = async (updatedData) => {
     try {
       const updatedDistrict = await api.updateDistrict(editingDistrict.id, updatedData);
+
+      // Update the cache
+      cache.updateDistrictInCache(updatedDistrict);
 
       // Update the districts list
       setDistricts(prev =>
