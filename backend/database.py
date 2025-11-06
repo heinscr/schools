@@ -1,6 +1,9 @@
 import os
 import boto3
+import logging
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 # Load environment variables from .env file for local development
 load_dotenv()
@@ -54,16 +57,16 @@ def init_db():
     In production, tables are created by Terraform
     """
     if not DYNAMODB_ENDPOINT:
-        print("Skipping table creation - using AWS DynamoDB (tables managed by Terraform)")
+        logger.info("Skipping table creation - using AWS DynamoDB (tables managed by Terraform)")
         return
 
     try:
         # Check if table exists
         dynamodb_client.describe_table(TableName=DISTRICTS_TABLE_NAME)
-        print(f"Table {DISTRICTS_TABLE_NAME} already exists")
+        logger.info(f"Table {DISTRICTS_TABLE_NAME} already exists")
     except dynamodb_client.exceptions.ResourceNotFoundException:
         # Create table for local development
-        print(f"Creating local DynamoDB table: {DISTRICTS_TABLE_NAME}")
+        logger.info(f"Creating local DynamoDB table: {DISTRICTS_TABLE_NAME}")
         table = dynamodb_resource.create_table(
             TableName=DISTRICTS_TABLE_NAME,
             KeySchema=[
@@ -97,7 +100,7 @@ def init_db():
             }
         )
         table.wait_until_exists()
-        print(f"Table {DISTRICTS_TABLE_NAME} created successfully")
+        logger.info(f"Table {DISTRICTS_TABLE_NAME} created successfully")
 
 
 def get_table():

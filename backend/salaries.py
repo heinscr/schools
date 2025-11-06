@@ -578,7 +578,7 @@ def get_salary_metadata(district_id: str) -> Dict[str, Any]:
                 for item in items
             ]
         })
-        
+
     except Exception as e:
-        print(f"Error getting salary metadata: {str(e)}")
+        logging.error(f"Error getting salary metadata: {str(e)}", exc_info=True)
         raise

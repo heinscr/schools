@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import * as d3 from 'd3';
 import api from '../services/api';
 import { DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
@@ -93,6 +93,28 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
   // Update panRef when pan changes
   useEffect(() => { panRef.current = pan; }, [pan]);
 
+  // Memoize selected towns set to avoid recalculation on every render
+  const selectedTowns = useMemo(() => {
+    const towns = new Set();
+    if (selectedDistrict) {
+      const districtTowns = selectedDistrict.members || selectedDistrict.towns || [];
+      districtTowns.forEach(t => towns.add(normalizeTownName(t)));
+    }
+    return towns;
+  }, [selectedDistrict]);
+
+  // Memoize normalized clicked town
+  const normalizedClickedTown = useMemo(() => {
+    return normalizeTownName(clickedTown);
+  }, [clickedTown]);
+
+  // Memoize town click handler
+  const handleTownClickCallback = useCallback((townName) => {
+    if (onTownClick && !isMobile) {
+      onTownClick(townName);
+    }
+  }, [onTownClick, isMobile]);
+
   // Remove initialPan/reset logic
 
   // Main render effect
@@ -177,16 +199,6 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
 
     const path = d3.geoPath().projection(projection);
 
-    // Get selected district towns
-    const selectedTowns = new Set();
-    if (selectedDistrict) {
-      const towns = selectedDistrict.members || selectedDistrict.towns || [];
-      towns.forEach(t => selectedTowns.add(normalizeTownName(t)));
-    }
-
-    // Normalize clicked town name
-    const normalizedClickedTown = normalizeTownName(clickedTown);
-
     // Create tooltip
     const tooltip = d3.select(tooltipRef.current);
 
@@ -257,22 +269,48 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
               boldDistrict = selectedDistrict.name;
             }
             // Show tooltip as bullet list with icons
-            tooltip
-              .style('opacity', 1)
-              .html(
-                (boldTown
-                  ? `<span class="town-highlight">${townName}</span>`
-                  : `${townName}`
-                ) + '<br/>' +
-                (districts.length > 0
-                  ? `<ul style='margin: 4px 0 0 12px; padding: 0; list-style: none;'>${districts.map(d => {
-                      const typeOpt = districtTypeOptions?.find(opt => opt.value === d.type);
-                      const icon = typeOpt?.icon || '';
-                      const label = boldDistrict === d.name ? `<strong>${d.name}</strong>` : d.name;
-                      return `<li>${icon ? `<span style='font-size:1.1em;vertical-align:middle;margin-right:4px;'>${icon}</span>` : ''}${label}</li>`;
-                    }).join('')}</ul>`
-                  : `<span>No districts found</span>`)
-              );
+            // Build DOM safely to prevent XSS
+            tooltip.style('opacity', 1);
+            tooltip.selectAll('*').remove(); // Clear previous content
+
+            // Add town name
+            const townSpan = tooltip.append('span');
+            if (boldTown) {
+              townSpan.attr('class', 'town-highlight');
+            }
+            townSpan.text(townName);
+
+            tooltip.append('br');
+
+            // Add districts list
+            if (districts.length > 0) {
+              const ul = tooltip.append('ul')
+                .style('margin', '4px 0 0 12px')
+                .style('padding', '0')
+                .style('list-style', 'none');
+
+              districts.forEach(d => {
+                const li = ul.append('li');
+                const typeOpt = districtTypeOptions?.find(opt => opt.value === d.type);
+                const icon = typeOpt?.icon || '';
+
+                if (icon) {
+                  li.append('span')
+                    .style('font-size', '1.1em')
+                    .style('vertical-align', 'middle')
+                    .style('margin-right', '4px')
+                    .text(icon);
+                }
+
+                const labelSpan = li.append('span');
+                if (boldDistrict === d.name) {
+                  labelSpan.style('font-weight', 'bold');
+                }
+                labelSpan.text(d.name);
+              });
+            } else {
+              tooltip.append('span').text('No districts found');
+            }
             // Position tooltip inside map window
             setTimeout(() => {
               const tooltipNode = tooltipRef.current;
@@ -341,21 +379,20 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
       })
       .on('click', function(event, d) {
         // Disable clicks on mobile
-        if (onTownClick && !isMobile) {
-          event.stopPropagation();
-          const props = d.properties;
-          const townName = props.TOWN || props.NAME || props.TOWN_NAME || 'Unknown';
-          onTownClick(townName);
-        }
+        event.stopPropagation();
+        const props = d.properties;
+        const townName = props.TOWN || props.NAME || props.TOWN_NAME || 'Unknown';
+        handleTownClickCallback(townName);
       });
 
-    }, [geojson, selectedDistrict, clickedTown, onTownClick, zoom, dimensions, pan, isMobile, cache]);
+    }, [geojson, selectedTowns, normalizedClickedTown, handleTownClickCallback, zoom, dimensions, pan, isMobile, cache, districtTypeOptions]);
 
-  // Zoom controls
-  const handleZoomIn = () => {
+  // Zoom controls - memoize to prevent recreation on every render
+  const handleZoomIn = useCallback(() => {
     setZoom(z => Math.min(4, Math.round((z + 0.25) * 100) / 100));
-  };
-  const handleZoomOut = () => {
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
     setZoom(z => {
       const newZoom = Math.max(1, Math.round((z - 0.25) * 100) / 100);
       // Reset pan when zooming back to 1x
@@ -364,11 +401,12 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
       }
       return newZoom;
     });
-  };
-  const handleReset = () => {
+  }, []);
+
+  const handleReset = useCallback(() => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
-  };
+  }, []);
 
   return (
     <div ref={containerRef} className="choropleth-container" style={{ position: 'relative' }}>

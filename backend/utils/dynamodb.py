@@ -2,7 +2,10 @@
 DynamoDB utility functions for batch operations and common queries
 """
 import boto3
+import logging
 from typing import Dict, List
+
+logger = logging.getLogger(__name__)
 
 
 def get_district_towns(district_ids: List[str], districts_table_name: str) -> Dict[str, List[str]]:
@@ -17,7 +20,7 @@ def get_district_towns(district_ids: List[str], districts_table_name: str) -> Di
         Dict mapping district_id to list of town names
     """
     if not districts_table_name or not district_ids:
-        print(f"get_district_towns: table={districts_table_name}, ids_count={len(district_ids) if district_ids else 0}")
+        logger.debug(f"get_district_towns: table={districts_table_name}, ids_count={len(district_ids) if district_ids else 0}")
         return {}
 
     district_towns = {}
@@ -25,12 +28,12 @@ def get_district_towns(district_ids: List[str], districts_table_name: str) -> Di
     try:
         # Use DynamoDB client for batch_get_item
         client = boto3.client('dynamodb')
-        print(f"Fetching towns for {len(district_ids)} districts")
+        logger.info(f"Fetching towns for {len(district_ids)} districts")
 
         # Batch get items (max 100 at a time)
         for i in range(0, len(district_ids), 100):
             batch = district_ids[i:i + 100]
-            print(f"Batch {i//100 + 1}: {len(batch)} districts")
+            logger.debug(f"Batch {i//100 + 1}: {len(batch)} districts")
 
             # Build request items
             keys = [
@@ -50,7 +53,7 @@ def get_district_towns(district_ids: List[str], districts_table_name: str) -> Di
             )
 
             items = response.get('Responses', {}).get(districts_table_name, [])
-            print(f"Got {len(items)} items back from DynamoDB")
+            logger.debug(f"Got {len(items)} items back from DynamoDB")
 
             # Extract towns from responses
             for item in items:
@@ -66,14 +69,12 @@ def get_district_towns(district_ids: List[str], districts_table_name: str) -> Di
 
                 if district_id:
                     district_towns[district_id] = towns
-                    print(f"  {district_id}: {towns}")
+                    logger.debug(f"  {district_id}: {towns}")
 
-        print(f"Returning {len(district_towns)} district->towns mappings")
+        logger.info(f"Returning {len(district_towns)} district->towns mappings")
 
     except Exception as e:
-        print(f"Error batch fetching district towns: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Error batch fetching district towns: {str(e)}", exc_info=True)
         # Return empty dict on error
 
     return district_towns

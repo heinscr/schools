@@ -4,6 +4,7 @@ import ChoroplethMap from './ChoroplethMap';
 import DistrictEditor from './DistrictEditor';
 import SalaryTable from './SalaryTable';
 import SalaryComparison from './SalaryComparison';
+import ErrorBoundary from './ErrorBoundary';
 import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
 import './DistrictBrowser.css';
@@ -355,12 +356,18 @@ function DistrictBrowser({ user }) {
         </div>
 
         <div className="map-section">
-          <ChoroplethMap
-            selectedDistrict={selectedDistrict}
-            clickedTown={clickedTown}
-            onTownClick={handleTownClick}
-            districtTypeOptions={DISTRICT_TYPE_OPTIONS}
-          />
+          <ErrorBoundary
+            errorTitle="Map Error"
+            errorMessage="There was a problem loading the map. Try refreshing the page."
+            showDetails={false}
+          >
+            <ChoroplethMap
+              selectedDistrict={selectedDistrict}
+              clickedTown={clickedTown}
+              onTownClick={handleTownClick}
+              districtTypeOptions={DISTRICT_TYPE_OPTIONS}
+            />
+          </ErrorBoundary>
         </div>
 
         {selectedDistrict && (
@@ -379,7 +386,13 @@ function DistrictBrowser({ user }) {
         </>
       ) : (
         <div className="salary-comparison-tab">
-          <SalaryComparison />
+          <ErrorBoundary
+            errorTitle="Salary Comparison Error"
+            errorMessage="There was a problem loading salary comparisons. Try refreshing the page."
+            showDetails={false}
+          >
+            <SalaryComparison />
+          </ErrorBoundary>
         </div>
       )}
     </div>

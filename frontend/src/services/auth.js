@@ -8,6 +8,7 @@ import {
   CognitoUser,
   AuthenticationDetails,
 } from 'amazon-cognito-identity-js';
+import { logger } from '../utils/logger';
 
 class AuthService {
   constructor() {
@@ -51,16 +52,16 @@ class AuthService {
       // Initialize Cognito User Pool
       this.initUserPool();
 
-      console.log('Loaded Cognito configuration from /config.json');
+      logger.log('Loaded Cognito configuration from /config.json');
       return this.cognitoConfig;
     } catch (error) {
       // Fallback to environment variables for local development
       // This is the expected path when running locally
       const isDev = import.meta.env.DEV;
       if (isDev || error.message.includes('not found')) {
-        console.log('Using Cognito configuration from environment variables (local development)');
+        logger.log('Using Cognito configuration from environment variables (local development)');
       } else {
-        console.warn('Failed to load /config.json, using environment variables:', error.message);
+        logger.warn('Failed to load /config.json, using environment variables:', error.message);
       }
 
       this.cognitoConfig = {
@@ -267,7 +268,7 @@ class AuthService {
           groups: payload['cognito:groups'] || [],
         });
       } catch (error) {
-        console.error('Failed to parse token:', error);
+        logger.error('Failed to parse token:', error);
       }
 
       // Clean up URL
@@ -341,7 +342,7 @@ class AuthService {
 
       return data;
     } catch (error) {
-      console.error('Failed to get current user:', error);
+      logger.error('Failed to get current user:', error);
       return { authenticated: false, user: null };
     }
   }

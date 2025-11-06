@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import authService from '../services/auth';
+import { logger } from '../utils/logger';
 import './Login.css';
 
 function Login({ onAuthChange, onLoadingChange }) {
@@ -32,7 +33,7 @@ function Login({ onAuthChange, onLoadingChange }) {
       setCognitoConfigured(authService.isConfigured());
 
       if (!authService.isConfigured()) {
-        console.warn('Cognito is not configured. Authentication features will be disabled.');
+        logger.warn('Cognito is not configured. Authentication features will be disabled.');
         return;
       }
 
@@ -49,7 +50,7 @@ function Login({ onAuthChange, onLoadingChange }) {
         await fetchUserDetails();
       }
     } catch (error) {
-      console.error('Auth initialization error:', error);
+      logger.error('Auth initialization error:', error);
       setLoading(false);
     }
   };
@@ -65,7 +66,7 @@ function Login({ onAuthChange, onLoadingChange }) {
         }
       }
     } catch (error) {
-      console.error('Failed to fetch user details:', error);
+      logger.error('Failed to fetch user details:', error);
     } finally {
       setLoading(false);
     }
@@ -87,7 +88,7 @@ function Login({ onAuthChange, onLoadingChange }) {
       setShowLoginModal(false);
       setLoginForm({ email: '', password: '' });
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
       setLoginError(error.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoggingIn(false);

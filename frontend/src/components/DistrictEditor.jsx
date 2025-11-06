@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import './DistrictEditor.css';
 import api from '../services/api';
 import { DataCacheContext } from '../contexts/DataCacheContext';
+import { logger } from '../utils/logger';
 
 function DistrictEditor({ district, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -101,11 +102,11 @@ function DistrictEditor({ district, onClose, onSave }) {
         }
 
         if (added.length > 0 || removed.length > 0) {
-          console.debug(`Towns changed for ${district.id}: added=${JSON.stringify(added)}, removed=${JSON.stringify(removed)}`);
+          logger.debug(`Towns changed for ${district.id}: added=${JSON.stringify(added)}, removed=${JSON.stringify(removed)}`);
         }
       } catch (err) {
         // Non-fatal: log and continue — still close editor
-        console.debug('Failed to refresh district after save:', err?.message || err);
+        logger.debug('Failed to refresh district after save:', err?.message || err);
       }
 
       onClose();
