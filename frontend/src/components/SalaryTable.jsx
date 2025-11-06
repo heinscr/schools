@@ -4,7 +4,7 @@ import { formatCurrency } from '../utils/formatters';
 import { logger } from '../utils/logger';
 import './SalaryTable.css';
 
-function SalaryTable({ districtId }) {
+function SalaryTable({ districtId, highlight = null }) {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -114,11 +114,19 @@ function SalaryTable({ districtId }) {
                 {sortedSteps.map(step => (
                   <tr key={step}>
                     <td className="step-cell">{step}</td>
-                    {sortedColumns.map(col => (
-                      <td key={col.key} className="salary-cell">
-                        {formatCurrency(salariesByStep[step][col.key])}
-                      </td>
-                    ))}
+                        {sortedColumns.map(col => {
+                          const cellValue = salariesByStep[step][col.key];
+                          const isMatch = highlight && (
+                            String(col.education) === String(highlight.education) &&
+                            Number(col.credits) === Number(highlight.credits) &&
+                            String(step) === String(highlight.step)
+                          );
+                          return (
+                            <td key={col.key} className={`salary-cell${isMatch ? ' highlight' : ''}`}>
+                              {formatCurrency(cellValue)}
+                            </td>
+                          );
+                        })}
                   </tr>
                 ))}
               </tbody>

@@ -271,6 +271,103 @@
   font-weight: 600;
 }
 
+/* Modal for district salary details */
+.salary-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.salary-modal {
+  width: 100%;
+  max-width: 1100px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+.salary-modal {
+  display: flex;
+  flex-direction: column;
+  /* keep modal from exceeding viewport and allow internal scrolling */
+  max-height: calc(100vh - 80px);
+}
+
+.salary-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  flex: 0 0 auto; /* anchor header so body can scroll */
+  color: black;
+}
+
+.salary-modal-title h2 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+}
+
+.salary-modal-address,
+.salary-modal-towns {
+  color: #666;
+  font-size: 14px;
+}
+
+.salary-modal-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.salary-modal-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-left: 8px;
+  color: #3b82f6;
+}
+
+.salary-modal-map {
+  margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a5568;
+}
+
+.salary-modal-criteria {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.salary-modal-body {
+  padding: 18px 20px 26px 20px;
+  flex: 1 1 auto;
+  overflow: auto; /* enable scrolling for modal content */
+}
+
+/* Optional: nicer scrollbar inside modal on supported browsers */
+.salary-modal-body::-webkit-scrollbar {
+  width: 10px;
+}
+.salary-modal-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 6px;
+}
+.salary-modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 6px;
+}
+
 .comparison-map-section {
   background: white;
   border-radius: 12px;
@@ -413,6 +510,36 @@
   padding: 16px 20px;
 }
 
+/* Details (table) button in results table */
+.details-col {
+  width: 20px;
+  text-align: center;
+}
+
+.details-cell {
+  width: 20px;
+  text-align: center;
+}
+
+.details-button {
+  background: transparent;
+  border: none;
+  padding: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s, transform 0.08s;
+  /* match external link color (blue-ish) for consistency */
+  color: #2563eb;
+}
+
+
+.details-button:active {
+  transform: translateY(0);
+}
+
 /* Narrow the link cell padding so the column stays just slightly larger than the icon */
 .results-table td.link-cell {
   padding: 6px 6px; /* smaller horizontal padding than default */
@@ -441,7 +568,7 @@
   box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 }
 
-.district-cell strong {
+.district-cell {
   color: #2d3748;
   font-weight: 600;
   font-size: 15px;

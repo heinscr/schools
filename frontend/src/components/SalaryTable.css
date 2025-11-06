@@ -103,6 +103,13 @@
   font-size: 14px;
 }
 
+.salary-cell.highlight {
+  background: linear-gradient(90deg,#6a3bdc,#8e5bff);
+  color: white;
+  font-weight: 700;
+  border-radius: 6px;
+}
+
 .salary-loading,
 .salary-error,
 .salary-empty {
