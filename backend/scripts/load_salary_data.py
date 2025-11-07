@@ -15,11 +15,6 @@ from datetime import datetime
 # Initialize DynamoDB
 dynamodb = boto3.resource('dynamodb')
 
-def get_districts_table_name():
-    """Get districts table name from environment or use default"""
-    import os
-    return os.getenv('DISTRICTS_TABLE_NAME', 'crackpow-schools-districts')
-
 def build_district_name_to_id_map(districts_table_name):
     """
     Query the districts table and build a mapping of district names to UUIDs
@@ -117,6 +112,13 @@ def create_items(salary_records, district_map, districts_table_name):
     # Group by district + year + period to track what we're creating
     schedules_created = defaultdict(set)
 
+    # Track availability: year_period -> district_id -> edu+credit -> max_step
+    availability_tracker = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: {'max_step': 0})))
+
+    # Track global maximums for normalization
+    global_max_step = 0
+    global_edu_credit_combos = set()  # Only track combos that actually exist in data
+
     for record in salary_records:
         district_name = record['district_name']
         district_id, matched = match_district_name_to_id(district_name, district_map)
@@ -160,11 +162,11 @@ def create_items(salary_records, district_map, districts_table_name):
             'step': step,
             'salary': salary,
 
-            # GSI1: Exact match query - find all districts at this edu/credits/step
-            # PK: YEAR#<yyyy>#PERIOD#<period>#EDU#<edu>#CR#<credits>#STEP#<step>
-            # SK: DISTRICT#<districtId>
-            'GSI1PK': f'YEAR#{school_year}#PERIOD#{period}#EDU#{education}#CR#{credits_padded}#STEP#{step_padded}',
-            'GSI1SK': f'DISTRICT#{district_id}',
+            # GSI1: Education/Credits query with step sorting
+            # PK: YEAR#<yyyy>#PERIOD#<period>#EDU#<edu>#CR#<credits>
+            # SK: STEP#<step>#DISTRICT#<districtId>
+            'GSI1PK': f'YEAR#{school_year}#PERIOD#{period}#EDU#{education}#CR#{credits_padded}',
+            'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
 
             # GSI2: Fallback query - get all salaries for a district's specific schedule
             # PK: YEAR#<yyyy>#PERIOD#<period>#DISTRICT#<districtId>
@@ -174,6 +176,18 @@ def create_items(salary_records, district_map, districts_table_name):
         }
 
         items.append(item)
+
+        # Track availability for this year/period/district/edu+credit combo
+        year_period_key = (school_year, period)
+        edu_credit_key = f'{education}+{credits}'
+
+        # Update max step for this combo
+        current_max = availability_tracker[year_period_key][district_id][edu_credit_key]['max_step']
+        availability_tracker[year_period_key][district_id][edu_credit_key]['max_step'] = max(current_max, step)
+
+        # Track global maximums
+        global_max_step = max(global_max_step, step)
+        global_edu_credit_combos.add(edu_credit_key)
 
     print(f"  ✓ Matched {match_stats['matched']} salary records to district UUIDs")
     if match_stats['unmatched'] > 0:
@@ -194,7 +208,42 @@ def create_items(salary_records, district_map, districts_table_name):
     print(f"  ✓ Created {len(metadata_items)} metadata items for year/period combinations")
     print(f"  ✓ Created schedules for {len(schedules_created)} districts")
 
-    return items + metadata_items
+    # Create availability index metadata items
+    availability_items = []
+    for year_period_key, districts_data in availability_tracker.items():
+        school_year, period = year_period_key
+
+        # Convert nested dict to simpler structure for DynamoDB
+        districts_availability = {}
+        for district_id, edu_credits in districts_data.items():
+            districts_availability[district_id] = dict(edu_credits)
+
+        availability_item = {
+            'PK': 'METADATA#AVAILABILITY',
+            'SK': f'YEAR#{school_year}#PERIOD#{period}',
+            'school_year': school_year,
+            'period': period,
+            'districts': districts_availability,
+            'created_at': datetime.utcnow().isoformat()
+        }
+        availability_items.append(availability_item)
+
+    print(f"  ✓ Created {len(availability_items)} availability index items")
+
+    # Create max values metadata item for normalization
+    max_values_item = {
+        'PK': 'METADATA#MAXVALUES',
+        'SK': 'GLOBAL',
+        'max_step': global_max_step,
+        'edu_credit_combos': sorted(list(global_edu_credit_combos)),  # Only combos that exist in data
+        'last_updated': datetime.utcnow().isoformat()
+    }
+
+    print(f"  ✓ Created max values metadata:")
+    print(f"    max_step: {global_max_step}")
+    print(f"    edu_credit_combos: {len(global_edu_credit_combos)} combinations")
+
+    return items + metadata_items + availability_items + [max_values_item]
 
 def batch_write_items(table_name, items, description):
     """Write items to DynamoDB in batches"""
@@ -229,18 +278,44 @@ def batch_write_items(table_name, items, description):
 
 def main():
     import sys
+    import os
+    from dotenv import load_dotenv
 
-    # Get table names from command line or use defaults
+    # Load environment variables from /backend/.env file
+    backend_dir = Path(__file__).parent.parent
+    env_path = backend_dir / '.env'
+    load_dotenv(dotenv_path=env_path)
+
+    # Get table names from command line or environment variables
     if len(sys.argv) > 1:
         salaries_table = sys.argv[1]
-        districts_table = sys.argv[2] if len(sys.argv) > 2 else get_districts_table_name()
+        districts_table = sys.argv[2] if len(sys.argv) > 2 else os.environ.get('DISTRICTS_TABLE_NAME')
+        if not districts_table:
+            print("ERROR: DISTRICTS_TABLE_NAME environment variable not set")
+            print("\nUsage:")
+            print("  python3 load_salary_data.py <salaries_table> <districts_table>")
+            print("  OR set environment variables in /backend/.env:")
+            print("    SALARIES_TABLE_NAME=<salaries_table>")
+            print("    DISTRICTS_TABLE_NAME=<districts_table>")
+            sys.exit(1)
     else:
-        salaries_table = 'crackpow-schools-teacher-salaries'
-        districts_table = get_districts_table_name()
-        print(f"Using default table names:")
+        # Try to get from environment variables
+        salaries_table = os.environ.get('SALARIES_TABLE_NAME')
+        districts_table = os.environ.get('DISTRICTS_TABLE_NAME')
+
+        if not salaries_table or not districts_table:
+            print("ERROR: Required environment variables not set")
+            print("\nUsage:")
+            print("  python3 load_salary_data.py <salaries_table> <districts_table>")
+            print("  OR set environment variables in /backend/.env:")
+            print("    SALARIES_TABLE_NAME=<salaries_table>")
+            print("    DISTRICTS_TABLE_NAME=<districts_table>")
+            sys.exit(1)
+
+        print(f"Using environment variables from .env:")
         print(f"  Salaries: {salaries_table}")
         print(f"  Districts: {districts_table}")
-        print(f"\nTo use different tables: python3 load_salary_data.py <salaries_table> <districts_table>\n")
+        print()
 
     # Build district name to UUID mapping
     district_map = build_district_name_to_id_map(districts_table)
@@ -274,6 +349,38 @@ def main():
     print(f"    ✓ Written: {written}")
     print(f"    ✗ Failed: {failed}")
     print(f"{'='*80}\n")
+
+    # Run normalization
+    if written > 0 and failed == 0:
+        print(f"\n{'='*80}")
+        print("Running normalization to fill complete salary matrix...")
+        print(f"{'='*80}\n")
+
+        import subprocess
+        import os
+
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        normalize_script = os.path.join(script_dir, 'normalize_salaries.py')
+
+        try:
+            # Call normalize_salaries.py with the same table name
+            result = subprocess.run(
+                [sys.executable, normalize_script, salaries_table],
+                check=True,
+                capture_output=False
+            )
+            print(f"\n{'='*80}")
+            print("✓ Normalization complete!")
+            print(f"{'='*80}\n")
+        except subprocess.CalledProcessError as e:
+            print(f"\n{'='*80}")
+            print(f"✗ Normalization failed with exit code {e.returncode}")
+            print(f"{'='*80}\n")
+            sys.exit(1)
+    else:
+        print("\n⚠️  Skipping normalization due to write failures")
+        print("    Please fix errors and run normalize_salaries.py manually\n")
 
 if __name__ == '__main__':
     main()

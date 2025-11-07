@@ -11,10 +11,30 @@
 # - PK: METADATA#SCHEDULES
 # - SK: YEAR#<yyyy>#PERIOD#<period>
 #
-# GSI1 - Exact Match Query:
-# - PK: YEAR#<yyyy>#PERIOD#<period>#EDU#<edu>#CR#<credits>#STEP#<step>
-# - SK: DISTRICT#<districtId>
-# Purpose: Fast lookup of all districts at a specific edu/credits/step for a year/period
+# - PK: METADATA#AVAILABILITY
+# - SK: YEAR#<yyyy>#PERIOD#<period>
+#   districts: {
+#     "district_id": {
+#       "M+30": {"max_step": 10},
+#       "B+0": {"max_step": 15},
+#       ...
+#     }
+#   }
+# Purpose: Fast lookup of which districts have which edu+credit combos for a year/period
+#
+# - PK: METADATA#MAXVALUES
+# - SK: GLOBAL
+#   max_step: 15
+#   edu_credit_combos: ["B+0", "B+15", "M+30", "D+45"]  (only combos that exist in data)
+# Purpose: Track global max step and edu+credit combinations that exist anywhere in data
+#          Used for normalization: every district gets all existing combos × max_step entries
+#          Example: If only B+0, B+15, M+30, D+45 exist globally, query for M+45 falls back to B+15
+#
+# GSI1 - Education/Credits Query with Step Sorting:
+# - PK: YEAR#<yyyy>#PERIOD#<period>#EDU#<edu>#CR#<credits>
+# - SK: STEP#<step>#DISTRICT#<districtId>
+# Purpose: Get all districts with given edu/credits (any step), sorted by step
+#          Enables fallback: find highest step <= target for each district
 #
 # GSI2 - Fallback Query:
 # - PK: YEAR#<yyyy>#PERIOD#<period>#DISTRICT#<districtId>

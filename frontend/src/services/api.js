@@ -243,7 +243,7 @@ class ApiService {
    * @param {string} education - Education level (B, M, D)
    * @param {number} credits - Additional credits (0, 15, 30, 45, 60)
    * @param {number} step - Experience step (1-15)
-   * @param {Object} options - Additional options (districtType, year, limit)
+   * @param {Object} options - Additional options (districtType, year, limit, includeFallback)
    * @returns {Promise<Object>} - Response with ranked salary results
    */
   async compareSalaries(education, credits, step, options = {}) {
@@ -255,6 +255,7 @@ class ApiService {
     if (options.districtType) queryParams.append('districtType', options.districtType);
     if (options.year) queryParams.append('year', options.year);
     if (options.limit) queryParams.append('limit', options.limit.toString());
+    if (options.includeFallback) queryParams.append('include_fallback', 'true');
 
     const url = `${API_BASE_URL}/api/salary-compare?${queryParams.toString()}`;
 

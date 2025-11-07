@@ -395,23 +395,140 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
 
         logger.info(f"Querying across {len(year_periods)} year/period combinations")
 
-        # STEP 2: Query GSI1 for exact matches across all year/period combinations
+        # STEP 2: Query availability index to get all district availability data
+        availability_response = salaries_table.query(
+            KeyConditionExpression=Key('PK').eq('METADATA#AVAILABILITY')
+        )
+        availability_items = availability_response.get('Items', [])
+
+        logger.info(f"Retrieved {len(availability_items)} availability index items")
+
+        # STEP 3: Determine target edu+credit+step for each district using availability data
+        # This is done in-memory - no queries needed!
+        from collections import defaultdict
+
+        # Build fallback hierarchy
+        edu_order = {'D': 3, 'M': 2, 'B': 1}
+        target_edu_level = edu_order.get(education, 0)
+
+        # Prepare target search key
+        target_key = f'{education}+{credits}'
+
+        # Track what we need to query: (year, period, edu, credits, step) -> [district_ids]
+        queries_needed = defaultdict(set)
+
+        # Process each year/period's availability data
+        for avail_item in availability_items:
+            year = avail_item.get('school_year')
+            period = avail_item.get('period')
+            districts_data = avail_item.get('districts', {})
+
+            # For each district in this year/period
+            for district_id, edu_credits_map in districts_data.items():
+                # Try to find best match for this district
+                best_match = None
+                best_edu = None
+                best_cred = None
+                best_step = None
+
+                # First, try exact edu+credits match
+                if target_key in edu_credits_map:
+                    max_step_available = edu_credits_map[target_key].get('max_step', 0)
+                    target_step_to_query = min(step, max_step_available) if max_step_available > 0 else max_step_available
+                    best_match = (education, credits, target_step_to_query)
+                    best_edu = education
+                    best_cred = credits
+                    best_step = target_step_to_query
+
+                # If no exact match and fallback enabled, find best fallback
+                elif include_fallback:
+                    # Find best available edu+credit combo for this district
+                    # Priority:
+                    # 1. Same education, highest credits <= target credits
+                    # 2. Lower education, highest available credits (any credits)
+                    for edu_cred_key, step_data in edu_credits_map.items():
+                        # Parse edu+credit from key
+                        parts = edu_cred_key.split('+')
+                        if len(parts) != 2:
+                            continue
+                        avail_edu = parts[0]
+                        avail_cred = int(parts[1])
+                        avail_edu_level = edu_order.get(avail_edu, 0)
+
+                        # Skip if education is higher than target
+                        if avail_edu_level > target_edu_level:
+                            continue
+
+                        # For same education level, only use credits <= target
+                        # For lower education level, allow any credits
+                        if avail_edu == education and avail_cred > credits:
+                            continue
+
+                        # Check if this is better than current best
+                        if best_match is None:
+                            max_step_available = step_data.get('max_step', 0)
+                            target_step_to_query = min(step, max_step_available) if max_step_available > 0 else max_step_available
+                            best_match = (avail_edu, avail_cred, target_step_to_query)
+                            best_edu = avail_edu
+                            best_cred = avail_cred
+                            best_step = target_step_to_query
+                        else:
+                            # Compare: prefer higher edu, then higher credit
+                            if avail_edu_level > edu_order.get(best_edu, 0):
+                                max_step_available = step_data.get('max_step', 0)
+                                target_step_to_query = min(step, max_step_available) if max_step_available > 0 else max_step_available
+                                best_match = (avail_edu, avail_cred, target_step_to_query)
+                                best_edu = avail_edu
+                                best_cred = avail_cred
+                                best_step = target_step_to_query
+                            elif avail_edu == best_edu and avail_cred > best_cred:
+                                max_step_available = step_data.get('max_step', 0)
+                                target_step_to_query = min(step, max_step_available) if max_step_available > 0 else max_step_available
+                                best_match = (avail_edu, avail_cred, target_step_to_query)
+                                best_edu = avail_edu
+                                best_cred = avail_cred
+                                best_step = target_step_to_query
+
+                # If we found a match, record what to query
+                if best_match:
+                    query_key = (year, period, best_edu, best_cred, best_step)
+                    queries_needed[query_key].add(district_id)
+
+        logger.info(f"Need to make {len(queries_needed)} targeted GSI1 queries")
+
+        # STEP 4: Execute targeted GSI1 queries
+        all_results = []
         credits_padded = pad_number(credits, 3)
         step_padded = pad_number(step, 2)
 
-        all_exact_matches = []
-        for year, period in year_periods:
-            exact_match_response = salaries_table.query(
+        for query_key, district_ids in queries_needed.items():
+            year, period, query_edu, query_cred, query_step = query_key
+
+            query_cred_padded = pad_number(query_cred, 3)
+            query_step_padded = pad_number(query_step, 2)
+
+            # Query GSI1 for this specific combination
+            response = salaries_table.query(
                 IndexName='ExactMatchIndex',
                 KeyConditionExpression=Key('GSI1PK').eq(
-                    f'YEAR#{year}#PERIOD#{period}#EDU#{education}#CR#{credits_padded}#STEP#{step_padded}'
-                )
+                    f'YEAR#{year}#PERIOD#{period}#EDU#{query_edu}#CR#{query_cred_padded}'
+                ) & Key('GSI1SK').begins_with(f'STEP#{query_step_padded}#')
             )
-            all_exact_matches.extend(exact_match_response.get('Items', []))
 
-        # STEP 3: Deduplicate by district - keep only the most recent year/period per district
+            # Filter to only the districts we need from this query
+            for item in response.get('Items', []):
+                district_id = item.get('district_id')
+                if district_id in district_ids:
+                    # Mark if this is exact match
+                    is_exact = (query_edu == education and query_cred == credits and query_step == step)
+                    item['is_exact_match'] = is_exact
+                    all_results.append(item)
+
+        logger.info(f"Retrieved {len(all_results)} total salary results")
+
+        # STEP 5: Deduplicate by district - keep most recent year/period per district
         district_best_match = {}
-        for item in all_exact_matches:
+        for item in all_results:
             district_id = item.get('district_id')
             year = item.get('school_year')
             period = item.get('period')
@@ -423,75 +540,23 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
                 existing_year = existing.get('school_year')
                 existing_period = existing.get('period')
 
-                # Keep the more recent: compare (year, period) tuples
+                # Keep the more recent
                 if (year, period) > (existing_year, existing_period):
                     district_best_match[district_id] = item
 
-        exact_matches = list(district_best_match.values())
-        exact_district_ids = set(district_best_match.keys())
-
-        logger.info(f"Found {len(exact_district_ids)} districts with exact matches")
-
-        # STEP 4: Get all districts with their types (used for fallback and for adding type to results)
-        all_districts_with_types = {}
-        district_types_map = {}
-
-        if include_fallback:
-            # Get all districts when fallback is enabled
-            all_districts_with_types = get_all_districts()
-            district_types_map = all_districts_with_types
-
-        # STEP 5: Optionally perform fallback queries (disabled by default for performance)
-        fallback_results = []
-
-        if include_fallback:
-            missing_district_ids = set(all_districts_with_types.keys()) - exact_district_ids
-
-            logger.info(f"Performing fallback queries for {len(missing_district_ids)} districts")
-
-            # For each missing district, find their most recent year/period and try fallback
-            # We need to query each district's data to find their latest year/period
-            for district_id in missing_district_ids:
-                # Try each year/period in reverse chronological order until we find a match
-                best_fallback = None
-                for year, period in sorted(year_periods, reverse=True):
-                    fallback_entry = find_fallback_salary(
-                        district_id, year, period,
-                        education, credits, step
-                    )
-                    if fallback_entry:
-                        best_fallback = fallback_entry
-                        break  # Use the first (most recent) match found
-
-                if best_fallback:
-                    fallback_results.append(best_fallback)
-
-        logger.info(f"Found {len(fallback_results)} districts with fallback matches")
-
-        # STEP 6: Mark exact vs fallback and combine results
-        for item in exact_matches:
-            item['is_exact_match'] = True
-
-        for item in fallback_results:
-            item['is_exact_match'] = False
-
-        all_results = exact_matches + fallback_results
-
-        # Filter by district type if specified
-        if district_type:
-            # Need to get district types - they're stored in districts table
-            # For now, skip this filter or implement it
-            pass
+        all_results = list(district_best_match.values())
+        logger.info(f"After deduplication: {len(all_results)} districts")
 
         # Sort by salary (descending)
         all_results.sort(key=lambda x: float(x.get('salary', 0)), reverse=True)
 
-        # STEP 7: Fetch towns and district types for all result districts
+        # STEP 6: Fetch towns and district types for all result districts
         result_district_ids = [item.get('district_id') for item in all_results]
         district_towns_map = get_district_towns_util(result_district_ids, DISTRICTS_TABLE_NAME)
 
-        # Fetch district types if not already fetched (when fallback is disabled)
-        if not district_types_map and result_district_ids:
+        # Fetch district types for all result districts
+        district_types_map = {}
+        if result_district_ids:
             try:
                 # Use batch_get_item for efficient bulk retrieval (max 100 items per request)
                 # Process in batches of 100
@@ -552,6 +617,10 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
 
             rankings.append(result)
 
+        # Calculate exact vs fallback match counts
+        exact_match_count = sum(1 for r in rankings if r.get('is_exact_match', True))
+        fallback_match_count = len(rankings) - exact_match_count
+
         return create_response(200, {
             'query': {
                 'education': education,
@@ -565,8 +634,8 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
             'results': rankings,
             'total': len(rankings),
             'summary': {
-                'exact_matches': len(exact_district_ids),
-                'fallback_matches': len(fallback_results),
+                'exact_matches': exact_match_count,
+                'fallback_matches': fallback_match_count,
                 'fallback_enabled': include_fallback,
                 'year_periods_queried': len(year_periods)
             }
