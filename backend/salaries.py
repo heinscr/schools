@@ -323,6 +323,7 @@ def get_salary_schedule(district_id: str, year: Optional[str] = None) -> Dict[st
             year_period = f"{item['school_year']}#{item['period']}"
             schedules[year_period].append({
                 'education': item.get('education'),
+                'is_calculated': item.get('is_calculated', False),
                 'credits': int(item.get('credits', 0)),
                 'step': int(item.get('step', 0)),
                 'salary': float(item.get('salary', 0))

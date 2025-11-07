@@ -54,7 +54,7 @@ function SalaryTable({ districtId, highlight = null }) {
       {schedules.map((schedule, idx) => {
         logger.log(`Schedule ${idx}:`, schedule);
         
-        // Group salaries by step for table display
+  // Group salaries by step for table display
         const salariesByStep = {};
         const educationCreditsSet = new Set();
         
@@ -65,7 +65,12 @@ function SalaryTable({ districtId, highlight = null }) {
           if (!salariesByStep[step]) {
             salariesByStep[step] = {};
           }
-          salariesByStep[step][eduCredKey] = item.salary;
+          // Preserve salary value and whether it was calculated (some APIs use isCalculated or is_calculated)
+          salariesByStep[step][eduCredKey] = {
+            value: item.salary,
+            // support both camelCase and snake_case flags
+            isCalculated: !!(item.isCalculated || item.is_calculated)
+          };
           educationCreditsSet.add(JSON.stringify({ 
             education: item.education, 
             credits: item.credits,
@@ -87,6 +92,17 @@ function SalaryTable({ districtId, highlight = null }) {
         // Get sorted steps
         const sortedSteps = Object.keys(salariesByStep).sort((a, b) => Number(a) - Number(b));
         
+        // Filter out columns where every step is calculated (suppress fully-calculated columns)
+        const visibleColumns = sortedColumns.filter(col => {
+          if (sortedSteps.length === 0) return true;
+          const allCalculated = sortedSteps.every(step => {
+            const cellEntry = salariesByStep[step] && salariesByStep[step][col.key];
+            // Only count as calculated if entry exists and is marked calculated
+            return cellEntry && cellEntry.isCalculated;
+          });
+          return !allCalculated;
+        });
+        
         return (
         <div key={idx} className="salary-schedule">
           <h3>
@@ -99,7 +115,7 @@ function SalaryTable({ districtId, highlight = null }) {
               <thead>
                 <tr>
                   <th>Step</th>
-                  {sortedColumns.map(col => (
+                  {visibleColumns.map(col => (
                     <th key={col.key} title={
                       col.education === 'B' ? "Bachelor's" :
                       col.education === 'M' ? "Master's" :
@@ -114,8 +130,10 @@ function SalaryTable({ districtId, highlight = null }) {
                 {sortedSteps.map(step => (
                   <tr key={step}>
                     <td className="step-cell">{step}</td>
-                        {sortedColumns.map(col => {
-                          const cellValue = salariesByStep[step][col.key];
+                        {visibleColumns.map(col => {
+                          const cellEntry = salariesByStep[step][col.key];
+                          const cellValue = cellEntry ? cellEntry.value : undefined;
+                          const cellIsCalculated = cellEntry ? cellEntry.isCalculated : false;
                           const isMatch = highlight && (
                             String(col.education) === String(highlight.education) &&
                             Number(col.credits) === Number(highlight.credits) &&
@@ -123,7 +141,7 @@ function SalaryTable({ districtId, highlight = null }) {
                           );
                           return (
                             <td key={col.key} className={`salary-cell${isMatch ? ' highlight' : ''}`}>
-                              {formatCurrency(cellValue)}
+                              {cellIsCalculated ? 'NA' : formatCurrency(cellValue)}
                             </td>
                           );
                         })}
