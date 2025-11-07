@@ -257,14 +257,15 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
                 'is_calculated': True,
                 'source_edu_credit': best_source,  # Track where it came from
                 'source_step': source_entry.get('source_step') if source_was_calculated else step,
-                'GSI1PK': f'YEAR#{year}#{period}#EDU#{target_edu}#CR#{target_cred_padded}',
+                'GSI1PK': f'YEAR#{year}#PERIOD#{period}#EDU#{target_edu}#CR#{target_cred_padded}',
                 'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
-                'GSI2PK': f'YEAR#{year}#{period}#DISTRICT#{district_id}',
+                'GSI2PK': f'YEAR#{year}#PERIOD#{period}#DISTRICT#{district_id}',
                 'GSI2SK': f'EDU#{target_edu}#CR#{target_cred_padded}#STEP#{step_padded}',
             }
             calculated_items.append(calculated_item)
 
     return calculated_items
+
 
 def batch_write_items(table, items, description):
     """Write items to DynamoDB in batches"""
@@ -334,6 +335,7 @@ def main():
 
     # STEP 3: Process each year/period
     total_calculated = 0
+    all_combos_set = set(edu_credit_combos)  # Track all combos (real + calculated)
 
     for year, period in year_periods:
         print(f"\nProcessing {year}/{period}...")
@@ -350,6 +352,11 @@ def main():
             )
             all_calculated.extend(calculated)
 
+            # Track combos created
+            for entry in calculated:
+                combo = f"{entry['education']}+{entry['credits']}"
+                all_combos_set.add(combo)
+
         print(f"  Generated {len(all_calculated)} calculated entries")
 
         # Write calculated entries
@@ -361,6 +368,27 @@ def main():
     print(f"NORMALIZATION COMPLETE")
     print(f"Total calculated entries created: {total_calculated}")
     print(f"{'='*60}\n")
+
+    # STEP 4: Update METADATA#MAXVALUES to include all combos (real + calculated)
+    print(f"Updating METADATA#MAXVALUES with all combos (including calculated)...")
+
+    try:
+        table.put_item(
+            Item={
+                'PK': 'METADATA#MAXVALUES',
+                'SK': 'GLOBAL',
+                'max_step': max_step,
+                'edu_credit_combos': sorted(list(all_combos_set)),
+                'last_updated': datetime.utcnow().isoformat()
+            }
+        )
+        print(f"✓ METADATA#MAXVALUES updated:")
+        print(f"  Original combos: {len(edu_credit_combos)}")
+        print(f"  Total combos (including calculated): {len(all_combos_set)}")
+        print(f"{'='*60}\n")
+    except Exception as e:
+        print(f"✗ Error updating METADATA#MAXVALUES: {e}")
+        print(f"{'='*60}\n")
 
 if __name__ == '__main__':
     main()

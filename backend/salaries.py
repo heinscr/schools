@@ -395,134 +395,117 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
 
         logger.info(f"Querying across {len(year_periods)} year/period combinations")
 
-        # STEP 2: Query availability index to get all district availability data
-        availability_response = salaries_table.query(
-            KeyConditionExpression=Key('PK').eq('METADATA#AVAILABILITY')
+        # STEP 2: Get global metadata to determine what edu+credit combos exist after normalization
+        # After normalization, all districts have the same combos (from METADATA#MAXVALUES)
+        max_values_response = salaries_table.get_item(
+            Key={'PK': 'METADATA#MAXVALUES', 'SK': 'GLOBAL'}
         )
-        availability_items = availability_response.get('Items', [])
 
-        logger.info(f"Retrieved {len(availability_items)} availability index items")
+        if 'Item' not in max_values_response:
+            return create_response(500, {'error': 'METADATA#MAXVALUES not found. Run load_salary_data.py first.'})
 
-        # STEP 3: Determine target edu+credit+step for each district using availability data
-        # This is done in-memory - no queries needed!
+        max_values = max_values_response['Item']
+        max_step_global = int(max_values.get('max_step', 15))
+        edu_credit_combos = max_values.get('edu_credit_combos', [])
+
+        logger.info(f"Global max_step: {max_step_global}, edu_credit_combos: {edu_credit_combos}")
+
+        # STEP 3: Determine best fallback combo from global list
         from collections import defaultdict
 
         # Build fallback hierarchy
         edu_order = {'D': 3, 'M': 2, 'B': 1}
         target_edu_level = edu_order.get(education, 0)
-
-        # Prepare target search key
         target_key = f'{education}+{credits}'
 
-        # Track what we need to query: (year, period, edu, credits, step) -> [district_ids]
-        queries_needed = defaultdict(set)
+        # Find best combo to query
+        query_edu = education
+        query_cred = credits
+        is_exact_match = False
 
-        # Process each year/period's availability data
-        for avail_item in availability_items:
-            year = avail_item.get('school_year')
-            period = avail_item.get('period')
-            districts_data = avail_item.get('districts', {})
+        logger.info(f"Looking for {target_key} in global combos")
 
-            # For each district in this year/period
-            for district_id, edu_credits_map in districts_data.items():
-                # Try to find best match for this district
-                best_match = None
-                best_edu = None
-                best_cred = None
-                best_step = None
+        # Check if exact combo exists globally
+        if target_key in edu_credit_combos:
+            is_exact_match = True
+            logger.info(f"Exact match found: {target_key}")
+        elif include_fallback:
+            logger.info(f"Exact match not found, finding fallback for {target_key}")
+            # Find best fallback from global combos
+            best_combo = None
+            best_combo_edu = None
+            best_combo_cred = None
 
-                # First, try exact edu+credits match
-                if target_key in edu_credits_map:
-                    max_step_available = edu_credits_map[target_key].get('max_step', 0)
-                    target_step_to_query = min(step, max_step_available) if max_step_available > 0 else max_step_available
-                    best_match = (education, credits, target_step_to_query)
-                    best_edu = education
-                    best_cred = credits
-                    best_step = target_step_to_query
+            for combo in edu_credit_combos:
+                parts = combo.split('+')
+                if len(parts) != 2:
+                    continue
+                combo_edu = parts[0]
+                combo_cred = int(parts[1])
+                combo_edu_level = edu_order.get(combo_edu, 0)
 
-                # If no exact match and fallback enabled, find best fallback
-                elif include_fallback:
-                    # Find best available edu+credit combo for this district
-                    # Priority:
-                    # 1. Same education, highest credits <= target credits
-                    # 2. Lower education, highest available credits (any credits)
-                    for edu_cred_key, step_data in edu_credits_map.items():
-                        # Parse edu+credit from key
-                        parts = edu_cred_key.split('+')
-                        if len(parts) != 2:
-                            continue
-                        avail_edu = parts[0]
-                        avail_cred = int(parts[1])
-                        avail_edu_level = edu_order.get(avail_edu, 0)
+                # Skip if education is higher than target
+                if combo_edu_level > target_edu_level:
+                    continue
 
-                        # Skip if education is higher than target
-                        if avail_edu_level > target_edu_level:
-                            continue
+                # For same education level, only use credits <= target
+                # For lower education level, allow any credits
+                if combo_edu == education and combo_cred > credits:
+                    continue
 
-                        # For same education level, only use credits <= target
-                        # For lower education level, allow any credits
-                        if avail_edu == education and avail_cred > credits:
-                            continue
+                # Check if this is better than current best
+                if best_combo is None:
+                    best_combo = combo
+                    best_combo_edu = combo_edu
+                    best_combo_cred = combo_cred
+                else:
+                    # Compare: prefer higher edu, then higher credit
+                    if combo_edu_level > edu_order.get(best_combo_edu, 0):
+                        best_combo = combo
+                        best_combo_edu = combo_edu
+                        best_combo_cred = combo_cred
+                    elif combo_edu == best_combo_edu and combo_cred > best_combo_cred:
+                        best_combo = combo
+                        best_combo_edu = combo_edu
+                        best_combo_cred = combo_cred
 
-                        # Check if this is better than current best
-                        if best_match is None:
-                            max_step_available = step_data.get('max_step', 0)
-                            target_step_to_query = min(step, max_step_available) if max_step_available > 0 else max_step_available
-                            best_match = (avail_edu, avail_cred, target_step_to_query)
-                            best_edu = avail_edu
-                            best_cred = avail_cred
-                            best_step = target_step_to_query
-                        else:
-                            # Compare: prefer higher edu, then higher credit
-                            if avail_edu_level > edu_order.get(best_edu, 0):
-                                max_step_available = step_data.get('max_step', 0)
-                                target_step_to_query = min(step, max_step_available) if max_step_available > 0 else max_step_available
-                                best_match = (avail_edu, avail_cred, target_step_to_query)
-                                best_edu = avail_edu
-                                best_cred = avail_cred
-                                best_step = target_step_to_query
-                            elif avail_edu == best_edu and avail_cred > best_cred:
-                                max_step_available = step_data.get('max_step', 0)
-                                target_step_to_query = min(step, max_step_available) if max_step_available > 0 else max_step_available
-                                best_match = (avail_edu, avail_cred, target_step_to_query)
-                                best_edu = avail_edu
-                                best_cred = avail_cred
-                                best_step = target_step_to_query
+            if best_combo:
+                query_edu = best_combo_edu
+                query_cred = best_combo_cred
+                logger.info(f"Fallback found: {best_combo} (will query for {query_edu}+{query_cred})")
+            else:
+                # No valid fallback found
+                logger.error(f"No valid fallback found for {target_key}")
+                return create_response(404, {
+                    'error': f'No data available for {education}+{credits} and no valid fallback found'
+                })
+        else:
+            # Exact match required but not found
+            logger.error(f"Exact match required but {target_key} not in global combos")
+            return create_response(404, {
+                'error': f'No data available for {education}+{credits} (fallback disabled)'
+            })
 
-                # If we found a match, record what to query
-                if best_match:
-                    query_key = (year, period, best_edu, best_cred, best_step)
-                    queries_needed[query_key].add(district_id)
+        logger.info(f"Querying for {query_edu}+{query_cred} step {step} across {len(year_periods)} year/periods")
 
-        logger.info(f"Need to make {len(queries_needed)} targeted GSI1 queries")
-
-        # STEP 4: Execute targeted GSI1 queries
+        # STEP 4: Query GSI1 for each year/period combination
         all_results = []
-        credits_padded = pad_number(credits, 3)
+        query_cred_padded = pad_number(query_cred, 3)
         step_padded = pad_number(step, 2)
 
-        for query_key, district_ids in queries_needed.items():
-            year, period, query_edu, query_cred, query_step = query_key
-
-            query_cred_padded = pad_number(query_cred, 3)
-            query_step_padded = pad_number(query_step, 2)
-
+        for year, period in year_periods:
             # Query GSI1 for this specific combination
             response = salaries_table.query(
                 IndexName='ExactMatchIndex',
                 KeyConditionExpression=Key('GSI1PK').eq(
                     f'YEAR#{year}#PERIOD#{period}#EDU#{query_edu}#CR#{query_cred_padded}'
-                ) & Key('GSI1SK').begins_with(f'STEP#{query_step_padded}#')
+                ) & Key('GSI1SK').begins_with(f'STEP#{step_padded}#')
             )
 
-            # Filter to only the districts we need from this query
+            # Add all results, marking if exact match
             for item in response.get('Items', []):
-                district_id = item.get('district_id')
-                if district_id in district_ids:
-                    # Mark if this is exact match
-                    is_exact = (query_edu == education and query_cred == credits and query_step == step)
-                    item['is_exact_match'] = is_exact
-                    all_results.append(item)
+                item['is_exact_match'] = is_exact_match
+                all_results.append(item)
 
         logger.info(f"Retrieved {len(all_results)} total salary results")
 
