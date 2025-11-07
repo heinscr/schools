@@ -110,16 +110,6 @@ output "salaries_table_arn" {
   value       = aws_dynamodb_table.teacher_salaries.arn
 }
 
-output "schedules_table_name" {
-  description = "DynamoDB teacher salary schedules table name"
-  value       = aws_dynamodb_table.teacher_salary_schedules.name
-}
-
-output "schedules_table_arn" {
-  description = "DynamoDB teacher salary schedules table ARN"
-  value       = aws_dynamodb_table.teacher_salary_schedules.arn
-}
-
 # Combined output for easy reference
 output "deployment_config" {
   description = "Complete configuration for deployment scripts"

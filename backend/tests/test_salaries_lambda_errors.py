@@ -27,13 +27,13 @@ def test_heatmap_missing_params(monkeypatch):
 
 
 def test_schedule_not_configured(monkeypatch):
-    monkeypatch.setattr(lambda_mod, 'schedules_table', None)
+    monkeypatch.setattr(lambda_mod, 'salaries_table', None)
     resp = lambda_mod.get_salary_schedule('d1')
     assert resp['statusCode'] == 503
 
 
 def test_metadata_not_configured(monkeypatch):
-    monkeypatch.setattr(lambda_mod, 'schedules_table', None)
+    monkeypatch.setattr(lambda_mod, 'salaries_table', None)
     resp = lambda_mod.get_salary_metadata('d1')
     assert resp['statusCode'] == 503
 
@@ -42,7 +42,7 @@ def test_schedule_not_found(monkeypatch):
     class FakeTable:
         def query(self, **kwargs):
             return {'Items': []}
-    monkeypatch.setattr(lambda_mod, 'schedules_table', FakeTable())
+    monkeypatch.setattr(lambda_mod, 'salaries_table', FakeTable())
     resp = lambda_mod.get_salary_schedule('d1')
     assert resp['statusCode'] == 404
 
@@ -51,7 +51,7 @@ def test_metadata_not_found(monkeypatch):
     class FakeTable:
         def query(self, **kwargs):
             return {'Items': []}
-    monkeypatch.setattr(lambda_mod, 'schedules_table', FakeTable())
+    monkeypatch.setattr(lambda_mod, 'salaries_table', FakeTable())
     resp = lambda_mod.get_salary_metadata('d1')
     assert resp['statusCode'] == 404
 

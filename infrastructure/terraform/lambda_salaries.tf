@@ -99,8 +99,6 @@ resource "aws_iam_role_policy" "salary_lambda_dynamodb" {
         Resource = [
           aws_dynamodb_table.teacher_salaries.arn,
           "${aws_dynamodb_table.teacher_salaries.arn}/index/*",
-          aws_dynamodb_table.teacher_salary_schedules.arn,
-          "${aws_dynamodb_table.teacher_salary_schedules.arn}/index/*",
           aws_dynamodb_table.districts.arn,
           "${aws_dynamodb_table.districts.arn}/index/*"
         ]
@@ -123,7 +121,6 @@ resource "aws_lambda_function" "salaries" {
   environment {
     variables = {
       SALARIES_TABLE_NAME  = aws_dynamodb_table.teacher_salaries.name
-      SCHEDULES_TABLE_NAME = aws_dynamodb_table.teacher_salary_schedules.name
       DISTRICTS_TABLE_NAME = aws_dynamodb_table.districts.name
     }
   }

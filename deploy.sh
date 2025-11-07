@@ -138,7 +138,6 @@ API_ENDPOINT=$(terraform output -raw api_endpoint)
 SALARY_API_ENDPOINT=$(terraform output -raw api_endpoint)
 SALARY_LAMBDA_FUNCTION_NAME=$(terraform output -raw salaries_lambda_function_name)
 SALARIES_TABLE_NAME=$(terraform output -raw salaries_table_name)
-SCHEDULES_TABLE_NAME=$(terraform output -raw schedules_table_name)
 
 echo -e "${GREEN}✓ Configuration loaded${NC}"
 echo "  S3 Bucket: $S3_BUCKET"
@@ -355,7 +354,7 @@ if aws lambda get-function --function-name $SALARY_LAMBDA_FUNCTION_NAME --region
         CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
     fi
     
-    SALARY_ENV_VARS="SALARIES_TABLE_NAME=$SALARIES_TABLE_NAME,SCHEDULES_TABLE_NAME=$SCHEDULES_TABLE_NAME,DISTRICTS_TABLE_NAME=$DYNAMODB_TABLE"
+    SALARY_ENV_VARS="SALARIES_TABLE_NAME=$SALARIES_TABLE_NAME,DISTRICTS_TABLE_NAME=$DYNAMODB_TABLE"
     
     # Add CUSTOM_DOMAIN if it exists
     if [ -n "$CUSTOM_DOMAIN" ]; then

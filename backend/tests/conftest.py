@@ -9,7 +9,6 @@ from pathlib import Path
 # Use test-specific table names that don't conflict with real tables
 os.environ["DYNAMODB_DISTRICTS_TABLE"] = "test-districts"
 os.environ["SALARIES_TABLE_NAME"] = "test-salaries"
-os.environ["SCHEDULES_TABLE_NAME"] = "test-schedules"
 os.environ["DISTRICTS_TABLE_NAME"] = "test-districts"
 
 # Set high rate limits for testing to avoid hitting limits during test runs

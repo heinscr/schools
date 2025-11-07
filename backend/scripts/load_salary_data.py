@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Load salary data from JSON into DynamoDB tables
-Creates both normalized (main) and aggregated (cache) tables
+Load salary data from JSON into DynamoDB
+New single-table design with metadata tracking and efficient GSIs
 """
 
 import json
@@ -10,6 +10,7 @@ from pathlib import Path
 from collections import defaultdict
 from decimal import Decimal
 from boto3.dynamodb.conditions import Attr
+from datetime import datetime
 
 # Initialize DynamoDB
 dynamodb = boto3.resource('dynamodb')
@@ -26,22 +27,22 @@ def build_district_name_to_id_map(districts_table_name):
     """
     print(f"\nQuerying districts table: {districts_table_name}...")
     table = dynamodb.Table(districts_table_name)
-    
+
     district_map = {}
-    
+
     try:
         # Scan the table for all district metadata items
         response = table.scan(
             FilterExpression=Attr('entity_type').eq('district')
         )
-        
+
         for item in response.get('Items', []):
             district_id = item.get('district_id')
             district_name = item.get('name', '')
             if district_id and district_name:
                 # Store with lowercase name for matching
                 district_map[district_name.lower()] = district_id
-        
+
         # Handle pagination if needed
         while 'LastEvaluatedKey' in response:
             response = table.scan(
@@ -53,42 +54,26 @@ def build_district_name_to_id_map(districts_table_name):
                 district_name = item.get('name', '')
                 if district_id and district_name:
                     district_map[district_name.lower()] = district_id
-        
+
         print(f"✓ Found {len(district_map)} districts in table")
-        
+
     except Exception as e:
         print(f"✗ Error querying districts table: {e}")
         print("  Continuing with name-based fallback...")
-    
+
     return district_map
 
 def load_salary_json():
     """Load salary data from JSON file"""
     json_path = Path(__file__).parent.parent.parent / 'data' / 'salary_data.json'
+
+    # Try example file if main file doesn't exist
+    if not json_path.exists():
+        json_path = Path(__file__).parent.parent.parent / 'data' / 'salary_data.example.json'
+        print(f"Using example data file: {json_path}")
+
     with open(json_path, 'r') as f:
         return json.load(f)
-
-def get_district_type_from_table(district_id, districts_table_name):
-    """
-    Get district type from DynamoDB districts table using the UUID
-    """
-    try:
-        table = dynamodb.Table(districts_table_name)
-        response = table.get_item(
-            Key={
-                'PK': f'DISTRICT#{district_id}',
-                'SK': 'METADATA'
-            }
-        )
-        
-        if 'Item' in response:
-            return response['Item'].get('district_type', 'unknown')
-        
-        return 'unknown'
-    except Exception as e:
-        print(f"  ⚠️  Error looking up district type for {district_id}: {e}")
-        return 'unknown'
-
 
 def match_district_name_to_id(district_name, district_map):
     """
@@ -97,206 +82,119 @@ def match_district_name_to_id(district_name, district_map):
     """
     # Normalize the name for matching
     normalized_name = district_name.lower().strip()
-    
+
     # Direct match
     if normalized_name in district_map:
         return district_map[normalized_name], True
-    
+
     # Try fuzzy matching - check if any district name contains this or vice versa
     for db_name, district_id in district_map.items():
         if normalized_name in db_name or db_name in normalized_name:
             return district_id, True
-    
+
     # No match - use the original district_name as fallback
     print(f"  ⚠️  No UUID match for '{district_name}', using name as ID")
     return district_name, False
 
-def create_normalized_items(salary_records, district_map, districts_table_name):
+def pad_number(num, width):
+    """Pad a number with leading zeros"""
+    return str(num).zfill(width)
+
+def create_items(salary_records, district_map, districts_table_name):
     """
-    Create normalized DynamoDB items (one per salary cell)
-    Structure: district_id + composite_key
+    Create DynamoDB items for the new single-table design
+
+    Structure:
+    - Main items: district + schedule + salary entry
+    - Metadata items: track available year/period combinations
     """
     items = []
     match_stats = {'matched': 0, 'unmatched': 0}
 
+    # Track all year/period combinations
+    year_periods = set()
+
+    # Group by district + year + period to track what we're creating
+    schedules_created = defaultdict(set)
+
     for record in salary_records:
         district_name = record['district_name']
         district_id, matched = match_district_name_to_id(district_name, district_map)
-        
+
         if matched:
             match_stats['matched'] += 1
         else:
             match_stats['unmatched'] += 1
-        
+
         school_year = record['school_year']
         period = record['period']
         education = record['education']
-        credits = record['credits']
-        step = record['step']
+        credits = int(record['credits'])
+        step = int(record['step'])
         salary = Decimal(str(record['salary']))
 
-        # Create composite key
-        composite_key = f"{school_year}#{period}#{education}#{credits}#{step}"
+        # Pad numbers for proper sorting
+        credits_padded = pad_number(credits, 3)
+        step_padded = pad_number(step, 2)
 
-        # Get district type from DynamoDB
-        district_type = get_district_type_from_table(district_id, districts_table_name)
+        # Track this year/period combination
+        year_periods.add((school_year, period))
 
-        # Create item - use the UUID as district_id
+        # Track schedule created for this district
+        schedules_created[district_id].add((school_year, period))
+
+        # Create main item
+        # PK: DISTRICT#<districtId>
+        # SK: SCHEDULE#<yyyy>#<period>#EDU#<edu>#CR#<credits>#STEP#<step>
         item = {
-            'district_id': district_id,  # This is now the UUID
-            'composite_key': composite_key,
+            'PK': f'DISTRICT#{district_id}',
+            'SK': f'SCHEDULE#{school_year}#{period}#EDU#{education}#CR#{credits_padded}#STEP#{step_padded}',
+
+            # Attributes
+            'district_id': district_id,
+            'district_name': district_name,
             'school_year': school_year,
             'period': period,
             'education': education,
             'credits': credits,
             'step': step,
             'salary': salary,
-            'district_name': district_name,
-            'district_type': district_type,
 
-            # GSI1: For querying by type/year
-            'GSI1PK': f"SALARY#{school_year}#{district_type}",
-            'GSI1SK': f"{education}#{credits}#{step}#{salary}",
+            # GSI1: Exact match query - find all districts at this edu/credits/step
+            # PK: YEAR#<yyyy>#PERIOD#<period>#EDU#<edu>#CR#<credits>#STEP#<step>
+            # SK: DISTRICT#<districtId>
+            'GSI1PK': f'YEAR#{school_year}#PERIOD#{period}#EDU#{education}#CR#{credits_padded}#STEP#{step_padded}',
+            'GSI1SK': f'DISTRICT#{district_id}',
 
-            # GSI2: For comparing all districts at specific education/credits/step
-            'GSI2PK': f"COMPARE#{education}#{credits}#{step}",
-            'GSI2SK': f"{salary}#{district_id}"
+            # GSI2: Fallback query - get all salaries for a district's specific schedule
+            # PK: YEAR#<yyyy>#PERIOD#<period>#DISTRICT#<districtId>
+            # SK: EDU#<edu>#CR#<credits>#STEP#<step>
+            'GSI2PK': f'YEAR#{school_year}#PERIOD#{period}#DISTRICT#{district_id}',
+            'GSI2SK': f'EDU#{education}#CR#{credits_padded}#STEP#{step_padded}',
         }
 
         items.append(item)
-    
-    print(f"  ✓ Matched {match_stats['matched']} districts to UUIDs")
+
+    print(f"  ✓ Matched {match_stats['matched']} salary records to district UUIDs")
     if match_stats['unmatched'] > 0:
-        print(f"  ⚠️  {match_stats['unmatched']} districts not matched (using name as ID)")
+        print(f"  ⚠️  {match_stats['unmatched']} records not matched (using name as ID)")
 
-    return items
-
-def compute_salary_metadata(salaries):
-    """
-    Compute metadata tracking max step for each credit level within each education.
-
-    Returns:
-    {
-        "max_education": "M",
-        "max_by_education": {
-            "B": {
-                "0": 5,   // B+0 has max step 5
-                "15": 5   // B+15 has max step 5
-            },
-            "M": {
-                "0": 9,   // M+0 has max step 9
-                "15": 10, // M+15 has max step 10
-                "30": 10  // M+30 has max step 10
-            }
+    # Create metadata items for year/period tracking
+    metadata_items = []
+    for school_year, period in sorted(year_periods):
+        metadata_item = {
+            'PK': 'METADATA#SCHEDULES',
+            'SK': f'YEAR#{school_year}#PERIOD#{period}',
+            'school_year': school_year,
+            'period': period,
+            'created_at': datetime.utcnow().isoformat()
         }
-    }
-    """
-    if not salaries:
-        return {
-            'max_education': None,
-            'max_by_education': {}
-        }
+        metadata_items.append(metadata_item)
 
-    edu_order = {'B': 1, 'M': 2, 'D': 3}
+    print(f"  ✓ Created {len(metadata_items)} metadata items for year/period combinations")
+    print(f"  ✓ Created schedules for {len(schedules_created)} districts")
 
-    # Group by education and credit level, track max step
-    by_education = defaultdict(lambda: defaultdict(int))
-
-    for s in salaries:
-        edu = s['education']
-        credit = s['credits']
-        step = s['step']
-
-        # Track max step for this education+credit combination
-        by_education[edu][credit] = max(by_education[edu][credit], step)
-
-    # Find max education (highest in B < M < D order)
-    max_education = max(by_education.keys(), key=lambda e: edu_order.get(e, 0))
-
-    # Convert to final structure: map credit -> max_step for each education
-    max_by_education = {}
-    for edu, credit_map in by_education.items():
-        # Convert credit keys to strings for JSON compatibility
-        max_by_education[edu] = {
-            str(credit): max_step
-            for credit, max_step in credit_map.items()
-        }
-
-    return {
-        'max_education': max_education,
-        'max_by_education': max_by_education
-    }
-
-
-def create_aggregated_items(salary_records, district_map, districts_table_name):
-    """
-    Create aggregated DynamoDB items (one per schedule)
-    Groups salaries by district + year + period
-    New structure: each salary is a flat record with step, education, credits, salary
-    """
-    # Group by district + year + period
-    schedules = defaultdict(lambda: {
-        'district_id': None,
-        'district_name': None,
-        'district_type': None,
-        'school_year': None,
-        'period': None,
-        'salaries': []  # List of salary records
-    })
-
-    for record in salary_records:
-        district_name = record['district_name']
-        district_id, matched = match_district_name_to_id(district_name, district_map)
-
-        key = f"{district_id}#{record['school_year']}#{record['period']}"
-
-        schedule = schedules[key]
-        schedule['district_id'] = district_id  # Use UUID
-        schedule['district_name'] = district_name
-        schedule['school_year'] = record['school_year']
-        schedule['period'] = record['period']
-        schedule['district_type'] = get_district_type_from_table(district_id, districts_table_name)
-
-        # Add salary record with all info
-        schedule['salaries'].append({
-            'step': record['step'],
-            'education': record['education'],
-            'credits': record['credits'],
-            'salary': Decimal(str(record['salary']))
-        })
-
-    # Convert to list of items
-    items = []
-    for key, schedule in schedules.items():
-        # Sort salaries: by step first, then education (B->M->D), then credits
-        edu_order = {'B': 1, 'M': 2, 'D': 3}
-        sorted_salaries = sorted(
-            schedule['salaries'],
-            key=lambda x: (x['step'], edu_order.get(x['education'], 99), x['credits'])
-        )
-
-        # Compute metadata for this schedule
-        salary_metadata = compute_salary_metadata(sorted_salaries)
-
-        item = {
-            'district_id': schedule['district_id'],
-            'schedule_key': f"{schedule['school_year']}#{schedule['period']}",
-            'district_name': schedule['district_name'],
-            'district_type': schedule['district_type'],
-            'school_year': schedule['school_year'],
-            'period': schedule['period'],
-            'salaries': sorted_salaries,
-            # Flatten metadata fields to top level
-            'max_education': salary_metadata.get('max_education'),
-            'max_by_education': salary_metadata.get('max_by_education', {}),
-            'contract_term': None,  # To be filled in later
-            'contract_expiration': None,  # To be filled in later
-            'notes': None  # To be filled in later
-        }
-
-        items.append(item)
-
-    return items
+    return items + metadata_items
 
 def batch_write_items(table_name, items, description):
     """Write items to DynamoDB in batches"""
@@ -333,19 +231,16 @@ def main():
     import sys
 
     # Get table names from command line or use defaults
-    if len(sys.argv) > 2:
+    if len(sys.argv) > 1:
         salaries_table = sys.argv[1]
-        schedules_table = sys.argv[2]
-        districts_table = sys.argv[3] if len(sys.argv) > 3 else get_districts_table_name()
+        districts_table = sys.argv[2] if len(sys.argv) > 2 else get_districts_table_name()
     else:
         salaries_table = 'crackpow-schools-teacher-salaries'
-        schedules_table = 'crackpow-schools-teacher-salary-schedules'
         districts_table = get_districts_table_name()
         print(f"Using default table names:")
         print(f"  Salaries: {salaries_table}")
-        print(f"  Schedules: {schedules_table}")
         print(f"  Districts: {districts_table}")
-        print(f"\nTo use different tables: python3 load_salary_data.py <salaries_table> <schedules_table> <districts_table>\n")
+        print(f"\nTo use different tables: python3 load_salary_data.py <salaries_table> <districts_table>\n")
 
     # Build district name to UUID mapping
     district_map = build_district_name_to_id_map(districts_table)
@@ -355,45 +250,29 @@ def main():
     salary_records = load_salary_json()
     print(f"✓ Loaded {len(salary_records)} salary records")
 
-    # Create normalized items
-    print("\nCreating normalized items...")
-    normalized_items = create_normalized_items(salary_records, district_map, districts_table)
-    print(f"✓ Created {len(normalized_items)} normalized items")
-
-    # Create aggregated items
-    print("\nCreating aggregated schedule items...")
-    aggregated_items = create_aggregated_items(salary_records, district_map, districts_table)
-    print(f"✓ Created {len(aggregated_items)} schedule items")
+    # Create items
+    print("\nCreating DynamoDB items...")
+    items = create_items(salary_records, district_map, districts_table)
+    print(f"✓ Created {len(items)} total items (salary entries + metadata)")
 
     # Write to DynamoDB
     print(f"\n{'='*80}")
     print("Writing to DynamoDB...")
     print(f"{'='*80}")
 
-    # Write normalized items
-    written1, failed1 = batch_write_items(
+    written, failed = batch_write_items(
         salaries_table,
-        normalized_items,
-        "Normalized items"
-    )
-
-    # Write aggregated items
-    written2, failed2 = batch_write_items(
-        schedules_table,
-        aggregated_items,
-        "Schedule items"
+        items,
+        "Salary data import"
     )
 
     # Summary
     print(f"\n{'='*80}")
     print("Summary:")
     print(f"{'='*80}")
-    print(f"  Normalized table ({salaries_table}):")
-    print(f"    ✓ Written: {written1}")
-    print(f"    ✗ Failed: {failed1}")
-    print(f"\n  Schedule table ({schedules_table}):")
-    print(f"    ✓ Written: {written2}")
-    print(f"    ✗ Failed: {failed2}")
+    print(f"  Salaries table ({salaries_table}):")
+    print(f"    ✓ Written: {written}")
+    print(f"    ✗ Failed: {failed}")
     print(f"{'='*80}\n")
 
 if __name__ == '__main__':
