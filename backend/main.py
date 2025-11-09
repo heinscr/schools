@@ -291,16 +291,19 @@ async def get_current_user(
     }
 
 
-# Salary endpoints (delegating to salaries module functions)
+# Salary endpoints - Native FastAPI implementation
 # Initialize DynamoDB for salary data
 dynamodb = boto3.resource('dynamodb')
 TABLE_NAME = os.getenv('DYNAMODB_TABLE_NAME')
 
 main_table = dynamodb.Table(TABLE_NAME) if TABLE_NAME else None
 
-
-# Import salary functions from salaries module
-import salaries
+# Import salary service functions
+from services.salary_service import (
+    get_salary_schedule_for_district,
+    compare_salaries_across_districts,
+    get_district_salary_metadata
+)
 
 
 @app.get("/api/salary-schedule/{district_id}")
@@ -308,14 +311,15 @@ import salaries
 @limiter.limit(GENERAL_RATE_LIMIT)
 async def get_salary_schedule(request: Request, district_id: str, year: Optional[str] = None):
     """Get salary schedule(s) for a district"""
-    # Set the table reference in the salaries module
-    salaries.table = main_table
-    result = salaries.get_salary_schedule(district_id, year)
-
-    # Convert Lambda response to FastAPI response
-    if result['statusCode'] != 200:
-        raise HTTPException(status_code=result['statusCode'], detail=json.loads(result['body']))
-    return json.loads(result['body'])
+    try:
+        result = get_salary_schedule_for_district(main_table, district_id, year)
+        if not result:
+            raise HTTPException(status_code=404, detail="Schedule not found")
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/salary-compare")
@@ -327,30 +331,24 @@ async def compare_salaries(
     step: int = Query(..., description="Experience step"),
     districtType: Optional[str] = Query(None, description="District type filter"),
     year: Optional[str] = Query(None, description="School year filter"),
-    limit: Optional[int] = Query(None, description="Result limit")
+    include_fallback: bool = Query(False, description="Enable cross-education fallback matching")
 ):
     """Compare salaries across districts"""
-    # Set the table reference in the salaries module
-    salaries.table = main_table
-
-    params = {
-        'education': education,
-        'credits': str(credits),
-        'step': str(step)
-    }
-    if districtType:
-        params['districtType'] = districtType
-    if year:
-        params['year'] = year
-    if limit:
-        params['limit'] = str(limit)
-
-    result = salaries.compare_salaries(params)
-
-    # Convert Lambda response to FastAPI response
-    if result['statusCode'] != 200:
-        raise HTTPException(status_code=result['statusCode'], detail=json.loads(result['body']))
-    return json.loads(result['body'])
+    try:
+        result = compare_salaries_across_districts(
+            main_table,
+            education,
+            credits,
+            step,
+            district_type=districtType,
+            year_param=year,
+            include_fallback=include_fallback
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/salary-heatmap")
@@ -360,40 +358,38 @@ async def get_salary_heatmap(
     education: str = Query(..., description="Education level (B, M, D)"),
     credits: int = Query(..., description="Additional credits"),
     step: int = Query(..., description="Experience step"),
-    year: Optional[str] = Query('2021-2022', description="School year")
+    year: Optional[str] = Query(None, description="School year"),
+    include_fallback: bool = Query(False, description="Enable cross-education fallback matching")
 ):
     """Get salary heatmap data"""
-    # Set the table references in the salaries module
-    salaries.table = main_table
-
-    params = {
-        'education': education,
-        'credits': str(credits),
-        'step': str(step),
-        'year': year
-    }
-
-    result = salaries.get_salary_heatmap(params)
-
-    # Convert Lambda response to FastAPI response
-    if result['statusCode'] != 200:
-        raise HTTPException(status_code=result['statusCode'], detail=json.loads(result['body']))
-    return json.loads(result['body'])
+    try:
+        # Heatmap uses the same logic as comparison
+        result = compare_salaries_across_districts(
+            main_table,
+            education,
+            credits,
+            step,
+            year_param=year,
+            include_fallback=include_fallback
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/districts/{district_id}/salary-metadata")
 @limiter.limit(GENERAL_RATE_LIMIT)
 async def get_salary_metadata(request: Request, district_id: str):
     """Get salary metadata for a district"""
-    # Set the table references in the salaries module
-    salaries.table = main_table
-
-    result = salaries.get_salary_metadata(district_id)
-
-    # Convert Lambda response to FastAPI response
-    if result['statusCode'] != 200:
-        raise HTTPException(status_code=result['statusCode'], detail=json.loads(result['body']))
-    return json.loads(result['body'])
+    try:
+        result = get_district_salary_metadata(main_table, district_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # Lambda handler (only needed for AWS deployment)
