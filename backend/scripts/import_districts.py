@@ -19,7 +19,7 @@ sys.path.insert(0, str(backend_path))
 
 from services.dynamodb_district_service import DynamoDBDistrictService
 from schemas import DistrictCreate
-from database import districts_table
+from database import table
 
 
 def load_districts_json(filepath: str) -> dict:
@@ -107,7 +107,7 @@ def import_districts(json_filepath: str, dry_run: bool = False):
                 try:
                     # Check if district exists by name (case-insensitive)
                     existing, _ = DynamoDBDistrictService.get_districts(
-                        districts_table, name=name, limit=1, offset=0
+                        table, name=name, limit=1, offset=0
                     )
                     if existing:
                         # Update existing
@@ -120,11 +120,11 @@ def import_districts(json_filepath: str, dry_run: bool = False):
                             towns=members if members else [],
                             district_type=district_type
                         )
-                        DynamoDBDistrictService.update_district(districts_table, district_id, update_data)
+                        DynamoDBDistrictService.update_district(table, district_id, update_data)
                         print(f"  ✓ Updated: {name} (ID: {district_id})")
                     else:
                         # Create new
-                        result = DynamoDBDistrictService.create_district(districts_table, district_create)
+                        result = DynamoDBDistrictService.create_district(table, district_create)
                         print(f"  ✓ Imported: {name} (ID: {result['id']})")
                     stats['success'] += 1
                 except Exception as e:

@@ -28,10 +28,9 @@ logger.setLevel(logging.INFO)
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb')
 
-SALARIES_TABLE_NAME = os.environ.get('SALARIES_TABLE_NAME')
-DISTRICTS_TABLE_NAME = os.environ.get('DISTRICTS_TABLE_NAME')
+TABLE_NAME = os.environ.get('DYNAMODB_TABLE_NAME')
 
-salaries_table = dynamodb.Table(SALARIES_TABLE_NAME) if SALARIES_TABLE_NAME else None
+table = dynamodb.Table(TABLE_NAME) if TABLE_NAME else None
 
 
 def validate_education_level(education: Optional[str]) -> str:
@@ -119,14 +118,13 @@ def get_all_districts() -> Dict[str, str]:
     Get dictionary of all district IDs mapped to their district types
     Returns: Dict[district_id, district_type]
     """
-    if not DISTRICTS_TABLE_NAME:
-        raise Exception("DISTRICTS_TABLE_NAME not configured")
+    if not table:
+        raise Exception("DynamoDB table not configured")
 
-    districts_table = dynamodb.Table(DISTRICTS_TABLE_NAME)
     district_types_map = {}
 
     try:
-        response = districts_table.scan(
+        response = table.scan(
             FilterExpression=Attr('entity_type').eq('district'),
             ProjectionExpression='district_id, district_type'
         )
@@ -138,7 +136,7 @@ def get_all_districts() -> Dict[str, str]:
 
         # Handle pagination
         while 'LastEvaluatedKey' in response:
-            response = districts_table.scan(
+            response = table.scan(
                 FilterExpression=Attr('entity_type').eq('district'),
                 ProjectionExpression='district_id, district_type',
                 ExclusiveStartKey=response['LastEvaluatedKey']
@@ -170,14 +168,14 @@ def find_fallback_salary(district_id: str, year: str, period: str,
     - Education: B < M < D
     - Credits: numerical order (0, 15, 30, 45, 60, ...)
     """
-    if not salaries_table:
+    if not table:
         return None
 
     edu_order = {'B': 1, 'M': 2, 'D': 3}
 
     try:
         # Query GSI2 to get ALL salary entries for this district's year/period
-        response = salaries_table.query(
+        response = table.query(
             IndexName='FallbackQueryIndex',
             KeyConditionExpression=Key('GSI2PK').eq(f'YEAR#{year}#PERIOD#{period}#DISTRICT#{district_id}')
         )
@@ -293,8 +291,8 @@ def get_salary_schedule(district_id: str, year: Optional[str] = None) -> Dict[st
     Get salary schedule(s) for a district
     GET /api/salary-schedule/:districtId/:year?
     """
-    if not salaries_table:
-        return create_response(503, {'error': 'Salaries table not configured'})
+    if not table:
+        return create_response(503, {'error': 'DynamoDB table not configured'})
 
     try:
         # Build key condition
@@ -305,13 +303,13 @@ def get_salary_schedule(district_id: str, year: Optional[str] = None) -> Dict[st
             key_condition = key_condition & Key('SK').begins_with(f'SCHEDULE#{year}')
         else:
             key_condition = key_condition & Key('SK').begins_with('SCHEDULE#')
-
-        response = salaries_table.query(
+        
+        response = table.query(
             KeyConditionExpression=key_condition
         )
 
         items = response.get('Items', [])
-
+ 
         if not items:
             return create_response(404, {'error': 'Schedule not found'})
 
@@ -330,6 +328,7 @@ def get_salary_schedule(district_id: str, year: Optional[str] = None) -> Dict[st
             })
 
         # Format response
+        
         result = []
         for year_period, salaries in schedules.items():
             year, period = year_period.split('#', 1)
@@ -357,8 +356,8 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
     Note: Fallback matching is disabled by default for performance.
     Use include_fallback=true to enable (may be slow with many districts).
     """
-    if not salaries_table:
-        return create_response(503, {'error': 'Salaries table not configured'})
+    if not table:
+        return create_response(503, {'error': 'DynamoDB table not configured'})
 
     # Validate required parameters
     education = validate_education_level(params.get('education'))
@@ -371,7 +370,7 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
 
     try:
         # STEP 1: Get metadata to get all available year/period combinations
-        metadata_response = salaries_table.query(
+        metadata_response = table.query(
             KeyConditionExpression=Key('PK').eq('METADATA#SCHEDULES')
         )
         metadata_items = metadata_response.get('Items', [])
@@ -398,7 +397,7 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
 
         # STEP 2: Get global metadata to determine what edu+credit combos exist after normalization
         # After normalization, all districts have the same combos (from METADATA#MAXVALUES)
-        max_values_response = salaries_table.get_item(
+        max_values_response = table.get_item(
             Key={'PK': 'METADATA#MAXVALUES', 'SK': 'GLOBAL'}
         )
 
@@ -496,7 +495,7 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
 
         for year, period in year_periods:
             # Query GSI1 for this specific combination
-            response = salaries_table.query(
+            response = table.query(
                 IndexName='ExactMatchIndex',
                 KeyConditionExpression=Key('GSI1PK').eq(
                     f'YEAR#{year}#PERIOD#{period}#EDU#{query_edu}#CR#{query_cred_padded}'
@@ -536,7 +535,7 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
 
         # STEP 6: Fetch towns and district types for all result districts
         result_district_ids = [item.get('district_id') for item in all_results]
-        district_towns_map = get_district_towns_util(result_district_ids, DISTRICTS_TABLE_NAME)
+        district_towns_map = get_district_towns_util(result_district_ids, TABLE_NAME)
 
         # Fetch district types for all result districts
         district_types_map = {}
@@ -550,14 +549,14 @@ def compare_salaries(params: Dict[str, str]) -> Dict[str, Any]:
 
                     response = dynamodb.batch_get_item(
                         RequestItems={
-                            DISTRICTS_TABLE_NAME: {
+                            TABLE_NAME: {
                                 'Keys': keys
                             }
                         }
                     )
 
                     # Process returned items
-                    for item in response.get('Responses', {}).get(DISTRICTS_TABLE_NAME, []):
+                    for item in response.get('Responses', {}).get(TABLE_NAME, []):
                         district_id = item['PK'].replace('DISTRICT#', '')
                         district_types_map[district_id] = item.get('district_type', 'unknown')
 
@@ -647,12 +646,12 @@ def get_salary_metadata(district_id: str) -> Dict[str, Any]:
     Get salary metadata for a district (available years, salary range)
     GET /api/districts/:id/salary-metadata
     """
-    if not salaries_table:
-        return create_response(503, {'error': 'Salaries table not configured'})
+    if not table:
+        return create_response(503, {'error': 'DynamoDB table not configured'})
 
     try:
         # Query for all schedules for this district
-        response = salaries_table.query(
+        response = table.query(
             KeyConditionExpression=Key('PK').eq(f'DISTRICT#{district_id}') & Key('SK').begins_with('SCHEDULE#')
         )
 

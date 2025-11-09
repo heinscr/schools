@@ -47,12 +47,12 @@ def test_init_db_create_when_local(monkeypatch):
     database.init_db()
 
     assert 'kwargs' in created
-    assert created['kwargs']['TableName'] == database.DISTRICTS_TABLE_NAME
+    assert created['kwargs']['TableName'] == database.TABLE_NAME
     assert created.get('waited') is True
 
 
 def test_get_table_returns_global(monkeypatch):
     # Ensure get_table returns the module's table object
     tbl = object()
-    monkeypatch.setattr(database, 'districts_table', tbl)
+    monkeypatch.setattr(database, 'table', tbl)
     assert database.get_table() is tbl

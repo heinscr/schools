@@ -6,10 +6,9 @@ import sys
 from pathlib import Path
 
 # Set environment variables before any modules are imported
-# Use test-specific table names that don't conflict with real tables
-os.environ["DYNAMODB_DISTRICTS_TABLE"] = "test-districts"
-os.environ["SALARIES_TABLE_NAME"] = "test-salaries"
-os.environ["DISTRICTS_TABLE_NAME"] = "test-districts"
+# Use test-specific table name that doesn't conflict with real table
+os.environ["DYNAMODB_TABLE_NAME"] = "test-data"
+os.environ["AWS_REGION"] = "us-east-1"
 
 # Set high rate limits for testing to avoid hitting limits during test runs
 os.environ["RATE_LIMIT_GENERAL"] = "1000/minute"

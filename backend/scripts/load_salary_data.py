@@ -15,13 +15,13 @@ from datetime import datetime
 # Initialize DynamoDB
 dynamodb = boto3.resource('dynamodb')
 
-def build_district_name_to_id_map(districts_table_name):
+def build_district_name_to_id_map(table_name):
     """
-    Query the districts table and build a mapping of district names to UUIDs
+    Query the table and build a mapping of district names to UUIDs
     Returns dict: {district_name_lower: district_id}
     """
-    print(f"\nQuerying districts table: {districts_table_name}...")
-    table = dynamodb.Table(districts_table_name)
+    print(f"\nQuerying districts from table: {table_name}...")
+    table = dynamodb.Table(table_name)
 
     district_map = {}
 
@@ -95,7 +95,7 @@ def pad_number(num, width):
     """Pad a number with leading zeros"""
     return str(num).zfill(width)
 
-def create_items(salary_records, district_map, districts_table_name):
+def create_items(salary_records, district_map, table_name):
     """
     Create DynamoDB items for the new single-table design
 
@@ -286,39 +286,27 @@ def main():
     env_path = backend_dir / '.env'
     load_dotenv(dotenv_path=env_path)
 
-    # Get table names from command line or environment variables
+    # Get table name from command line or environment variable
     if len(sys.argv) > 1:
-        salaries_table = sys.argv[1]
-        districts_table = sys.argv[2] if len(sys.argv) > 2 else os.environ.get('DISTRICTS_TABLE_NAME')
-        if not districts_table:
-            print("ERROR: DISTRICTS_TABLE_NAME environment variable not set")
-            print("\nUsage:")
-            print("  python3 load_salary_data.py <salaries_table> <districts_table>")
-            print("  OR set environment variables in /backend/.env:")
-            print("    SALARIES_TABLE_NAME=<salaries_table>")
-            print("    DISTRICTS_TABLE_NAME=<districts_table>")
-            sys.exit(1)
+        table_name = sys.argv[1]
     else:
-        # Try to get from environment variables
-        salaries_table = os.environ.get('SALARIES_TABLE_NAME')
-        districts_table = os.environ.get('DISTRICTS_TABLE_NAME')
+        # Try to get from environment variable
+        table_name = os.environ.get('DYNAMODB_TABLE_NAME')
 
-        if not salaries_table or not districts_table:
-            print("ERROR: Required environment variables not set")
+        if not table_name:
+            print("ERROR: Required environment variable not set")
             print("\nUsage:")
-            print("  python3 load_salary_data.py <salaries_table> <districts_table>")
-            print("  OR set environment variables in /backend/.env:")
-            print("    SALARIES_TABLE_NAME=<salaries_table>")
-            print("    DISTRICTS_TABLE_NAME=<districts_table>")
+            print("  python3 load_salary_data.py <table_name>")
+            print("  OR set environment variable in /backend/.env:")
+            print("    DYNAMODB_TABLE_NAME=<table_name>")
             sys.exit(1)
 
-        print(f"Using environment variables from .env:")
-        print(f"  Salaries: {salaries_table}")
-        print(f"  Districts: {districts_table}")
+        print(f"Using environment variable from .env:")
+        print(f"  Table: {table_name}")
         print()
 
     # Build district name to UUID mapping
-    district_map = build_district_name_to_id_map(districts_table)
+    district_map = build_district_name_to_id_map(table_name)
 
     # Load data
     print("\nLoading salary data from JSON...")
@@ -327,7 +315,7 @@ def main():
 
     # Create items
     print("\nCreating DynamoDB items...")
-    items = create_items(salary_records, district_map, districts_table)
+    items = create_items(salary_records, district_map, table_name)
     print(f"✓ Created {len(items)} total items (salary entries + metadata)")
 
     # Write to DynamoDB
@@ -336,7 +324,7 @@ def main():
     print(f"{'='*80}")
 
     written, failed = batch_write_items(
-        salaries_table,
+        table_name,
         items,
         "Salary data import"
     )
@@ -345,7 +333,7 @@ def main():
     print(f"\n{'='*80}")
     print("Summary:")
     print(f"{'='*80}")
-    print(f"  Salaries table ({salaries_table}):")
+    print(f"  Table ({table_name}):")
     print(f"    ✓ Written: {written}")
     print(f"    ✗ Failed: {failed}")
     print(f"{'='*80}\n")
@@ -366,7 +354,7 @@ def main():
         try:
             # Call normalize_salaries.py with the same table name
             result = subprocess.run(
-                [sys.executable, normalize_script, salaries_table],
+                [sys.executable, normalize_script, table_name],
                 check=True,
                 capture_output=False
             )

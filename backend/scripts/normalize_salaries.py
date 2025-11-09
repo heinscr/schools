@@ -311,13 +311,13 @@ def main():
     if len(sys.argv) > 1:
         table_name = sys.argv[1]
     else:
-        table_name = os.environ.get('SALARIES_TABLE_NAME')
+        table_name = os.environ.get('DYNAMODB_TABLE_NAME')
         if not table_name:
-            print("ERROR: SALARIES_TABLE_NAME environment variable not set")
+            print("ERROR: DYNAMODB_TABLE_NAME environment variable not set")
             print("\nUsage:")
-            print("  python3 normalize_salaries.py <salaries_table>")
+            print("  python3 normalize_salaries.py <table_name>")
             print("  OR set environment variable in /backend/.env:")
-            print("    SALARIES_TABLE_NAME=<salaries_table>")
+            print("    DYNAMODB_TABLE_NAME=<table_name>")
             sys.exit(1)
         print(f"Using environment variable from .env: {table_name}\n")
 

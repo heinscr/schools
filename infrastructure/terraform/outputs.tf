@@ -90,24 +90,14 @@ output "lambda_function_name" {
   value       = local.function_name
 }
 
-output "dynamodb_districts_table_name" {
-  description = "DynamoDB districts table name"
-  value       = aws_dynamodb_table.districts.name
+output "dynamodb_table_name" {
+  description = "DynamoDB main table name (combined districts and salaries)"
+  value       = aws_dynamodb_table.main.name
 }
 
-output "dynamodb_districts_table_arn" {
-  description = "DynamoDB districts table ARN"
-  value       = aws_dynamodb_table.districts.arn
-}
-
-output "salaries_table_name" {
-  description = "DynamoDB teacher salaries table name"
-  value       = aws_dynamodb_table.teacher_salaries.name
-}
-
-output "salaries_table_arn" {
-  description = "DynamoDB teacher salaries table ARN"
-  value       = aws_dynamodb_table.teacher_salaries.arn
+output "dynamodb_table_arn" {
+  description = "DynamoDB main table ARN (combined districts and salaries)"
+  value       = aws_dynamodb_table.main.arn
 }
 
 # Combined output for easy reference
@@ -134,8 +124,8 @@ output "deployment_config" {
       lambda_function_name          = local.function_name
     }
     database = {
-      dynamodb_districts_table_name = aws_dynamodb_table.districts.name
-      dynamodb_districts_table_arn  = aws_dynamodb_table.districts.arn
+      dynamodb_table_name = aws_dynamodb_table.main.name
+      dynamodb_table_arn  = aws_dynamodb_table.main.arn
     }
   }
   sensitive = false

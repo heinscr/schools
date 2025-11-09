@@ -130,14 +130,13 @@ S3_BUCKET=$(terraform output -raw s3_bucket)
 LAMBDA_FUNCTION_NAME=$(terraform output -raw lambda_function_name)
 LAMBDA_ROLE_ARN=$(terraform output -raw lambda_role_arn)
 AWS_REGION=$(terraform output -raw region)
-DYNAMODB_TABLE=$(terraform output -raw dynamodb_districts_table_name)
+DYNAMODB_TABLE=$(terraform output -raw dynamodb_table_name)
 CLOUDFRONT_ID=$(terraform output -raw cloudfront_distribution_id)
 CLOUDFRONT_DOMAIN=$(terraform output -raw cloudfront_domain)
 API_GATEWAY_ID=$(terraform output -raw api_gateway_id)
 API_ENDPOINT=$(terraform output -raw api_endpoint)
 SALARY_API_ENDPOINT=$(terraform output -raw api_endpoint)
 SALARY_LAMBDA_FUNCTION_NAME=$(terraform output -raw salaries_lambda_function_name)
-SALARIES_TABLE_NAME=$(terraform output -raw salaries_table_name)
 
 echo -e "${GREEN}✓ Configuration loaded${NC}"
 echo "  S3 Bucket: $S3_BUCKET"
@@ -255,7 +254,7 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
         CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
     fi
 
-    ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
+    ENV_VARS="DYNAMODB_TABLE_NAME=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
 
     # Add Cognito configuration if available
     if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
@@ -291,7 +290,7 @@ else
         CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
     fi
 
-    ENV_VARS="DYNAMODB_DISTRICTS_TABLE=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
+    ENV_VARS="DYNAMODB_TABLE_NAME=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
     
     # Add Cognito configuration if available
     if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
@@ -354,7 +353,7 @@ if aws lambda get-function --function-name $SALARY_LAMBDA_FUNCTION_NAME --region
         CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
     fi
     
-    SALARY_ENV_VARS="SALARIES_TABLE_NAME=$SALARIES_TABLE_NAME,DISTRICTS_TABLE_NAME=$DYNAMODB_TABLE"
+    SALARY_ENV_VARS="DYNAMODB_TABLE_NAME=$DYNAMODB_TABLE"
     
     # Add CUSTOM_DOMAIN if it exists
     if [ -n "$CUSTOM_DOMAIN" ]; then

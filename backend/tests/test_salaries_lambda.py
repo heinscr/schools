@@ -83,8 +83,7 @@ def test_compare_salaries_basic(monkeypatch):
     all_items = metadata_items + exact_match_items
 
     # Mock the tables
-    monkeypatch.setattr(lambda_mod, 'salaries_table', FakeTable(all_items))
-    monkeypatch.setattr(lambda_mod, 'DISTRICTS_TABLE_NAME', 'test-districts')
+    monkeypatch.setattr(lambda_mod, 'table', FakeTable(all_items))
 
     # Mock get_district_towns
     monkeypatch.setattr('utils.dynamodb.get_district_towns', lambda ids, table_name: {'d1': ['Town1'], 'd2': ['Town2']})
@@ -145,7 +144,7 @@ def test_get_salary_schedule(monkeypatch):
         }
     ]
 
-    monkeypatch.setattr(lambda_mod, 'salaries_table', FakeTable(items))
+    monkeypatch.setattr(lambda_mod, 'table', FakeTable(items))
 
     resp = lambda_mod.get_salary_schedule('d1')
     assert resp['statusCode'] == 200
@@ -184,7 +183,7 @@ def test_get_salary_metadata(monkeypatch):
         }
     ]
 
-    monkeypatch.setattr(lambda_mod, 'salaries_table', FakeTable(items))
+    monkeypatch.setattr(lambda_mod, 'table', FakeTable(items))
 
     resp = lambda_mod.get_salary_metadata('d1')
     assert resp['statusCode'] == 200
@@ -283,7 +282,7 @@ def test_find_fallback_salary(monkeypatch):
         }
     ]
 
-    monkeypatch.setattr(lambda_mod, 'salaries_table', FakeTable(fallback_items))
+    monkeypatch.setattr(lambda_mod, 'table', FakeTable(fallback_items))
 
     # Test 1: Query for M+60 at step 10 (should get M+60@step5, highest step available)
     result = lambda_mod.find_fallback_salary('d1', '2023-2024', 'full-year', 'M', 60, 10)

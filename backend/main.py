@@ -294,10 +294,9 @@ async def get_current_user(
 # Salary endpoints (delegating to salaries module functions)
 # Initialize DynamoDB for salary data
 dynamodb = boto3.resource('dynamodb')
-SALARIES_TABLE_NAME = os.getenv('SALARIES_TABLE_NAME')
-DISTRICTS_TABLE_NAME = os.getenv('DISTRICTS_TABLE_NAME')
+TABLE_NAME = os.getenv('DYNAMODB_TABLE_NAME')
 
-salaries_table = dynamodb.Table(SALARIES_TABLE_NAME) if SALARIES_TABLE_NAME else None
+main_table = dynamodb.Table(TABLE_NAME) if TABLE_NAME else None
 
 
 # Import salary functions from salaries module
@@ -309,8 +308,8 @@ import salaries
 @limiter.limit(GENERAL_RATE_LIMIT)
 async def get_salary_schedule(request: Request, district_id: str, year: Optional[str] = None):
     """Get salary schedule(s) for a district"""
-    # Set the table references in the salaries module
-    salaries.salaries_table = salaries_table
+    # Set the table reference in the salaries module
+    salaries.table = main_table
     result = salaries.get_salary_schedule(district_id, year)
 
     # Convert Lambda response to FastAPI response
@@ -331,9 +330,8 @@ async def compare_salaries(
     limit: Optional[int] = Query(None, description="Result limit")
 ):
     """Compare salaries across districts"""
-    # Set the table references in the salaries module
-    salaries.salaries_table = salaries_table
-    salaries.DISTRICTS_TABLE_NAME = DISTRICTS_TABLE_NAME
+    # Set the table reference in the salaries module
+    salaries.table = main_table
 
     params = {
         'education': education,
@@ -366,7 +364,7 @@ async def get_salary_heatmap(
 ):
     """Get salary heatmap data"""
     # Set the table references in the salaries module
-    salaries.salaries_table = salaries_table
+    salaries.table = main_table
 
     params = {
         'education': education,
@@ -388,7 +386,7 @@ async def get_salary_heatmap(
 async def get_salary_metadata(request: Request, district_id: str):
     """Get salary metadata for a district"""
     # Set the table references in the salaries module
-    salaries.salaries_table = salaries_table
+    salaries.table = main_table
 
     result = salaries.get_salary_metadata(district_id)
 

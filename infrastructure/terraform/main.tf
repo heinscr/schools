@@ -213,34 +213,110 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# DynamoDB Tables
-resource "aws_dynamodb_table" "districts" {
-  name           = "${var.project_name}-districts"
-  billing_mode   = "PAY_PER_REQUEST"  # On-demand pricing
+# Combined DynamoDB Table (Districts + Teacher Salaries)
+#
+# Single-table design optimized for efficient queries across districts and salary data
+# with intelligent fallback matching for missing education/credit combinations
+#
+# Main Table Structure:
+#
+# District Metadata:
+# - PK: DISTRICT#{districtId}
+# - SK: METADATA
+#
+# District-Town Relationships:
+# - PK: DISTRICT#{districtId}
+# - SK: TOWN#{townName}
+# - GSI_TOWN_PK: TOWN#{townName}
+# - GSI_TOWN_SK: DISTRICT#{districtName}
+#
+# Salary Schedules:
+# - PK: DISTRICT#{districtId}
+# - SK: SCHEDULE#{yyyy}#{period}#EDU#{edu}#CR#{credits}#STEP#{step}
+#
+# Salary Metadata:
+# - PK: METADATA#SCHEDULES | METADATA#AVAILABILITY | METADATA#MAXVALUES
+# - SK: YEAR#{yyyy}#PERIOD#{period} | GLOBAL
+#
+# GSI1 - ExactMatchIndex (Salary comparisons across districts):
+# - PK: YEAR#{yyyy}#PERIOD#{period}#EDU#{edu}#CR#{credits}
+# - SK: STEP#{step}#DISTRICT#{districtId}
+#
+# GSI2 - FallbackQueryIndex (All salary entries for a district's schedule):
+# - PK: YEAR#{yyyy}#PERIOD#{period}#DISTRICT#{districtId}
+# - SK: EDU#{edu}#CR#{credits}#STEP#{step}
+#
+# GSI3 - GSI_TOWN (District search by town):
+# - PK: TOWN#{townName}
+# - SK: DISTRICT#{districtName}
+
+resource "aws_dynamodb_table" "main" {
+  name           = "${var.project_name}-data"
+  billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "PK"
   range_key      = "SK"
 
-  attribute { 
+  # Primary key attributes
+  attribute {
     name = "PK"
     type = "S"
-   }
-  
-  attribute { 
-    name = "SK"
-    type = "S" 
   }
 
+  attribute {
+    name = "SK"
+    type = "S"
+  }
+
+  # GSI1: ExactMatchIndex - For salary comparisons across all districts
+  attribute {
+    name = "GSI1PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "GSI1SK"
+    type = "S"
+  }
+
+  # GSI2: FallbackQueryIndex - For fallback query on district's schedule
+  attribute {
+    name = "GSI2PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "GSI2SK"
+    type = "S"
+  }
+
+  # GSI3: GSI_TOWN - For town-based district searches
   attribute {
     name = "GSI_TOWN_PK"
-    type = "S" 
-  }
-  
-  attribute {
-    name = "GSI_TOWN_SK"
-    type = "S" 
+    type = "S"
   }
 
-  # Global Secondary Index for town searches
+  attribute {
+    name = "GSI_TOWN_SK"
+    type = "S"
+  }
+
+  # GSI1: Exact match query for salary comparisons
+  global_secondary_index {
+    name            = "ExactMatchIndex"
+    hash_key        = "GSI1PK"
+    range_key       = "GSI1SK"
+    projection_type = "ALL"
+  }
+
+  # GSI2: Fallback query for specific district's schedule
+  global_secondary_index {
+    name            = "FallbackQueryIndex"
+    hash_key        = "GSI2PK"
+    range_key       = "GSI2SK"
+    projection_type = "ALL"
+  }
+
+  # GSI3: Town-based district search
   global_secondary_index {
     name            = "GSI_TOWN"
     hash_key        = "GSI_TOWN_PK"
@@ -261,7 +337,7 @@ resource "aws_dynamodb_table" "districts" {
   tags = merge(
     local.common_tags,
     {
-      Name = "${var.project_name}-districts"
+      Name = "${var.project_name}-combined-data"
     }
   )
 }
@@ -282,11 +358,12 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
           "dynamodb:UpdateItem",
           "dynamodb:DeleteItem",
           "dynamodb:Query",
-          "dynamodb:Scan"
+          "dynamodb:Scan",
+          "dynamodb:BatchGetItem"
         ]
         Resource = [
-          aws_dynamodb_table.districts.arn,
-          "${aws_dynamodb_table.districts.arn}/index/*"
+          aws_dynamodb_table.main.arn,
+          "${aws_dynamodb_table.main.arn}/index/*"
         ]
       }
     ]
@@ -308,7 +385,7 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      DYNAMODB_DISTRICTS_TABLE = aws_dynamodb_table.districts.name
+      DYNAMODB_TABLE_NAME      = aws_dynamodb_table.main.name
       CLOUDFRONT_DOMAIN        = aws_cloudfront_distribution.frontend.domain_name
       # Cognito configuration for JWT validation
       COGNITO_USER_POOL_ID     = aws_cognito_user_pool.main.id

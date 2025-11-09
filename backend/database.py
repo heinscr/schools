@@ -11,10 +11,10 @@ load_dotenv()
 # Get DynamoDB configuration from environment
 DYNAMODB_ENDPOINT = os.getenv("DYNAMODB_ENDPOINT")  # For local development
 AWS_REGION = os.getenv("AWS_REGION", "us-east-2")
-DISTRICTS_TABLE_NAME = os.getenv("DYNAMODB_DISTRICTS_TABLE")
+TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
 
-if not DISTRICTS_TABLE_NAME:
-    raise ValueError("DYNAMODB_DISTRICTS_TABLE environment variable must be set")
+if not TABLE_NAME:
+    raise ValueError("DYNAMODB_TABLE_NAME environment variable must be set")
 
 # Create DynamoDB client
 def get_dynamodb_client():
@@ -48,27 +48,32 @@ def get_dynamodb_resource():
 # Global clients (reused across Lambda invocations)
 dynamodb_client = get_dynamodb_client()
 dynamodb_resource = get_dynamodb_resource()
-districts_table = dynamodb_resource.Table(DISTRICTS_TABLE_NAME)
+table = dynamodb_resource.Table(TABLE_NAME)
 
 
 def init_db():
     """
-    Initialize DynamoDB tables (for local development only)
-    In production, tables are created by Terraform
+    Initialize DynamoDB table (for local development only)
+    In production, table is created by Terraform
+
+    Creates a single table with all GSIs:
+    - ExactMatchIndex: For salary comparisons across districts
+    - FallbackQueryIndex: For fallback matching logic
+    - GSI_TOWN: For town-based district searches
     """
     if not DYNAMODB_ENDPOINT:
-        logger.info("Skipping table creation - using AWS DynamoDB (tables managed by Terraform)")
+        logger.info("Skipping table creation - using AWS DynamoDB (table managed by Terraform)")
         return
 
     try:
         # Check if table exists
-        dynamodb_client.describe_table(TableName=DISTRICTS_TABLE_NAME)
-        logger.info(f"Table {DISTRICTS_TABLE_NAME} already exists")
+        dynamodb_client.describe_table(TableName=TABLE_NAME)
+        logger.info(f"Table {TABLE_NAME} already exists")
     except dynamodb_client.exceptions.ResourceNotFoundException:
         # Create table for local development
-        logger.info(f"Creating local DynamoDB table: {DISTRICTS_TABLE_NAME}")
-        table = dynamodb_resource.create_table(
-            TableName=DISTRICTS_TABLE_NAME,
+        logger.info(f"Creating local DynamoDB table: {TABLE_NAME}")
+        local_table = dynamodb_resource.create_table(
+            TableName=TABLE_NAME,
             KeySchema=[
                 {'AttributeName': 'PK', 'KeyType': 'HASH'},
                 {'AttributeName': 'SK', 'KeyType': 'RANGE'}
@@ -76,10 +81,38 @@ def init_db():
             AttributeDefinitions=[
                 {'AttributeName': 'PK', 'AttributeType': 'S'},
                 {'AttributeName': 'SK', 'AttributeType': 'S'},
+                {'AttributeName': 'GSI1PK', 'AttributeType': 'S'},
+                {'AttributeName': 'GSI1SK', 'AttributeType': 'S'},
+                {'AttributeName': 'GSI2PK', 'AttributeType': 'S'},
+                {'AttributeName': 'GSI2SK', 'AttributeType': 'S'},
                 {'AttributeName': 'GSI_TOWN_PK', 'AttributeType': 'S'},
                 {'AttributeName': 'GSI_TOWN_SK', 'AttributeType': 'S'}
             ],
             GlobalSecondaryIndexes=[
+                {
+                    'IndexName': 'ExactMatchIndex',
+                    'KeySchema': [
+                        {'AttributeName': 'GSI1PK', 'KeyType': 'HASH'},
+                        {'AttributeName': 'GSI1SK', 'KeyType': 'RANGE'}
+                    ],
+                    'Projection': {'ProjectionType': 'ALL'},
+                    'ProvisionedThroughput': {
+                        'ReadCapacityUnits': 5,
+                        'WriteCapacityUnits': 5
+                    }
+                },
+                {
+                    'IndexName': 'FallbackQueryIndex',
+                    'KeySchema': [
+                        {'AttributeName': 'GSI2PK', 'KeyType': 'HASH'},
+                        {'AttributeName': 'GSI2SK', 'KeyType': 'RANGE'}
+                    ],
+                    'Projection': {'ProjectionType': 'ALL'},
+                    'ProvisionedThroughput': {
+                        'ReadCapacityUnits': 5,
+                        'WriteCapacityUnits': 5
+                    }
+                },
                 {
                     'IndexName': 'GSI_TOWN',
                     'KeySchema': [
@@ -99,10 +132,10 @@ def init_db():
                 'WriteCapacityUnits': 5
             }
         )
-        table.wait_until_exists()
-        logger.info(f"Table {DISTRICTS_TABLE_NAME} created successfully")
+        local_table.wait_until_exists()
+        logger.info(f"Table {TABLE_NAME} created successfully")
 
 
 def get_table():
     """Dependency function to get DynamoDB table"""
-    return districts_table
+    return table
