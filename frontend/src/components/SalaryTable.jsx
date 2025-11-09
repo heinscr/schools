@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 import { formatCurrency } from '../utils/formatters';
 import { logger } from '../utils/logger';
 import './SalaryTable.css';
+import { DataCacheContext } from '../contexts/DataCacheContext';
 
 function SalaryTable({ districtId, highlight = null }) {
   const [schedules, setSchedules] = useState([]);
@@ -48,6 +49,8 @@ function SalaryTable({ districtId, highlight = null }) {
   if (schedules.length === 0) {
     return <div className="salary-empty">No salary data available for this district.</div>;
   }
+
+  const { getDistrictById } = useContext(DataCacheContext);
 
   return (
     <div className="salary-tables">
@@ -106,7 +109,11 @@ function SalaryTable({ districtId, highlight = null }) {
         return (
         <div key={idx} className="salary-schedule">
           <h3>
-            {schedule.district_name} - {schedule.school_year}
+            {(() => {
+              // Prefer the cached district name when available
+              const d = getDistrictById ? getDistrictById(schedule.district_id) : null;
+              return (d && (d.name || d.district_name)) || schedule.district_name || schedule.district_id;
+            })()} - {schedule.school_year}
             {schedule.period && <span className="salary-period"> ({schedule.period})</span>}
           </h3>
 

@@ -104,3 +104,9 @@ scripts/debug_html/contact_01770000.html
 scripts/debug_html/contact_01890000.html
 scripts/debug_html/contact_02660000.html
 scripts/doe_orgcodes.json
+data/teacher_contracts/*
+backend/scripts/google_search_results.csv
+.gitignore
+backend/scripts/search_contracts_google.py
+backend/scripts/download_teacher_contacts_v2.py
+backend/requirements.txt
