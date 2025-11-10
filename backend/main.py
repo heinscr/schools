@@ -304,6 +304,7 @@ from services.salary_service import (
     compare_salaries_across_districts,
     get_district_salary_metadata
 )
+from services.salary_service import get_global_salary_metadata
 
 
 @app.get("/api/salary-schedule/{district_id}")
@@ -388,6 +389,17 @@ async def get_salary_metadata(request: Request, district_id: str):
         return result
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/salary-metadata")
+@limiter.limit(GENERAL_RATE_LIMIT)
+async def get_global_salary_metadata_route(request: Request):
+    """Return global salary metadata (max_step and edu_credit_combos)"""
+    try:
+        result = get_global_salary_metadata(main_table)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

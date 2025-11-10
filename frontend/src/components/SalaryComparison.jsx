@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import api from '../services/api';
 import { DataCacheContext } from '../contexts/DataCacheContext';
 import SalaryComparisonMap from './SalaryComparisonMap';
@@ -22,6 +22,9 @@ function SalaryComparison() {
   const [showCustomFilter, setShowCustomFilter] = useState(false);
   const [selectedDistricts, setSelectedDistricts] = useState(new Set());
   const [selectedTowns, setSelectedTowns] = useState(new Set());
+  const [salaryMeta, setSalaryMeta] = useState(null);
+  const [salaryMetaError, setSalaryMetaError] = useState(null);
+  const [salaryMetaLoading, setSalaryMetaLoading] = useState(false);
   const _dataCache = useContext(DataCacheContext);
   const getDistrictUrl = _dataCache?.getDistrictUrl;
   const [modalOpen, setModalOpen] = useState(false);
@@ -175,6 +178,95 @@ function SalaryComparison() {
       }));
     };
 
+    // Fetch global salary metadata (edu_credit_combos, max_step) on mount
+    useEffect(() => {
+      let mounted = true;
+      const load = async () => {
+        setSalaryMetaLoading(true);
+        try {
+          const data = await api.getGlobalSalaryMetadata();
+          if (!mounted) return;
+          setSalaryMeta(data || null);
+          setSalaryMetaError(null);
+        } catch (err) {
+          if (!mounted) return;
+          setSalaryMeta(null);
+          setSalaryMetaError(err?.message || String(err));
+        } finally {
+          if (mounted) setSalaryMetaLoading(false);
+        }
+      };
+
+      load();
+      return () => { mounted = false; };
+    }, []);
+
+    // Derive option lists from metadata with sensible fallbacks
+    const DEFAULT_MAX_STEP = 15;
+    const DEFAULT_EDU_OPTIONS = [
+      { value: 'B', label: "Bachelor's" },
+      { value: 'M', label: "Master's" },
+      { value: 'D', label: 'Doctorate' },
+    ];
+    const DEFAULT_CREDITS = [0, 15, 30, 45, 60];
+
+    const parsedEduOptions = (() => {
+      if (!salaryMeta || !Array.isArray(salaryMeta.edu_credit_combos)) return DEFAULT_EDU_OPTIONS;
+      const eduSet = new Set();
+      for (const combo of salaryMeta.edu_credit_combos) {
+        if (!combo) continue;
+        const parts = String(combo).split('+');
+        const edu = parts[0];
+        if (edu) eduSet.add(edu);
+      }
+      // Preserve conventional order if present
+      const order = ['B', 'M', 'D'];
+      const found = order.filter(o => eduSet.has(o));
+      const rest = Array.from(eduSet).filter(e => !order.includes(e));
+      const final = [...found, ...rest].map(e => ({ value: e, label: e === 'B' ? "Bachelor's" : e === 'M' ? "Master's" : e === 'D' ? 'Doctorate' : e }));
+      return final.length > 0 ? final : DEFAULT_EDU_OPTIONS;
+    })();
+
+    const parsedCredits = (() => {
+      if (!salaryMeta || !Array.isArray(salaryMeta.edu_credit_combos)) return DEFAULT_CREDITS;
+      const creditsSet = new Set();
+      for (const combo of salaryMeta.edu_credit_combos) {
+        if (!combo) continue;
+        const parts = String(combo).split('+');
+        const cred = parts.length > 1 ? parseInt(parts[1], 10) : 0;
+        if (!Number.isNaN(cred)) creditsSet.add(cred);
+      }
+      const arr = Array.from(creditsSet).sort((a, b) => a - b);
+      return arr.length > 0 ? arr : DEFAULT_CREDITS;
+    })();
+
+    const maxStep = (salaryMeta && Number.isFinite(Number(salaryMeta.max_step))) ? Number(salaryMeta.max_step) : DEFAULT_MAX_STEP;
+
+    // Ensure current searchParams values are present in options; if not, adjust them
+    useEffect(() => {
+      if (!salaryMeta) return;
+      setSearchParams(prev => {
+        let changed = false;
+        const next = { ...prev };
+        const eduVals = parsedEduOptions.map(o => o.value);
+        if (!eduVals.includes(next.education)) {
+          next.education = eduVals[0] || next.education;
+          changed = true;
+        }
+        const creditVals = parsedCredits.map(c => String(c));
+        if (!creditVals.includes(String(next.credits))) {
+          next.credits = creditVals[0] || next.credits;
+          changed = true;
+        }
+        if (Number(next.step) < 1 || Number(next.step) > maxStep) {
+          next.step = String(Math.max(1, Math.min(Number(next.step) || 1, maxStep)));
+          changed = true;
+        }
+        return changed ? next : prev;
+      });
+    // Only run when salaryMeta changes
+    }, [salaryMeta]);
+
     // Perform the comparison search against the API and cache results
     const handleSearch = async () => {
       setLoading(true);
@@ -236,9 +328,9 @@ function SalaryComparison() {
               value={searchParams.education}
               onChange={(e) => handleInputChange('education', e.target.value)}
             >
-              <option value="B">Bachelor's</option>
-              <option value="M">Master's</option>
-              <option value="D">Doctorate</option>
+              {parsedEduOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </select>
           </div>
 
@@ -249,11 +341,9 @@ function SalaryComparison() {
               value={searchParams.credits}
               onChange={(e) => handleInputChange('credits', e.target.value)}
             >
-              <option value="0">0</option>
-              <option value="15">15</option>
-              <option value="30">30</option>
-              <option value="45">45</option>
-              <option value="60">60</option>
+              {parsedCredits.map(c => (
+                <option key={String(c)} value={String(c)}>{String(c)}</option>
+              ))}
             </select>
           </div>
 
@@ -264,8 +354,8 @@ function SalaryComparison() {
               value={searchParams.step}
               onChange={(e) => handleInputChange('step', e.target.value)}
             >
-              {[...Array(15)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1}</option>
+              {[...Array(maxStep)].map((_, i) => (
+                <option key={i + 1} value={String(i + 1)}>{i + 1}</option>
               ))}
             </select>
           </div>

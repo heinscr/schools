@@ -129,6 +129,29 @@ def get_salary_schedule_for_district(
     return result
 
 
+def get_global_salary_metadata(table) -> Dict[str, Any]:
+    """
+    Return global salary metadata stored at PK=METADATA#MAXVALUES SK=GLOBAL
+    Returns dict with keys: max_step (int) and edu_credit_combos (list of strings like 'M+30')
+    """
+    if not table:
+        raise Exception('DynamoDB table not configured')
+
+    resp = table.get_item(Key={'PK': 'METADATA#MAXVALUES', 'SK': 'GLOBAL'})
+    if 'Item' not in resp:
+        raise Exception('METADATA#MAXVALUES not found. Run load_salary_data.py first.')
+
+    item = resp['Item']
+    # Defensive conversions
+    max_step = int(item.get('max_step', 15))
+    edu_credit_combos = item.get('edu_credit_combos', []) or []
+
+    return {
+        'max_step': max_step,
+        'edu_credit_combos': edu_credit_combos
+    }
+
+
 def compare_salaries_across_districts(
     table,
     education: str,

@@ -239,6 +239,24 @@ class ApiService {
   }
 
   /**
+   * Get global salary metadata (max_step and edu_credit_combos)
+   */
+  async getGlobalSalaryMetadata() {
+    const url = `${API_BASE_URL}/api/salary-metadata`;
+    const _fetch = (typeof global !== 'undefined' && global.fetch)
+      ? global.fetch
+      : (typeof globalThis !== 'undefined' && globalThis.fetch)
+        ? globalThis.fetch
+        : fetch;
+
+    const response = await _fetch(url);
+    if (!response || !response.ok) {
+      throw new Error(`Failed to fetch salary metadata: ${response ? response.statusText : 'no response'}`);
+    }
+    return response.json();
+  }
+
+  /**
    * Compare salaries across districts for specific credentials
    * @param {string} education - Education level (B, M, D)
    * @param {number} credits - Additional credits (0, 15, 30, 45, 60)
