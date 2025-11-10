@@ -136,12 +136,10 @@ CLOUDFRONT_DOMAIN=$(terraform output -raw cloudfront_domain)
 API_GATEWAY_ID=$(terraform output -raw api_gateway_id)
 API_ENDPOINT=$(terraform output -raw api_endpoint)
 SALARY_API_ENDPOINT=$(terraform output -raw api_endpoint)
-SALARY_LAMBDA_FUNCTION_NAME=$(terraform output -raw salaries_lambda_function_name)
 
 echo -e "${GREEN}✓ Configuration loaded${NC}"
 echo "  S3 Bucket: $S3_BUCKET"
 echo "  Lambda Function: $LAMBDA_FUNCTION_NAME"
-echo "  Salary Lambda Function: $SALARY_LAMBDA_FUNCTION_NAME"
 echo "  Region: $AWS_REGION"
 echo "  DynamoDB Table: $DYNAMODB_TABLE"
 echo "  CloudFront Domain: $CLOUDFRONT_DOMAIN"
@@ -181,45 +179,18 @@ echo -e "${GREEN}✓ Python Lambda package created${NC}"
 
 cd ..
 
-# 2. Package Python Lambda (salary API)
-echo "Creating salary Lambda deployment package..."
-cd backend
+# Note: Salary endpoints are now served by the main API Lambda. The separate
+# `salaries.zip` package is no longer built or uploaded. Terraform has been
+# updated to integrate the salary API routes with the main API Lambda.
+# If you need to keep a separate salaries Lambda, re-enable packaging here.
 
-# Create a temporary directory for packaging
-mkdir -p salary_package
-
-# Copy the salary Lambda handler, config, and utils
-cp salaries.py salary_package/
-cp config.py salary_package/
-[ -d "utils" ] && cp -r utils salary_package/
-
-# Install dependencies (boto3 is included in Lambda runtime, but we might need others)
-# For now, just package the handler since it only uses boto3
-cd salary_package
-
-# Remove old zip if exists
-rm -f ../salaries.zip
-
-# Create zip file
-zip -r ../salaries.zip . -q
-
-cd ..
-
-# Clean up
-rm -rf salary_package
-
-echo -e "${GREEN}✓ Salary Lambda package created${NC}"
-
-cd ..
-
-# Upload to S3
-echo "Uploading Lambda packages to S3..."
+# Upload backend lambda-deployment.zip to S3
+echo "Uploading backend Lambda package to S3..."
 cd backend
 aws s3 cp lambda-deployment.zip s3://$S3_BUCKET/backend/lambda-deployment.zip --region $AWS_REGION
-aws s3 cp salaries.zip s3://$S3_BUCKET/backend/salaries.zip --region $AWS_REGION
 cd ..
 
-echo -e "${GREEN}✓ Lambda packages uploaded${NC}"
+echo -e "${GREEN}✓ Lambda package uploaded${NC}"
 
 # Check if Lambda function exists
 if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION > /dev/null 2>&1; then
@@ -240,140 +211,16 @@ if aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_R
     echo "Waiting for code update to complete..."
     aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
 
-    # Update environment variables
-    echo "Updating Lambda configuration..."
-
-    # Get Cognito configuration from Terraform
-    COGNITO_USER_POOL_ID=$(cd infrastructure/terraform && terraform output -raw cognito_user_pool_id 2>/dev/null || echo "")
-    COGNITO_CLIENT_ID=$(cd infrastructure/terraform && terraform output -raw cognito_client_id 2>/dev/null || echo "")
-    COGNITO_REGION=$(cd infrastructure/terraform && terraform output -raw region 2>/dev/null || echo "")
-
-    # Get CUSTOM_DOMAIN from backend/.env if it exists
-    CUSTOM_DOMAIN=""
-    if [ -f "backend/.env" ]; then
-        CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
-    fi
-
-    ENV_VARS="DYNAMODB_TABLE_NAME=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
-
-    # Add Cognito configuration if available
-    if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
-        ENV_VARS="$ENV_VARS,COGNITO_USER_POOL_ID=$COGNITO_USER_POOL_ID,COGNITO_CLIENT_ID=$COGNITO_CLIENT_ID,COGNITO_REGION=$COGNITO_REGION"
-        echo "  Using Cognito User Pool: $COGNITO_USER_POOL_ID"
-    fi
-
-    # Add CUSTOM_DOMAIN if it exists
-    if [ -n "$CUSTOM_DOMAIN" ]; then
-        ENV_VARS="$ENV_VARS,CUSTOM_DOMAIN=$CUSTOM_DOMAIN"
-        echo "  Using custom domain: $CUSTOM_DOMAIN"
-    fi
-
-    aws lambda update-function-configuration \
-        --function-name $LAMBDA_FUNCTION_NAME \
-        --environment "Variables={$ENV_VARS}" \
-        --region $AWS_REGION \
-        --output json > /dev/null
-
-    echo "Waiting for configuration update to complete..."
-    aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
+    # Note: Lambda environment variables are managed by Terraform in main.tf
+    # and should not be updated here. Run 'terraform apply' to update configuration.
 else
-    echo "Creating new Lambda function..."
-
-    # Get Cognito configuration from Terraform
-    COGNITO_USER_POOL_ID=$(cd infrastructure/terraform && terraform output -raw cognito_user_pool_id 2>/dev/null || echo "")
-    COGNITO_CLIENT_ID=$(cd infrastructure/terraform && terraform output -raw cognito_client_id 2>/dev/null || echo "")
-    COGNITO_REGION=$(cd infrastructure/terraform && terraform output -raw region 2>/dev/null || echo "")
-
-    # Get CUSTOM_DOMAIN from backend/.env if it exists
-    CUSTOM_DOMAIN=""
-    if [ -f "backend/.env" ]; then
-        CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
-    fi
-
-    ENV_VARS="DYNAMODB_TABLE_NAME=$DYNAMODB_TABLE,CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN"
-    
-    # Add Cognito configuration if available
-    if [ -n "$COGNITO_USER_POOL_ID" ] && [ -n "$COGNITO_CLIENT_ID" ]; then
-        ENV_VARS="$ENV_VARS,COGNITO_USER_POOL_ID=$COGNITO_USER_POOL_ID,COGNITO_CLIENT_ID=$COGNITO_CLIENT_ID,COGNITO_REGION=$COGNITO_REGION"
-        echo "  Using Cognito User Pool: $COGNITO_USER_POOL_ID"
-    fi
-
-    # Add CUSTOM_DOMAIN if it exists
-    if [ -n "$CUSTOM_DOMAIN" ]; then
-        ENV_VARS="$ENV_VARS,CUSTOM_DOMAIN=$CUSTOM_DOMAIN"
-        echo "  Using custom domain: $CUSTOM_DOMAIN"
-    fi
-
-    aws lambda create-function \
-        --function-name $LAMBDA_FUNCTION_NAME \
-        --runtime python3.12 \
-        --role $LAMBDA_ROLE_ARN \
-        --handler main.handler \
-        --code S3Bucket=$S3_BUCKET,S3Key=backend/lambda-deployment.zip \
-        --environment "Variables={$ENV_VARS}" \
-        --timeout 30 \
-        --memory-size 512 \
-        --region $AWS_REGION \
-        --output json > /dev/null
-
-    echo "Waiting for Lambda to be ready..."
-    aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
+    echo -e "${RED}Lambda function does not exist!${NC}"
+    echo -e "${YELLOW}Lambda should be created by Terraform. Please run:${NC}"
+    echo -e "  cd infrastructure/terraform && terraform apply"
+    exit 1
 fi
 
 echo -e "${GREEN}✓ Lambda function deployed${NC}"
-
-# Deploy Salary Lambda
-echo -e "\n${YELLOW}=== Deploying Salary Lambda ===${NC}"
-
-# Check if Salary Lambda function exists
-if aws lambda get-function --function-name $SALARY_LAMBDA_FUNCTION_NAME --region $AWS_REGION > /dev/null 2>&1; then
-    echo "Updating existing Salary Lambda function code..."
-
-    # Wait for any pending updates to complete first
-    echo "Checking if Salary Lambda is ready..."
-    aws lambda wait function-updated --function-name $SALARY_LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
-
-    # Update function code
-    aws lambda update-function-code \
-        --function-name $SALARY_LAMBDA_FUNCTION_NAME \
-        --s3-bucket $S3_BUCKET \
-        --s3-key backend/salaries.zip \
-        --region $AWS_REGION \
-        --output json > /dev/null
-
-    echo "Waiting for code update to complete..."
-    aws lambda wait function-updated --function-name $SALARY_LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
-
-    # Update environment variables
-    echo "Updating Salary Lambda configuration..."
-    
-    # Get CUSTOM_DOMAIN from backend/.env if it exists
-    CUSTOM_DOMAIN=""
-    if [ -f "backend/.env" ]; then
-        CUSTOM_DOMAIN=$(grep -E "^CUSTOM_DOMAIN=" backend/.env | cut -d '=' -f2- | tr -d '\r\n')
-    fi
-    
-    SALARY_ENV_VARS="DYNAMODB_TABLE_NAME=$DYNAMODB_TABLE"
-    
-    # Add CUSTOM_DOMAIN if it exists
-    if [ -n "$CUSTOM_DOMAIN" ]; then
-        SALARY_ENV_VARS="$SALARY_ENV_VARS,CUSTOM_DOMAIN=$CUSTOM_DOMAIN"
-        echo "  Using custom domain: $CUSTOM_DOMAIN"
-    fi
-    
-    aws lambda update-function-configuration \
-        --function-name $SALARY_LAMBDA_FUNCTION_NAME \
-        --environment "Variables={$SALARY_ENV_VARS}" \
-        --region $AWS_REGION \
-        --output json > /dev/null
-
-    echo "Waiting for configuration update to complete..."
-    aws lambda wait function-updated --function-name $SALARY_LAMBDA_FUNCTION_NAME --region $AWS_REGION 2>/dev/null || true
-else
-    echo -e "${YELLOW}Salary Lambda function not found. It should be created by Terraform.${NC}"
-fi
-
-echo -e "${GREEN}✓ Salary Lambda function deployed${NC}"
 
 # Deploy Frontend
 

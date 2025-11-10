@@ -110,3 +110,8 @@ backend/scripts/google_search_results.csv
 backend/scripts/search_contracts_google.py
 backend/scripts/download_teacher_contacts_v2.py
 backend/requirements.txt
+infrastructure/terraform/tfplan
+backend/scripts/search_contracts_comprehensive.py
+infrastructure/terraform/backend_env.tftpl
+backend/scripts/download_teacher_contacts.py
+backend/scripts/comprehensive_results.csv

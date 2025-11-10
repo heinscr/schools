@@ -13,6 +13,10 @@ terraform {
       source  = "hashicorp/archive"
       version = "~> 2.0"
     }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.0"
+    }
   }
 
   # Optional: Uncomment to use S3 backend for state
@@ -384,14 +388,18 @@ resource "aws_lambda_function" "api" {
   s3_key    = "backend/lambda-deployment.zip"
 
   environment {
-    variables = {
-      DYNAMODB_TABLE_NAME      = aws_dynamodb_table.main.name
-      CLOUDFRONT_DOMAIN        = aws_cloudfront_distribution.frontend.domain_name
-      # Cognito configuration for JWT validation
-      COGNITO_USER_POOL_ID     = aws_cognito_user_pool.main.id
-      COGNITO_CLIENT_ID        = aws_cognito_user_pool_client.frontend.id
-      COGNITO_REGION           = var.aws_region
-    }
+    variables = merge(
+      {
+        DYNAMODB_TABLE_NAME      = aws_dynamodb_table.main.name
+        CLOUDFRONT_DOMAIN        = aws_cloudfront_distribution.frontend.domain_name
+        # Cognito configuration for JWT validation
+        COGNITO_USER_POOL_ID     = aws_cognito_user_pool.main.id
+        COGNITO_CLIENT_ID        = aws_cognito_user_pool_client.frontend.id
+        COGNITO_REGION           = var.aws_region
+      },
+      # Add custom domain if configured
+      var.cloudfront_domain_name != "" ? { CUSTOM_DOMAIN = var.cloudfront_domain_name } : {}
+    )
   }
 
   tags = merge(
@@ -472,18 +480,6 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_integration.lambda.id,
       aws_api_gateway_method.proxy_root.id,
       aws_api_gateway_integration.lambda_root.id,
-      # Salary endpoints
-      aws_api_gateway_resource.salary_schedule.id,
-      aws_api_gateway_resource.salary_schedule_path.id,
-      aws_api_gateway_resource.salary_schedule_proxy.id,
-      aws_api_gateway_resource.salary_compare.id,
-      aws_api_gateway_resource.salary_heatmap.id,
-      aws_api_gateway_method.salary_schedule_proxy.id,
-      aws_api_gateway_method.salary_compare.id,
-      aws_api_gateway_method.salary_heatmap.id,
-      aws_api_gateway_integration.salary_schedule_lambda.id,
-      aws_api_gateway_integration.salary_compare_lambda.id,
-      aws_api_gateway_integration.salary_heatmap_lambda.id,
     ]))
   }
 
@@ -493,10 +489,7 @@ resource "aws_api_gateway_deployment" "main" {
 
   depends_on = [
     aws_api_gateway_integration.lambda,
-    aws_api_gateway_integration.lambda_root,
-    aws_api_gateway_integration.salary_schedule_lambda,
-    aws_api_gateway_integration.salary_compare_lambda,
-    aws_api_gateway_integration.salary_heatmap_lambda
+    aws_api_gateway_integration.lambda_root
   ]
 }
 
@@ -521,4 +514,19 @@ resource "aws_lambda_permission" "api_gateway" {
   function_name = aws_lambda_function.api.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.main.execution_arn}/*/*"
+}
+
+# Generate backend/.env file with configuration from Terraform
+resource "local_file" "backend_env" {
+  filename = "${path.module}/../../backend/.env"
+  content = templatefile("${path.module}/backend_env.tftpl", {
+    aws_region           = var.aws_region
+    dynamodb_table_name  = aws_dynamodb_table.main.name
+    cognito_user_pool_id = aws_cognito_user_pool.main.id
+    cognito_client_id    = aws_cognito_user_pool_client.frontend.id
+    cognito_region       = var.aws_region
+    environment          = var.environment
+  })
+
+  file_permission = "0644"
 }
