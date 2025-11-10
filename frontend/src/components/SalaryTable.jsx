@@ -9,6 +9,10 @@ function SalaryTable({ districtId, highlight = null }) {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [globalMaxStep, setGlobalMaxStep] = useState(15);
+
+  // Compute reserved height for the table area (header + rows)
+  const reservedHeight = 56 + (globalMaxStep * 44);
 
   useEffect(() => {
     if (!districtId) {
@@ -34,12 +38,59 @@ function SalaryTable({ districtId, highlight = null }) {
     fetchSalaries();
   }, [districtId]);
 
+  // Fetch global salary metadata (max_step) to calculate reserved table height
+  useEffect(() => {
+    let mounted = true;
+    const loadMeta = async () => {
+      try {
+        const meta = await api.getGlobalSalaryMetadata();
+        if (!mounted) return;
+        if (meta && Number.isFinite(Number(meta.max_step))) {
+          setGlobalMaxStep(Number(meta.max_step));
+        }
+      } catch (e) {
+        // ignore — keep default
+      }
+    };
+    loadMeta();
+    return () => { mounted = false; };
+  }, []);
+
   if (!districtId) {
     return null;
   }
 
+  const { getDistrictById } = useContext(DataCacheContext);
+
   if (loading) {
-    return <div className="salary-loading">Loading salary data...</div>;
+    // Show the same header as the final table (prefer cached district name) to avoid layout jump
+    const d = getDistrictById ? getDistrictById(districtId) : null;
+    const headerName = (d && (d.name || d.district_name)) || districtId;
+      return (
+        <div className="salary-tables">
+          <div className="salary-schedule">
+            <h3>{headerName}</h3>
+            <div className="salary-table-wrapper" style={{ minHeight: `${reservedHeight}px` }}>
+              <table className="salary-table">
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    {[...Array(5)].map((_, i) => <th key={i}>—</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...Array(globalMaxStep)].map((_, r) => (
+                    <tr key={r}>
+                      <td className="step-cell skeleton-cell">&nbsp;</td>
+                      {[...Array(5)].map((__, c) => <td key={c} className="skeleton-cell">&nbsp;</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    );
   }
 
   if (error) {
@@ -47,10 +98,34 @@ function SalaryTable({ districtId, highlight = null }) {
   }
 
   if (schedules.length === 0) {
-    return <div className="salary-empty">No salary data available for this district.</div>;
+    const d = getDistrictById ? getDistrictById(districtId) : null;
+    const headerName = (d && (d.name || d.district_name)) || districtId;
+    return (
+      <div className="salary-tables">
+        <div className="salary-schedule">
+          <h3>{headerName}</h3>
+          <div className="salary-table-wrapper" style={{ minHeight: `${reservedHeight}px` }}>
+            <table className="salary-table">
+              <thead>
+                <tr>
+                  <th>Step</th>
+                  {[...Array(5)].map((_, i) => <th key={i}>—</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(globalMaxStep)].map((_, r) => (
+                  <tr key={r}>
+                    <td className="step-cell skeleton-cell">&nbsp;</td>
+                    {[...Array(5)].map((__, c) => <td key={c} className="skeleton-cell">&nbsp;</td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
   }
-
-  const { getDistrictById } = useContext(DataCacheContext);
 
   // Sort schedules: newest school_year first, then period in inverse ASCII order
   const extractYear = (s) => {
@@ -200,7 +275,8 @@ function SalaryTable({ districtId, highlight = null }) {
             )}
           </h3>
 
-          <div className="salary-table-wrapper">
+          {/* Reserve vertical space based on globalMaxStep so the modal doesn't jump when rows render */}
+          <div className="salary-table-wrapper" style={{ minHeight: `${reservedHeight}px` }}>
             <table className="salary-table">
               <thead>
                 <tr>
