@@ -52,9 +52,27 @@ function SalaryTable({ districtId, highlight = null }) {
 
   const { getDistrictById } = useContext(DataCacheContext);
 
+  // Sort schedules: newest school_year first, then period in inverse ASCII order
+  const extractYear = (s) => {
+    if (!s) return Number.NEGATIVE_INFINITY;
+    const m = String(s).match(/(\d{4})/);
+    return m ? parseInt(m[1], 10) : Number.NEGATIVE_INFINITY;
+  };
+
+  const sortedSchedules = [...schedules].sort((a, b) => {
+    const ya = extractYear(a?.school_year);
+    const yb = extractYear(b?.school_year);
+    if (ya !== yb) return yb - ya; // descending year
+    const pa = a?.period || '';
+    const pb = b?.period || '';
+    if (pa === pb) return 0;
+    // inverse ASCII sort (reverse lexicographic)
+    return pa < pb ? 1 : -1;
+  });
+
   return (
     <div className="salary-tables">
-      {schedules.map((schedule, idx) => {
+  {sortedSchedules.map((schedule, idx) => {
         logger.log(`Schedule ${idx}:`, schedule);
         
   // Group salaries by step for table display
