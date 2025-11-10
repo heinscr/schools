@@ -16,17 +16,15 @@ from services.hybrid_extractor import HybridContractExtractor
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Process contract PDFs from S3 with hybrid extraction (pdfplumber + Claude API)',
+        description='Process contract PDFs from S3 with hybrid extraction (pdfplumber + AWS Textract)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Environment Variables:
-  ANTHROPIC_API_KEY    Claude API key (required)
   AWS_PROFILE          AWS profile to use (optional)
   AWS_REGION           AWS region (default: us-east-1)
 
 Examples:
   # Process all PDFs in the bucket
-  export ANTHROPIC_API_KEY=sk-ant-...
   python process_s3_contracts.py
 
   # Use specific AWS profile
@@ -41,9 +39,9 @@ Examples:
 
 Cost Estimate:
   - Text-based PDFs: Free (pdfplumber)
-  - Image-based PDFs: ~$0.03 per contract (Claude API)
+  - Image-based PDFs: $15 per 1,000 pages (AWS Textract)
   - Based on samples: 25% text-based, 75% image-based
-  - 350 contracts = ~$8 total
+  - 350 contracts (avg 3 pages) = ~$10-12 total
         """
     )
 
@@ -72,11 +70,6 @@ Cost Estimate:
     )
 
     parser.add_argument(
-        '--api-key',
-        help='Claude API key (or set ANTHROPIC_API_KEY env var)'
-    )
-
-    parser.add_argument(
         '--dry-run',
         action='store_true',
         help='List files without processing'
@@ -84,31 +77,17 @@ Cost Estimate:
 
     args = parser.parse_args()
 
-    # Check for API key
-    api_key = args.api_key or os.environ.get('ANTHROPIC_API_KEY')
-    if not api_key and not args.dry_run:
-        print("❌ Error: ANTHROPIC_API_KEY environment variable not set")
-        print("Get your API key from: https://console.anthropic.com/")
-        print("\nSet it with:")
-        print("  export ANTHROPIC_API_KEY=sk-ant-...")
-        sys.exit(1)
-
     # Check dependencies
     try:
         import pdfplumber
-        import anthropic
-        import pdf2image
         import boto3
     except ImportError as e:
         print(f"❌ Error: Missing dependency: {e}")
         print("\nInstall required packages:")
-        print("  pip install pdfplumber anthropic pdf2image boto3 pillow")
-        print("\nSystem dependencies (for pdf2image):")
-        print("  Ubuntu/Debian: apt-get install poppler-utils")
-        print("  macOS: brew install poppler")
+        print("  pip install pdfplumber boto3")
         sys.exit(1)
 
-    print("🚀 Contract PDF Processor")
+    print("🚀 Contract PDF Processor (AWS Textract)")
     print("="*60)
     print(f"Input:  s3://{args.input_bucket}/{args.input_prefix}")
     print(f"Output: s3://{args.output_bucket}/{args.output_prefix}")
@@ -136,8 +115,12 @@ Cost Estimate:
                 filename = Path(key).name
                 print(f"  {i}. {filename}")
 
-            print(f"\n💰 Estimated cost (assuming 75% need Claude API):")
-            print(f"   {len(pdf_files)} files × 75% × $0.03 = ${len(pdf_files) * 0.75 * 0.03:.2f}")
+            # Count pages for cost estimate
+            print(f"\n💰 Estimated cost (assuming 75% need Textract, avg 3 pages/PDF):")
+            textract_pdfs = int(len(pdf_files) * 0.75)
+            total_pages = textract_pdfs * 3
+            cost = (total_pages / 1000) * 15
+            print(f"   {textract_pdfs} PDFs × 3 pages × $15/1000 pages = ${cost:.2f}")
 
         except Exception as e:
             print(f"❌ Error accessing S3: {e}")
@@ -152,7 +135,7 @@ Cost Estimate:
     print("\n📄 Processing PDFs...\n")
 
     try:
-        extractor = HybridContractExtractor(anthropic_api_key=api_key)
+        extractor = HybridContractExtractor()
 
         results = extractor.process_s3_bucket(
             input_bucket=args.input_bucket,
@@ -167,15 +150,15 @@ Cost Estimate:
             if file_info.get('success'):
                 method = file_info['method']
                 records = file_info['records']
-                icon = "📝" if method == "pdfplumber" else "🤖"
+                icon = "📝" if method == "pdfplumber" else "🔍"
                 print(f"  {icon} {file_info['filename']}: {records} records ({method})")
             else:
                 print(f"  ❌ {file_info['filename']}: {file_info.get('error', 'unknown error')}")
 
         # Cost estimate
         print(f"\n💰 COST ESTIMATE:")
-        print(f"   Claude API calls: {results['claude_count']}")
-        print(f"   Estimated cost: ${results['claude_count'] * 0.03:.2f}")
+        print(f"   Textract calls: {results['textract_count']}")
+        print(f"   Estimated cost (avg 3 pages): ${results['textract_count'] * 3 * 0.015:.2f}")
 
         # Exit code
         sys.exit(0 if results['failed'] == 0 else 1)

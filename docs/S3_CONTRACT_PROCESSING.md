@@ -1,8 +1,8 @@
-# S3 Contract Processing with Hybrid Extraction
+# S3 Contract Processing with AWS Textract
 
 Automated salary schedule extraction from teacher contract PDFs using a hybrid approach:
 - **pdfplumber** for text-based PDFs (free, fast)
-- **Claude API** for image-based PDFs (~$0.03 each, high accuracy)
+- **AWS Textract** for image-based PDFs ($15 per 1,000 pages, accurate)
 
 ## Quick Start
 
@@ -14,27 +14,41 @@ cd backend
 pip install -r requirements.txt
 ```
 
-**2. Install system dependencies (for pdf2image):**
-```bash
-# Ubuntu/Debian
-sudo apt-get install poppler-utils
-
-# macOS
-brew install poppler
-```
-
-**3. Set up AWS credentials:**
+**2. Set up AWS credentials:**
 ```bash
 aws configure
 # Or set AWS_PROFILE environment variable
 ```
 
-**4. Get Claude API key:**
-- Visit: https://console.anthropic.com/
-- Create API key
-- Export it:
-```bash
-export ANTHROPIC_API_KEY=sk-ant-...
+**3. Ensure IAM permissions:**
+
+Your AWS user/role needs these permissions:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::crackpow-schools-918213481336/*",
+        "arn:aws:s3:::crackpow-schools-918213481336"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "textract:StartDocumentAnalysis",
+        "textract:GetDocumentAnalysis"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
 ```
 
 ### Usage
@@ -52,13 +66,12 @@ Found 10 PDF files:
   2. Agawam_contract_2_conf85.pdf
   ...
 
-💰 Estimated cost (assuming 75% need Claude API):
-   10 files × 75% × $0.03 = $0.23
+💰 Estimated cost (assuming 75% need Textract, avg 3 pages/PDF):
+   8 PDFs × 3 pages × $15/1000 pages = $0.36
 ```
 
 **Process all PDFs:**
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
 python3 process_s3_contracts.py
 ```
 
@@ -78,7 +91,7 @@ python3 process_s3_contracts.py \
 if is_text_based_pdf(pdf):
     # Use pdfplumber (free, fast)
 else:
-    # Use Claude API (accurate, ~$0.03)
+    # Use AWS Textract ($15/1000 pages)
 ```
 
 ### 2. Text-Based PDF Processing
@@ -88,11 +101,13 @@ else:
 - Extracts year from dates/text
 - Maps education columns (BA, MA, DOC, etc.)
 
-### 3. Image-Based PDF Processing
-- Converts pages to images (200 DPI)
-- Sends to Claude API with structured prompt
-- Claude returns JSON salary data
-- Validates and saves results
+### 3. Image-Based PDF Processing (AWS Textract)
+- Uploads PDF location to Textract
+- Starts asynchronous document analysis job
+- Polls for completion (2-5 seconds typical)
+- Retrieves table structures from Textract
+- Parses cells into salary records
+- Validates table structure
 
 ### 4. Output Format
 
@@ -124,34 +139,47 @@ else:
 
 ## Cost Estimates
 
-Based on sample contracts (25% text-based, 75% image-based):
+Based on sample contracts (25% text-based, 75% image-based, avg 3 pages/PDF):
 
-| Districts | Text PDFs (free) | Image PDFs (@$0.03) | Total Cost |
-|-----------|------------------|---------------------|------------|
-| 10        | 3                | 7                   | $0.21      |
-| 50        | 13               | 37                  | $1.11      |
-| 100       | 25               | 75                  | $2.25      |
-| 356       | 89               | 267                 | **$8.01**  |
+| Districts | Text PDFs (free) | Image PDFs | Total Pages | Cost @ $15/1000 |
+|-----------|------------------|------------|-------------|-----------------|
+| 10        | 3                | 7          | 21          | **$0.32**       |
+| 50        | 13               | 37         | 111         | **$1.67**       |
+| 100       | 25               | 75         | 225         | **$3.38**       |
+| 356       | 89               | 267        | 801         | **$12.02**      |
+
+**AWS Textract Pricing:**
+- Table extraction: $15 per 1,000 pages
+- No minimum charge
+- Pay only for what you use
+
+## Textract vs Claude API Comparison
+
+| Feature | AWS Textract | Claude API (previous) |
+|---------|--------------|----------------------|
+| **Cost** | $15/1000 pages | $3-15 per 1M tokens (~$0.03/page) |
+| **Setup** | AWS credentials only | External API key needed |
+| **Integration** | Native AWS | External service |
+| **Table Detection** | Excellent | Excellent |
+| **Speed** | 2-5 seconds/page | 3-10 seconds/page |
+| **Accuracy** | Very Good | Excellent |
+| **Best For** | AWS-native apps | Maximum accuracy |
+
+**For 356 districts:**
+- Textract: **$12.02** ✅ (chosen)
+- Claude API: **$8.01**
+
+Textract chosen for:
+- ✅ Native AWS integration
+- ✅ No external dependencies
+- ✅ Simple IAM permissions
+- ✅ Similar cost (~$4 difference)
 
 ## Troubleshooting
 
-### "ModuleNotFoundError: No module named 'pdf2image'"
+### "ModuleNotFoundError: No module named 'pdfplumber'"
 ```bash
-pip install pdf2image pillow
-```
-
-### "Unable to load pdf2image - poppler not installed"
-```bash
-# Ubuntu/Debian
-sudo apt-get install poppler-utils
-
-# macOS
-brew install poppler
-```
-
-### "ANTHROPIC_API_KEY not set"
-```bash
-export ANTHROPIC_API_KEY=sk-ant-your-key-here
+pip install pdfplumber
 ```
 
 ### "NoCredentialsError: Unable to locate credentials"
@@ -164,6 +192,31 @@ aws configure
 - Verify IAM permissions for S3 read/write
 - Check bucket name is correct
 - Ensure AWS profile has proper permissions
+
+### "AccessDeniedException" for Textract
+Add these permissions to your IAM user/role:
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "textract:StartDocumentAnalysis",
+    "textract:GetDocumentAnalysis"
+  ],
+  "Resource": "*"
+}
+```
+
+### Textract job timing out
+- Textract jobs are asynchronous
+- Script polls every 2 seconds
+- Typical processing: 2-5 seconds per page
+- Large PDFs (50+ pages) may take 1-2 minutes
+
+### "No tables found" for image-based PDF
+- Textract detected the PDF but no tables matched salary schedule pattern
+- Check PDF quality (scans should be 200+ DPI)
+- Tables must have clear borders
+- May need manual review
 
 ## Architecture
 
@@ -184,10 +237,13 @@ aws configure
 │  ┌──────────────────┐       ┌──────────────────┐       │
 │  │  Text-based PDF  │       │ Image-based PDF  │       │
 │  │                  │       │                  │       │
-│  │  pdfplumber +    │       │  pdf2image +     │       │
-│  │  regex parsing   │       │  Claude API      │       │
+│  │  pdfplumber +    │       │  AWS Textract    │       │
+│  │  regex parsing   │       │  (async job)     │       │
+│  │                  │       │  - Start job     │       │
+│  │  FREE            │       │  - Poll status   │       │
+│  │                  │       │  - Get tables    │       │
 │  │                  │       │                  │       │
-│  │  FREE            │       │  ~$0.03 each     │       │
+│  │                  │       │  $15/1000 pages  │       │
 │  └──────────────────┘       └──────────────────┘       │
 │                                                         │
 │  3. Parse salary data                                   │
@@ -204,9 +260,63 @@ aws configure
 
 ## Files
 
-- **`backend/services/hybrid_extractor.py`** - Core extraction logic
+- **`backend/services/hybrid_extractor.py`** - Core extraction logic with Textract
 - **`scripts/process_s3_contracts.py`** - CLI script for S3 processing
 - **`backend/requirements.txt`** - Python dependencies
+
+## Example Output
+
+After running:
+```
+🚀 Contract PDF Processor (AWS Textract)
+============================================================
+Input:  s3://crackpow-schools-918213481336/contracts/pdfs/
+Output: s3://crackpow-schools-918213481336/contracts/data/
+============================================================
+
+📄 Processing PDFs...
+
+============================================================
+Processing: Bedford_contract_1_conf85.pdf
+============================================================
+✓ Text-based PDF detected: Bedford_contract_1_conf85.pdf
+Extracting with pdfplumber: Bedford_contract_1_conf85.pdf
+✓ SUCCESS: 234 records via pdfplumber
+✓ Saved to s3://crackpow-schools-918213481336/contracts/data/Bedford_contract_1.json
+
+============================================================
+Processing: Agawam_contract_2_conf85.pdf
+============================================================
+⚠ Image-based PDF detected: Agawam_contract_2_conf85.pdf
+Extracting with AWS Textract: Agawam_contract_2_conf85.pdf
+Started Textract job: abc123...
+Textract job status: IN_PROGRESS, waiting...
+Textract job status: SUCCEEDED
+Retrieved 1247 blocks from Textract
+Found 3 tables in Textract response
+✓ SUCCESS: 312 records via textract
+✓ Saved to s3://crackpow-schools-918213481336/contracts/data/Agawam_contract_2.json
+
+============================================================
+EXTRACTION SUMMARY
+============================================================
+Total files:      10
+Successful:       9
+Failed:           1
+pdfplumber:       3
+AWS Textract:     6
+============================================================
+
+DETAILED RESULTS:
+  📝 Bedford_contract_1.pdf: 234 records (pdfplumber)
+  🔍 Agawam_contract_2.pdf: 312 records (textract)
+  🔍 Abington_contract_1.pdf: 156 records (textract)
+  ...
+
+💰 COST ESTIMATE:
+   Textract calls: 6
+   Estimated cost (avg 3 pages): $0.27
+```
 
 ## Next Steps
 
@@ -227,10 +337,10 @@ After extraction:
 3. **Review Failed Extractions**
    - Check logs for error messages
    - Manually review PDF structure
-   - Adjust patterns or use Claude fallback
+   - Re-upload with better quality if needed
 
 ## Support
 
 - **pdfplumber docs:** https://github.com/jsvine/pdfplumber
-- **Claude API docs:** https://docs.anthropic.com/
-- **pdf2image docs:** https://github.com/Belval/pdf2image
+- **AWS Textract docs:** https://docs.aws.amazon.com/textract/
+- **AWS Textract pricing:** https://aws.amazon.com/textract/pricing/
