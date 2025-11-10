@@ -93,15 +93,61 @@ class TableDetector:
 
     def _extract_school_year(self, text: str) -> Optional[str]:
         """
-        Extract school year like '2022-2023'
+        Extract school year using multiple pattern matching strategies
+
+        Tries in order:
+        1. School year format: "2022-2023"
+        2. Effective date with month: "Effective July 1, 2022"
+        3. Month followed by year: "July 2022"
+        4. Any 4-digit year in 2000-2099 range
 
         Examples:
             "2022-2023" → "2022-2023"
+            "Effective July 1, 2022" → "2022-2023"
             "Teachers Salary Schedule 2023-2024" → "2023-2024"
+            "July 2022" → "2022-2023"
         """
-        match = re.search(self.YEAR_PATTERN, text)
+        if not text:
+            return None
+
+        # Strategy 1: Look for YYYY-YYYY pattern (e.g., "2022-2023")
+        match = re.search(r'(\d{4})\s*[-–—]\s*(\d{4})', text)
         if match:
-            return f"{match.group(1)}-{match.group(2)}"
+            year1, year2 = match.group(1), match.group(2)
+            return f"{year1}-{year2}"
+
+        # Strategy 2: Look for "Effective [Month] [Day,] YYYY" pattern
+        # Matches: "Effective July 1, 2022" or "Effective September 1, 2023"
+        match = re.search(
+            r'Effective\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+(\d{4})',
+            text,
+            re.IGNORECASE
+        )
+        if match:
+            year = int(match.group(1))
+            # Convert to school year format (e.g., 2022 -> "2022-2023")
+            return f"{year}-{year + 1}"
+
+        # Strategy 3: Look for month name followed by year
+        # Matches: "July 2022" or "September 2023"
+        match = re.search(
+            r'(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})',
+            text,
+            re.IGNORECASE
+        )
+        if match:
+            year = int(match.group(1))
+            # Convert to school year format
+            return f"{year}-{year + 1}"
+
+        # Strategy 4: Look for any standalone 4-digit year (2000-2099)
+        # This is a fallback and less reliable
+        years = re.findall(r'\b(20\d{2})\b', text)
+        if years:
+            # Take the most recent year found
+            year = int(max(years))
+            return f"{year}-{year + 1}"
+
         return None
 
     def _extract_effective_date(self, text: str) -> Optional[str]:

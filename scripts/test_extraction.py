@@ -10,6 +10,63 @@ from pathlib import Path
 import json
 
 
+def extract_year_from_text(text):
+    """
+    Extract school year from text using multiple pattern matching strategies
+
+    Tries in order:
+    1. School year format: "2022-2023"
+    2. Effective date with month: "Effective July 1, 2022"
+    3. Month followed by year: "July 2022"
+    4. Any 4-digit year in 1900-2099 range
+
+    Returns school year in "YYYY-YYYY" format or "unknown"
+    """
+    if not text:
+        return "unknown"
+
+    # Strategy 1: Look for YYYY-YYYY pattern (e.g., "2022-2023")
+    match = re.search(r'(\d{4})\s*[-–—]\s*(\d{4})', text)
+    if match:
+        year1, year2 = match.group(1), match.group(2)
+        return f"{year1}-{year2}"
+
+    # Strategy 2: Look for "Effective [Month] [Day,] YYYY" pattern
+    # Matches: "Effective July 1, 2022" or "Effective September 1, 2023"
+    match = re.search(
+        r'Effective\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+(\d{4})',
+        text,
+        re.IGNORECASE
+    )
+    if match:
+        year = int(match.group(1))
+        # Convert to school year format (e.g., 2022 -> "2022-2023")
+        return f"{year}-{year + 1}"
+
+    # Strategy 3: Look for month name followed by year
+    # Matches: "July 2022" or "September 2023"
+    match = re.search(
+        r'(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})',
+        text,
+        re.IGNORECASE
+    )
+    if match:
+        year = int(match.group(1))
+        # Convert to school year format
+        return f"{year}-{year + 1}"
+
+    # Strategy 4: Look for any standalone 4-digit year (1900-2099)
+    # This is a fallback and less reliable
+    years = re.findall(r'\b(19\d{2}|20\d{2})\b', text)
+    if years:
+        # Take the most recent year found
+        year = int(max(years))
+        if 2000 <= year <= 2099:  # Reasonable range for school contracts
+            return f"{year}-{year + 1}"
+
+    return "unknown"
+
+
 def extract_tables_from_pdf(pdf_path):
     """Extract all tables from a PDF"""
     results = []
@@ -21,9 +78,8 @@ def extract_tables_from_pdf(pdf_path):
 
             # Check if this looks like a salary table page
             if re.search(r'(SALARY|COMPENSATION|TEACHERS?)\s+SCHEDULE', text, re.I):
-                # Extract year
-                year_match = re.search(r'(\d{4})-(\d{4})', text)
-                year = f"{year_match.group(1)}-{year_match.group(2)}" if year_match else "unknown"
+                # Extract year using improved logic
+                year = extract_year_from_text(text)
 
                 print(f"\nPage {page_num}: Found salary table for {year}")
                 print(f"  Tables found: {len(tables)}")
