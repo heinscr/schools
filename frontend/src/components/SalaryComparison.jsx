@@ -554,7 +554,7 @@ function SalaryComparison() {
                       <td className="year-cell">
                         {result.school_year || 'N/A'}
                       </td>
-                      <td className="salary-cell">
+                      <td className={`salary-cell${result.is_calculated ? ' fallback-highlight' : ''}`}>
                         {formatCurrency(result.salary)}
                       </td>
                     </tr>

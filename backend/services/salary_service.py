@@ -397,6 +397,7 @@ def compare_salaries_across_districts(
             'credits': int(item.get('credits', 0)),
             'step': int(item.get('step', 0)),
             'salary': float(item.get('salary', 0)),
+            'is_calculated': bool(item.get('is_calculated', False)),
             'is_exact_match': item.get('is_exact_match', True),
             'towns': district_towns_map.get(district_id, [])
         }
