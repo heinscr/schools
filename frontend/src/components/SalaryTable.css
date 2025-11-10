@@ -110,6 +110,27 @@
   border-radius: 6px;
 }
 
+/* Fallback highlight (when exact cell was calculated and we display closest non-calculated) */
+.salary-cell.fallback-highlight {
+  background: linear-gradient(90deg,#ff7a59,#ffb870);
+  color: #2b2b2b;
+  font-weight: 700;
+  border-radius: 6px;
+}
+
+.salary-interpret-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 4px 10px;
+  background: linear-gradient(90deg,#ff7a59,#ffb870);
+  color: #2b2b2b;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: middle;
+  box-shadow: 0 1px 4px rgba(255,122,89,0.12);
+}
+
 .salary-loading,
 .salary-error,
 .salary-empty {

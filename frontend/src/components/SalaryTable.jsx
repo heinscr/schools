@@ -123,6 +123,66 @@ function SalaryTable({ districtId, highlight = null }) {
           });
           return !allCalculated;
         });
+
+        // Compute fallback highlight when the requested highlight cell is calculated
+        let fallbackHighlight = null;
+  let highlightMode = null; // 'exact' | 'fallback' | null
+        if (highlight) {
+          try {
+            // Find the target column among all columns (sortedColumns) to preserve relative ordering
+            const allColumns = sortedColumns;
+            const targetColIndex = allColumns.findIndex(c =>
+              String(c.education) === String(highlight.education) && Number(c.credits) === Number(highlight.credits)
+            );
+
+            const targetStepIndex = sortedSteps.findIndex(s => String(s) === String(highlight.step));
+
+            if (targetColIndex !== -1 && targetStepIndex !== -1) {
+              // Helper to check a cell at (colIndex, stepIndex) for non-calculated
+              const findInColumnUpwards = (colIndex) => {
+                const col = allColumns[colIndex];
+                if (!col) return null;
+                // Only consider columns that are visible (not fully-calculated)
+                const visibleCol = visibleColumns.find(vc => vc.key === col.key);
+                if (!visibleCol) return null;
+                // Search upwards from targetStepIndex down to 0
+                for (let si = targetStepIndex; si >= 0; si--) {
+                  const stepKey = sortedSteps[si];
+                  const entry = salariesByStep[stepKey] && salariesByStep[stepKey][visibleCol.key];
+                  if (entry && !entry.isCalculated) {
+                    return { education: visibleCol.education, credits: visibleCol.credits, step: stepKey };
+                  }
+                }
+                return null;
+              };
+
+              // First check same column, then move leftwards
+              for (let dc = 0; dc <= targetColIndex; dc++) {
+                const colIndexToCheck = targetColIndex - dc;
+                const found = findInColumnUpwards(colIndexToCheck);
+                if (found) { fallbackHighlight = found; break; }
+              }
+            }
+          } catch (e) {
+            // defensive: don't break rendering on unexpected issues
+            // leave fallbackHighlight as null
+            console.error('Error computing fallback highlight', e);
+          }
+        }
+
+        // Decide whether this schedule will use exact highlight or fallback
+        if (highlight) {
+          const targetVisibleCol = visibleColumns.find(c => String(c.education) === String(highlight.education) && Number(c.credits) === Number(highlight.credits));
+          const targetStepKey = String(highlight.step);
+          const targetEntry = targetVisibleCol ? (salariesByStep[targetStepKey] && salariesByStep[targetStepKey][targetVisibleCol.key]) : null;
+          if (targetEntry && !targetEntry.isCalculated) {
+            highlightMode = 'exact';
+          } else if (fallbackHighlight) {
+            highlightMode = 'fallback';
+          } else {
+            highlightMode = null;
+          }
+        }
         
         return (
         <div key={idx} className="salary-schedule">
@@ -133,6 +193,11 @@ function SalaryTable({ districtId, highlight = null }) {
               return (d && (d.name || d.district_name)) || schedule.district_name || schedule.district_id;
             })()} - {schedule.school_year}
             {schedule.period && <span className="salary-period"> ({schedule.period})</span>}
+            {highlightMode === 'fallback' && (
+              <span className="salary-interpret-badge" role="status" aria-live="polite">
+                Interpreted
+              </span>
+            )}
           </h3>
 
           <div className="salary-table-wrapper">
@@ -159,13 +224,26 @@ function SalaryTable({ districtId, highlight = null }) {
                           const cellEntry = salariesByStep[step][col.key];
                           const cellValue = cellEntry ? cellEntry.value : undefined;
                           const cellIsCalculated = cellEntry ? cellEntry.isCalculated : false;
-                          const isMatch = highlight && (
+                          // Exact match only when the target cell exists and is NOT calculated
+                          const isMatch = Boolean(highlight && (
                             String(col.education) === String(highlight.education) &&
                             Number(col.credits) === Number(highlight.credits) &&
-                            String(step) === String(highlight.step)
-                          );
+                            String(step) === String(highlight.step) &&
+                            !cellIsCalculated
+                          ));
+
+                          // Fallback exact match (when exact is calculated) — compare against computed fallbackHighlight
+                          const isFallbackExact = Boolean(fallbackHighlight && (
+                            String(col.education) === String(fallbackHighlight.education) &&
+                            Number(col.credits) === Number(fallbackHighlight.credits) &&
+                            String(step) === String(fallbackHighlight.step)
+                          ));
+
+                          const finalIsMatch = isMatch || isFallbackExact;
+                          const isFallback = Boolean(isFallbackExact && highlightMode === 'fallback');
+                          const cellClass = `salary-cell${finalIsMatch ? ' highlight' : ''}${isFallback ? ' fallback-highlight' : ''}`;
                           return (
-                            <td key={col.key} className={`salary-cell${isMatch ? ' highlight' : ''}`}>
+                            <td key={col.key} className={cellClass}>
                               {cellIsCalculated ? 'NA' : formatCurrency(cellValue)}
                             </td>
                           );
