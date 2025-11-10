@@ -32,18 +32,23 @@ function SalaryComparison() {
   const [modalDistrictInfo, setModalDistrictInfo] = useState(null);
   const [modalHighlight, setModalHighlight] = useState(null);
 
-  const openDistrictModal = (result) => {
+  const openDistrictModal = async (result) => {
     const districtId = result.district_id;
-    // Try to get richer district metadata from the DataCache. The cache may store districts keyed
-    // differently (e.g. `id` vs `district_id`), so attempt multiple fallbacks.
+
+    // Try to get district info from cache, or fetch it if not available
     let cacheInfo = null;
     if (_dataCache?.getDistrictById) {
       cacheInfo = _dataCache.getDistrictById(districtId);
     }
-    if (!cacheInfo && _dataCache?.getAllDistricts) {
-      // Try to locate a matching district object in the cache by several possible id fields
-      const all = _dataCache.getAllDistricts();
-      cacheInfo = all.find(d => d && (d.district_id === districtId || d.id === districtId || String(d.id) === String(districtId) || String(d.district_id) === String(districtId)) ) || null;
+
+    // If not in cache, fetch it on-demand
+    if (!cacheInfo && _dataCache?.ensureDistrictById) {
+      try {
+        cacheInfo = await _dataCache.ensureDistrictById(districtId);
+      } catch (err) {
+        console.error(`Failed to fetch district ${districtId}:`, err);
+        // Continue with result data if fetch fails
+      }
     }
 
     const info = {
@@ -554,7 +559,7 @@ function SalaryComparison() {
                       <td className="year-cell">
                         {result.school_year || 'N/A'}
                       </td>
-                      <td className={`salary-cell${result.is_calculated ? ' fallback-highlight' : ''}`}>
+                      <td className={`salary-cell${result.is_calculated || result.is_exact_match==false ? ' fallback-highlight' : ''}`}>
                         {formatCurrency(result.salary)}
                       </td>
                     </tr>

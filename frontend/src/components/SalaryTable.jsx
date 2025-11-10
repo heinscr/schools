@@ -212,30 +212,58 @@ function SalaryTable({ districtId, highlight = null }) {
 
             const targetStepIndex = sortedSteps.findIndex(s => String(s) === String(highlight.step));
 
-            if (targetColIndex !== -1 && targetStepIndex !== -1) {
-              // Helper to check a cell at (colIndex, stepIndex) for non-calculated
-              const findInColumnUpwards = (colIndex) => {
-                const col = allColumns[colIndex];
-                if (!col) return null;
-                // Only consider columns that are visible (not fully-calculated)
-                const visibleCol = visibleColumns.find(vc => vc.key === col.key);
-                if (!visibleCol) return null;
-                // Search upwards from targetStepIndex down to 0
-                for (let si = targetStepIndex; si >= 0; si--) {
-                  const stepKey = sortedSteps[si];
-                  const entry = salariesByStep[stepKey] && salariesByStep[stepKey][visibleCol.key];
-                  if (entry && !entry.isCalculated) {
-                    return { education: visibleCol.education, credits: visibleCol.credits, step: stepKey };
+            // Helper to check a cell at (colIndex, stepIndex) for non-calculated
+            const findInColumnUpwards = (colIndex, stepIndex = targetStepIndex) => {
+              const col = allColumns[colIndex];
+              if (!col) return null;
+              // Only consider columns that are visible (not fully-calculated)
+              const visibleCol = visibleColumns.find(vc => vc.key === col.key);
+              if (!visibleCol) return null;
+              // Search upwards from stepIndex down to 0
+              for (let si = stepIndex; si >= 0; si--) {
+                const stepKey = sortedSteps[si];
+                const entry = salariesByStep[stepKey] && salariesByStep[stepKey][visibleCol.key];
+                if (entry && !entry.isCalculated) {
+                  return { education: visibleCol.education, credits: visibleCol.credits, step: stepKey };
+                }
+              }
+              return null;
+            };
+
+            if (targetStepIndex !== -1) {
+              if (targetColIndex !== -1) {
+                // Target column exists: check it then scan leftwards
+                logger.log('highlight-search', { allColumns: allColumns.map(c => c.key), visibleColumns: visibleColumns.map(c => c.key), targetColIndex, targetStepIndex });
+                let found = findInColumnUpwards(targetColIndex, targetStepIndex);
+                logger.log('highlight-search-check', { col: allColumns[targetColIndex]?.key, found });
+                if (found) {
+                  fallbackHighlight = found;
+                } else {
+                  for (let li = targetColIndex - 1; li >= 0; li--) {
+                    logger.log('highlight-search-left', { checkingIndex: li, col: allColumns[li]?.key });
+                    found = findInColumnUpwards(li, targetStepIndex);
+                    logger.log('highlight-search-left-result', { index: li, col: allColumns[li]?.key, found });
+                    if (found) { fallbackHighlight = found; break; }
                   }
                 }
-                return null;
-              };
-
-              // First check same column, then move leftwards
-              for (let dc = 0; dc <= targetColIndex; dc++) {
-                const colIndexToCheck = targetColIndex - dc;
-                const found = findInColumnUpwards(colIndexToCheck);
-                if (found) { fallbackHighlight = found; break; }
+              } else {
+                // Target column missing: compute insertion index in allColumns and start left from there
+                const targetObj = { education: String(highlight.education), credits: Number(highlight.credits) };
+                const compareCols = (a, b) => {
+                  const ea = eduOrder[a.education] || 99;
+                  const eb = eduOrder[b.education] || 99;
+                  if (ea !== eb) return ea - eb;
+                  return a.credits - b.credits;
+                };
+                let insertionIndex = allColumns.findIndex(c => compareCols(c, targetObj) > 0);
+                if (insertionIndex === -1) insertionIndex = allColumns.length;
+                logger.log('highlight-search-missing', { allColumns: allColumns.map(c => c.key), visibleColumns: visibleColumns.map(c => c.key), targetObj, insertionIndex, targetStepIndex });
+                for (let li = insertionIndex - 1; li >= 0; li--) {
+                  logger.log('highlight-search-missing-left', { checkingIndex: li, col: allColumns[li]?.key });
+                  const found = findInColumnUpwards(li, targetStepIndex);
+                  logger.log('highlight-search-missing-left-result', { index: li, col: allColumns[li]?.key, found });
+                  if (found) { fallbackHighlight = found; break; }
+                }
               }
             }
           } catch (e) {
@@ -257,6 +285,17 @@ function SalaryTable({ districtId, highlight = null }) {
           } else {
             highlightMode = null;
           }
+        }
+        // DEBUG: surface the decision for troubleshooting
+        try {
+          logger.log('highlight-debug', {
+            highlight,
+            visibleColumns: visibleColumns.map(c => c.key),
+            fallbackHighlight,
+            highlightMode
+          });
+        } catch (e) {
+          // ignore logging errors
         }
         
         return (
