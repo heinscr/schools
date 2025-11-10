@@ -212,10 +212,13 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
             source_cred = int(source_parts[1])
 
             # Check if this is a valid fallback
+            # Do not allow using a source from a higher education level
             if edu_order.get(source_edu, 0) > edu_order.get(target_edu, 0):
                 continue  # Can't fallback from higher edu
-            if source_cred > target_cred:
-                continue  # Can't fallback from higher credits
+            # For the same education level, don't fallback from higher credits
+            # (but allow lower-education sources to supply any credits)
+            if source_edu == target_edu and source_cred > target_cred:
+                continue
 
             # Check if this is better than current best
             if best_source is None:
