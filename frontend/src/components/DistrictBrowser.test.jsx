@@ -1,5 +1,28 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
+import { DataCacheContext } from '../contexts/DataCacheContext'
+
+// Mock the cache context
+const mockCacheContext = {
+  status: 'ready',
+  error: null,
+  lastFetched: Date.now(),
+  districtCount: 0,
+  townCount: 0,
+  getDistrictById: vi.fn(),
+  getDistrictUrl: vi.fn(),
+  getDistrictsByTown: vi.fn(),
+  getAllDistricts: vi.fn(() => []),
+  searchDistrictsByName: vi.fn(() => []),
+  getAllTowns: vi.fn(() => []),
+  getMunicipalitiesGeojson: vi.fn(() => null),
+  loadAllDistricts: vi.fn(),
+  loadMunicipalitiesGeojson: vi.fn(),
+  invalidateCache: vi.fn(),
+  updateDistrictInCache: vi.fn(),
+  addDistrictToCache: vi.fn(),
+  removeDistrictFromCache: vi.fn(),
+}
 
 vi.mock('./ChoroplethMap', () => ({ default: () => <div data-testid="map" /> }))
 vi.mock('./DistrictEditor', () => ({ default: () => <div data-testid="editor" /> }))
@@ -16,17 +39,27 @@ vi.mock('../services/api', () => ({
 
 import DistrictBrowser from './DistrictBrowser'
 
-it('can switch to the salaries tab and see comparison header', () => {
-  render(<DistrictBrowser />)
+it('can switch to the salaries tab and see comparison header', async () => {
+  render(
+    <DataCacheContext.Provider value={mockCacheContext}>
+      <DistrictBrowser />
+    </DataCacheContext.Provider>
+  )
   fireEvent.click(screen.getByRole('button', { name: /Compare Salaries/i }))
-  expect(screen.getByText(/Compare Salaries Across Districts/i)).toBeInTheDocument()
+  await waitFor(() => {
+    expect(screen.getByText(/Compare Salaries Across Districts/i)).toBeInTheDocument()
+  })
 })
 
 it('searches and renders empty list, then clears', async () => {
   const { default: api } = await import('../services/api')
   api.searchDistricts.mockResolvedValueOnce({ data: [{ id: 'd1', name: 'Alpha', towns: [], district_type: 'municipal' }] })
 
-  render(<DistrictBrowser />)
+  render(
+    <DataCacheContext.Provider value={mockCacheContext}>
+      <DistrictBrowser />
+    </DataCacheContext.Provider>
+  )
   // ensure starting on districts tab (h2 heading)
   expect(screen.getByRole('heading', { level: 2, name: /Districts \(0\)/ })).toBeInTheDocument()
 

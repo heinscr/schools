@@ -32,6 +32,18 @@ class FakeTable:
         # Main table query
         return {'Items': self._items}
 
+    def get_item(self, **kwargs):
+        """Mock get_item for retrieving single items by Key"""
+        key = kwargs.get('Key', {})
+        pk = key.get('PK')
+        sk = key.get('SK')
+        
+        for item in self._items:
+            if item.get('PK') == pk and item.get('SK') == sk:
+                return {'Item': item}
+        
+        return {}
+
     def scan(self, **kwargs):
         return {'Items': self._items}
 
@@ -45,6 +57,12 @@ def test_compare_salaries_basic(monkeypatch):
             'SK': 'YEAR#2022-2023#PERIOD#full-year',
             'school_year': '2022-2023',
             'period': 'full-year'
+        },
+        {
+            'PK': 'METADATA#MAXVALUES',
+            'SK': 'GLOBAL',
+            'max_step': 15,
+            'edu_credit_combos': ['B', 'M+30', 'M+45', 'M+60', 'D']
         }
     ]
 
@@ -112,9 +130,10 @@ def test_determine_current_year_period():
 
     year, period = lambda_mod.determine_current_year_period(metadata_items)
 
-    # Should pick latest year (2022-2023) and last period alphabetically (spring > full-year > fall)
+    # Should pick latest year (2022-2023) and last period alphabetically
+    # For 2022-2023: max(['fall', 'full-year']) = 'full-year' (alphabetically)
     assert year == '2022-2023'
-    assert period == 'spring'
+    assert period == 'full-year'
 
 
 def test_get_salary_schedule(monkeypatch):

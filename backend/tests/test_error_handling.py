@@ -255,12 +255,9 @@ def test_lambda_endpoint_errors_not_leaked(monkeypatch):
     import main
     client = TestClient(main.app)
 
-    # Mock the salaries module to raise an exception
-    with patch('main.salaries.get_salary_schedule') as mock_salary:
-        mock_salary.return_value = {
-            'statusCode': 500,
-            'body': '{"message": "Internal Lambda error with sensitive details"}'
-        }
+    # Mock the salary service function to raise an exception
+    with patch('services.salary_service.get_salary_schedule_for_district') as mock_salary:
+        mock_salary.side_effect = Exception("Internal error with sensitive details")
 
         # Test salary schedule endpoint with invalid district
         r = client.get('/api/salary-schedule/invalid-district-id-999')
@@ -270,3 +267,5 @@ def test_lambda_endpoint_errors_not_leaked(monkeypatch):
             data = r.json()
             # Should have standard error format
             assert "detail" in data or "message" in data
+            # Should not leak sensitive error message
+            assert "sensitive details" not in str(data).lower()
