@@ -451,7 +451,6 @@ resource "aws_lambda_function" "api" {
         DYNAMODB_TABLE_NAME      = aws_dynamodb_table.main.name
         CLOUDFRONT_DOMAIN        = aws_cloudfront_distribution.frontend.domain_name
         S3_BUCKET_NAME           = aws_s3_bucket.main.id
-        AWS_REGION               = var.aws_region
         # Cognito configuration for JWT validation
         COGNITO_USER_POOL_ID     = aws_cognito_user_pool.main.id
         COGNITO_CLIENT_ID        = aws_cognito_user_pool_client.frontend.id

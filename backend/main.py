@@ -294,6 +294,7 @@ async def get_current_user(
 
 # Salary endpoints - Native FastAPI implementation
 # Initialize DynamoDB for salary data
+# AWS_REGION is automatically provided by Lambda runtime, fallback to us-east-1 for local dev
 AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
 dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
 TABLE_NAME = os.getenv('DYNAMODB_TABLE_NAME')
