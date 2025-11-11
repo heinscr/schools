@@ -64,16 +64,6 @@ app = FastAPI(
 # Add rate limiter state
 app.state.limiter = limiter
 
-# Add middleware to exempt OPTIONS requests from rate limiting (CORS preflight)
-@app.middleware("http")
-async def bypass_rate_limit_for_options(request: Request, call_next):
-    """Exempt OPTIONS requests (CORS preflight) from rate limiting"""
-    if request.method == "OPTIONS":
-        # Process the request without rate limiting
-        response = await call_next(request)
-        return response
-    return await call_next(request)
-
 # Register error handlers
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
@@ -304,15 +294,16 @@ async def get_current_user(
 
 # Salary endpoints - Native FastAPI implementation
 # Initialize DynamoDB for salary data
-dynamodb = boto3.resource('dynamodb')
+AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
+dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
 TABLE_NAME = os.getenv('DYNAMODB_TABLE_NAME')
 
 main_table = dynamodb.Table(TABLE_NAME) if TABLE_NAME else None
 
 # Initialize S3, SQS, and Lambda clients for salary processing
-s3_client = boto3.client('s3')
-sqs_client = boto3.client('sqs')
-lambda_client = boto3.client('lambda')
+s3_client = boto3.client('s3', region_name=AWS_REGION)
+sqs_client = boto3.client('sqs', region_name=AWS_REGION)
+lambda_client = boto3.client('lambda', region_name=AWS_REGION)
 
 # Get environment variables for salary processing
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
