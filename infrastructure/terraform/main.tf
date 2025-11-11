@@ -338,6 +338,12 @@ resource "aws_dynamodb_table" "main" {
     enabled = true
   }
 
+  # TTL for automatic cleanup of temporary items (jobs)
+  ttl {
+    attribute_name = "ttl"
+    enabled        = true
+  }
+
   tags = merge(
     local.common_tags,
     {
@@ -392,10 +398,14 @@ resource "aws_lambda_function" "api" {
       {
         DYNAMODB_TABLE_NAME      = aws_dynamodb_table.main.name
         CLOUDFRONT_DOMAIN        = aws_cloudfront_distribution.frontend.domain_name
+        S3_BUCKET_NAME           = aws_s3_bucket.main.id
         # Cognito configuration for JWT validation
         COGNITO_USER_POOL_ID     = aws_cognito_user_pool.main.id
         COGNITO_CLIENT_ID        = aws_cognito_user_pool_client.frontend.id
         COGNITO_REGION           = var.aws_region
+        # Salary processing queue
+        SALARY_PROCESSING_QUEUE_URL = aws_sqs_queue.salary_processing.url
+        SALARY_NORMALIZER_LAMBDA_ARN = aws_lambda_function.salary_normalizer.arn
       },
       # Add custom domain if configured
       var.cloudfront_domain_name != "" ? { CUSTOM_DOMAIN = var.cloudfront_domain_name } : {}
