@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import api from '../services/api';
 import DistrictEditor from './DistrictEditor';
+import SalaryUploadModal from './SalaryUploadModal';
 import ErrorBoundary from './ErrorBoundary';
 import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
@@ -16,6 +17,7 @@ const SalaryComparison = lazy(() => import('./SalaryComparison'));
 function DistrictBrowser({ user }) {
   const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'salaries'
   const [editingDistrict, setEditingDistrict] = useState(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   // District type filters
   const [selectedTypes, setSelectedTypes] = useState(DISTRICT_TYPE_OPTIONS.map(opt => opt.value));
 
@@ -160,6 +162,22 @@ function DistrictBrowser({ user }) {
         setSelectedDistrict(sortedDistricts[nextIndex - 1]);
         setClickedTown(null);
       }
+    }
+  };
+
+  const handleUploadSuccess = (result) => {
+    // Refresh the salary table after successful upload
+    if (result.needs_global_normalization) {
+      alert(
+        `Salary data applied successfully! ${result.records_added} records added.\n\n` +
+        `Global metadata has changed. Please run normalization from the user menu.`
+      );
+    } else {
+      alert(`Salary data applied successfully! ${result.records_added} records added.`);
+    }
+    // Force re-render of salary table by updating selected district
+    if (selectedDistrict) {
+      handleDistrictClick(selectedDistrict);
     }
   };
 
@@ -373,6 +391,23 @@ function DistrictBrowser({ user }) {
 
         {selectedDistrict && (
           <div className="salary-section">
+            <div className="salary-section-header">
+              <h3>Salary Schedule</h3>
+              {isAdmin && (
+                <button
+                  className="upload-salary-button"
+                  onClick={() => setShowUploadModal(true)}
+                  title="Upload PDF salary schedule"
+                >
+                  <svg className="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  Upload PDF
+                </button>
+              )}
+            </div>
             <Suspense fallback={<div className="loading">Loading salary table...</div>}>
               <SalaryTable districtId={selectedDistrict.id} />
             </Suspense>
@@ -386,6 +421,14 @@ function DistrictBrowser({ user }) {
         onSave={handleSaveDistrict}
         user={user}
       />
+
+      {showUploadModal && selectedDistrict && (
+        <SalaryUploadModal
+          district={selectedDistrict}
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={handleUploadSuccess}
+        />
+      )}
         </>
       ) : (
         <div className="salary-comparison-tab">

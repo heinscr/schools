@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import authService from '../services/auth';
+import api from '../services/api';
 import { logger } from '../utils/logger';
 import './Login.css';
 
@@ -12,6 +13,8 @@ function Login({ onAuthChange, onLoadingChange }) {
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [normalizationStatus, setNormalizationStatus] = useState(null);
+  const [isNormalizing, setIsNormalizing] = useState(false);
 
   useEffect(() => {
     initAuth();
@@ -23,6 +26,31 @@ function Login({ onAuthChange, onLoadingChange }) {
       onLoadingChange(loading);
     }
   }, [loading, onLoadingChange]);
+
+  // Poll for normalization status if user is admin
+  useEffect(() => {
+    if (!user || !user.is_admin) {
+      setNormalizationStatus(null);
+      return;
+    }
+
+    const checkNormalizationStatus = async () => {
+      try {
+        const status = await api.getNormalizationStatus();
+        setNormalizationStatus(status);
+      } catch (err) {
+        logger.warn('Failed to check normalization status:', err);
+      }
+    };
+
+    // Check immediately
+    checkNormalizationStatus();
+
+    // Poll every 30 seconds
+    const interval = setInterval(checkNormalizationStatus, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const initAuth = async () => {
     try {
@@ -113,6 +141,31 @@ function Login({ onAuthChange, onLoadingChange }) {
     setShowMenu(!showMenu);
   };
 
+  const handleNormalize = async () => {
+    if (isNormalizing) return;
+
+    const confirmed = window.confirm(
+      'This will normalize salary data across all districts. This may take several minutes. Continue?'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setIsNormalizing(true);
+      await api.startNormalization();
+      alert('Normalization started successfully. This will take a few minutes to complete.');
+      setShowMenu(false);
+
+      // Check status immediately
+      const status = await api.getNormalizationStatus();
+      setNormalizationStatus(status);
+    } catch (err) {
+      alert(`Failed to start normalization: ${err.message}`);
+    } finally {
+      setIsNormalizing(false);
+    }
+  };
+
   // Don't render the loading overlay here - parent handles it
   if (loading) {
     return null;
@@ -181,6 +234,9 @@ function Login({ onAuthChange, onLoadingChange }) {
     );
   }
 
+  const needsNormalization = normalizationStatus?.needs_normalization || false;
+  const isNormalizationRunning = normalizationStatus?.is_running || false;
+
   return (
     <div className="user-menu">
       <button className="user-icon-button logged-in" onClick={toggleMenu} title={user.email}>
@@ -190,6 +246,7 @@ function Login({ onAuthChange, onLoadingChange }) {
           <path d="M6.168 18.849A4 4 0 0 1 10 16h4a4 4 0 0 1 3.834 2.855" />
         </svg>
         {user.is_admin && <span className="admin-dot"></span>}
+        {needsNormalization && <span className="normalization-badge" title="Normalization needed"></span>}
       </button>
 
       {showMenu && (
@@ -199,7 +256,28 @@ function Login({ onAuthChange, onLoadingChange }) {
             {user.is_admin && <span className="user-info-badge">Administrator</span>}
           </div>
           <hr />
-          <button className="logout-button" onClick={handleLogout}>
+          {user.is_admin && (
+            <>
+              <button
+                className="menu-button normalize-button"
+                onClick={handleNormalize}
+                disabled={isNormalizing || isNormalizationRunning}
+              >
+                <svg className="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="23 4 23 10 17 10" />
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+                {isNormalizationRunning
+                  ? 'Normalizing...'
+                  : isNormalizing
+                  ? 'Starting...'
+                  : 'Normalize All Districts'}
+                {needsNormalization && <span className="badge-dot"></span>}
+              </button>
+              <hr />
+            </>
+          )}
+          <button className="menu-button logout-button" onClick={handleLogout}>
             <svg className="logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
