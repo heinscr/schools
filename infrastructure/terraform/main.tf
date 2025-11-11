@@ -177,6 +177,10 @@ resource "aws_api_gateway_rest_api" "main" {
   name        = "${var.project_name}-api"
   description = "API for ${var.project_name}"
 
+  # Treat all content types as binary to prevent UTF-8 decoding issues
+  # This forces API Gateway to base64 encode the body, which Mangum then decodes correctly
+  binary_media_types = ["*/*"]
+
   endpoint_configuration {
     types = ["REGIONAL"]
   }
@@ -540,6 +544,7 @@ resource "aws_api_gateway_deployment" "main" {
 
   triggers = {
     redeployment = sha1(jsonencode([
+      aws_api_gateway_rest_api.main.binary_media_types,
       aws_api_gateway_resource.proxy.id,
       aws_api_gateway_method.proxy.id,
       aws_api_gateway_integration.lambda.id,
