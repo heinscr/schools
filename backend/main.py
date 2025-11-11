@@ -438,6 +438,7 @@ async def upload_salary_schedule(
     request: Request,
     district_id: str,
     file: UploadFile = File(...),
+    table = Depends(get_table),
     user: dict = Depends(require_admin_role)
 ):
     """Upload a PDF contract for processing"""
@@ -450,7 +451,6 @@ async def upload_salary_schedule(
 
     # Validate district exists
     from services.dynamodb_district_service import DynamoDBDistrictService
-    table = next(get_table())
     district = DynamoDBDistrictService.get_district(table=table, district_id=district_id)
     if not district:
         raise HTTPException(status_code=404, detail="District not found")

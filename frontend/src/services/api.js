@@ -416,7 +416,8 @@ class ApiService {
    * @returns {Promise<Object>} - Normalization status
    */
   async getNormalizationStatus() {
-    const url = `${API_BASE_URL}/api/admin/global/normalization/status`;
+    // Use string concatenation to prevent bundler from transforming 'global' to 'globalThis'
+    const url = `${API_BASE_URL}/api/admin/${'glo' + 'bal'}/normalization/status`;
 
     const response = await fetch(url, {
       headers: {
@@ -440,7 +441,8 @@ class ApiService {
    * @returns {Promise<Object>} - Job start result
    */
   async startNormalization() {
-    const url = `${API_BASE_URL}/api/admin/global/normalize`;
+    // Use string concatenation to prevent bundler from transforming 'global' to 'globalThis'
+    const url = `${API_BASE_URL}/api/admin/${'glo' + 'bal'}/normalize`;
 
     const response = await fetch(url, {
       method: 'POST',
