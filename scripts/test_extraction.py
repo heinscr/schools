@@ -165,6 +165,89 @@ def parse_salary_table(table, district_name, year):
     return records
 
 
+def filter_records_by_year_and_period(records):
+    """
+    Filter records to include only relevant years and periods.
+
+    Rules:
+    1. Only include past years if there are no current or future years
+    2. If including past year, only include one year (most recent)
+    3. Include all current and future years
+    4. For each year, only include the period that sorts last alphabetically
+    """
+    if not records:
+        return records
+
+    from datetime import datetime
+
+    # Determine current school year
+    today = datetime.now()
+    if today.month >= 7:  # July or later
+        current_year_start = today.year
+    else:  # January-June
+        current_year_start = today.year - 1
+
+    print(f"\nCurrent school year: {current_year_start}-{current_year_start + 1}")
+
+    # Group records by year
+    years_data = {}
+    for record in records:
+        year = record.get('school_year', 'unknown')
+        if year not in years_data:
+            years_data[year] = []
+        years_data[year].append(record)
+
+    # Categorize years as past, current, or future
+    past_years = []
+    current_future_years = []
+
+    for year in years_data.keys():
+        if year == 'unknown':
+            continue
+
+        try:
+            year_start = int(year.split('-')[0])
+            if year_start < current_year_start:
+                past_years.append(year)
+            else:
+                current_future_years.append(year)
+        except:
+            continue
+
+    # Determine which years to include
+    if current_future_years:
+        years_to_include = sorted(current_future_years)
+        print(f"Including current/future years: {years_to_include}")
+    elif past_years:
+        most_recent_past = max(past_years)
+        years_to_include = [most_recent_past]
+        print(f"Including most recent past year: {years_to_include}")
+    else:
+        return records
+
+    # For each year, filter to only the period that sorts last
+    filtered_records = []
+    for year in years_to_include:
+        year_records = years_data[year]
+
+        # Group by period
+        periods = {}
+        for record in year_records:
+            period = record.get('period', 'full-year')
+            if period not in periods:
+                periods[period] = []
+            periods[period].append(record)
+
+        # Select period that sorts last alphabetically
+        selected_period = max(periods.keys())
+        print(f"Year {year}: selected period '{selected_period}' from {list(periods.keys())}")
+
+        filtered_records.extend(periods[selected_period])
+
+    print(f"Filtered from {len(records)} to {len(filtered_records)} records")
+    return filtered_records
+
+
 def main():
     import sys
 
@@ -201,9 +284,13 @@ def main():
             all_records.extend(records)
             print(f"    Extracted {len(records)} salary records")
 
+    # Filter records by year and period
+    if all_records:
+        all_records = filter_records_by_year_and_period(all_records)
+
     # Summary
     print(f"\n{'='*60}")
-    print(f"TOTAL RECORDS EXTRACTED: {len(all_records)}")
+    print(f"TOTAL RECORDS AFTER FILTERING: {len(all_records)}")
     print(f"{'='*60}")
 
     if all_records:

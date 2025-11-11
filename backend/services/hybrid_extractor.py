@@ -363,6 +363,104 @@ class HybridContractExtractor:
 
         return has_edu_cols and has_steps
 
+    def filter_records_by_year_and_period(self, records: List[Dict]) -> List[Dict]:
+        """
+        Filter records to include only relevant years and periods.
+
+        Rules:
+        1. Only include past years if there are no current or future years
+        2. If including past year, only include one year (most recent)
+        3. Include all current and future years
+        4. For each year, only include the period that sorts last alphabetically
+
+        Args:
+            records: List of salary records
+
+        Returns:
+            Filtered list of salary records
+        """
+        if not records:
+            return records
+
+        from datetime import datetime
+
+        # Determine current school year
+        # School year spans July-June, so if we're in July-Dec, it's year-year+1
+        # If we're in Jan-June, it's year-1 to year
+        today = datetime.now()
+        if today.month >= 7:  # July or later
+            current_year_start = today.year
+        else:  # January-June
+            current_year_start = today.year - 1
+        current_school_year = f"{current_year_start}-{current_year_start + 1}"
+
+        logger.info(f"Current school year: {current_school_year}")
+
+        # Group records by year
+        years_data = {}
+        for record in records:
+            year = record.get('school_year', 'unknown')
+            if year not in years_data:
+                years_data[year] = []
+            years_data[year].append(record)
+
+        # Categorize years as past, current, or future
+        past_years = []
+        current_future_years = []
+
+        for year in years_data.keys():
+            if year == 'unknown':
+                continue
+
+            # Parse year (format: "2022-2023")
+            try:
+                year_start = int(year.split('-')[0])
+                if year_start < current_year_start:
+                    past_years.append(year)
+                else:
+                    current_future_years.append(year)
+            except:
+                logger.warning(f"Could not parse year: {year}")
+                continue
+
+        # Determine which years to include
+        if current_future_years:
+            # Have current or future years - use only those
+            years_to_include = sorted(current_future_years)
+            logger.info(f"Including current/future years: {years_to_include}")
+        elif past_years:
+            # Only have past years - use most recent one
+            most_recent_past = max(past_years)
+            years_to_include = [most_recent_past]
+            logger.info(f"Including most recent past year: {years_to_include}")
+        else:
+            # No valid years found
+            logger.warning("No valid years found in records")
+            return records
+
+        # For each year to include, filter to only the period that sorts last
+        filtered_records = []
+        for year in years_to_include:
+            year_records = years_data[year]
+
+            # Group by period
+            periods = {}
+            for record in year_records:
+                period = record.get('period', 'full-year')
+                if period not in periods:
+                    periods[period] = []
+                periods[period].append(record)
+
+            # Select period that sorts last alphabetically
+            selected_period = max(periods.keys())
+            logger.info(f"Year {year}: selected period '{selected_period}' from {list(periods.keys())}")
+
+            # Add all records for this year+period
+            filtered_records.extend(periods[selected_period])
+
+        logger.info(f"Filtered from {len(records)} to {len(filtered_records)} records")
+        return filtered_records
+
     def extract_from_pdf(self, pdf_bytes: bytes, filename: str, s3_bucket: str, s3_key: str) -> Tuple[List[Dict], str]:
         """
         Extract salary data using hybrid approach
@@ -381,6 +479,8 @@ class HybridContractExtractor:
             logger.info(f"✓ Text-based PDF detected: {filename}")
             records = self.extract_with_pdfplumber(pdf_bytes, filename)
             if records:
+                # Filter records by year and period
+                records = self.filter_records_by_year_and_period(records)
                 return records, "pdfplumber"
             else:
                 logger.warning("pdfplumber extraction failed, falling back to Textract")
@@ -389,6 +489,8 @@ class HybridContractExtractor:
         logger.info(f"⚠ Image-based PDF detected: {filename}")
         records = self.extract_with_textract(pdf_bytes, filename, s3_bucket, s3_key)
         if records:
+            # Filter records by year and period
+            records = self.filter_records_by_year_and_period(records)
             return records, "textract"
 
         return [], "failed"
