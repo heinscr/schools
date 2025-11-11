@@ -299,8 +299,6 @@ class SalaryJobsService:
 
     def _load_salary_records(self, district_id: str, records: List[Dict]) -> int:
         """Load salary records into DynamoDB"""
-        from backend.scripts.load_salary_data import pad_number
-
         items = []
         for record in records:
             school_year = record['school_year']
