@@ -59,13 +59,14 @@ class HybridContractExtractor:
         """
         Extract year from text using multiple strategies
 
-        Returns single year value (the ending/larger year of a school year range)
+        Returns school year in "YYYY-YYYY" format
 
         Examples:
-            "2024-2025" → "2025" (larger year)
-            "Effective July 1, 2024" → "2024"
-            "July 2024" → "2024"
-            "2024" → "2024"
+            "2024-2025" → "2024-2025" (keep as is)
+            "2023" → "2023-2024" (convert to range)
+            "Effective July 1, 2027" → "2027-2028" (convert to range)
+            "July 2024" → "2024-2025" (convert to range)
+            "27" → "2027-2028" (expand and convert to range)
         """
         import re
 
@@ -73,46 +74,48 @@ class HybridContractExtractor:
             return "unknown"
 
         # Strategy 1: Look for YYYY-YYYY pattern (e.g., "2024-2025")
-        # Take the second/larger year
+        # Keep as is
         match = re.search(r'(\d{4})\s*[-–—]\s*(\d{4})', text)
         if match:
-            year2 = match.group(2)  # Take the ending year
-            return year2
+            year1 = match.group(1)
+            year2 = match.group(2)
+            return f"{year1}-{year2}"
 
         # Strategy 2: Look for "Effective [Month] [Day,] YYYY" pattern
-        # Matches: "Effective July 1, 2024" → "2024"
+        # Matches: "Effective July 1, 2027" → "2027-2028"
         match = re.search(
             r'Effective\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+(\d{4})',
             text, re.IGNORECASE
         )
         if match:
-            year = match.group(1)
-            return year
+            year = int(match.group(1))
+            return f"{year}-{year + 1}"
 
         # Strategy 3: Look for month name followed by year
-        # Matches: "July 2024" → "2024"
+        # Matches: "July 2024" → "2024-2025"
         match = re.search(
             r'(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})',
             text, re.IGNORECASE
         )
         if match:
-            year = match.group(1)
-            return year
+            year = int(match.group(1))
+            return f"{year}-{year + 1}"
 
         # Strategy 4: Look for any standalone 4-digit year (2000-2099)
+        # Matches: "2023" → "2023-2024"
         years = re.findall(r'\b(20\d{2})\b', text)
         if years:
             # Take the most recent year found
-            year = max(years)
-            return year
+            year = int(max(years))
+            return f"{year}-{year + 1}"
 
-        # Strategy 5: Look for 2-digit year (e.g., "27" → "2027")
+        # Strategy 5: Look for 2-digit year (e.g., "27" → "2027-2028")
         match = re.search(r'\b(\d{2})\b', text)
         if match:
             year_2digit = int(match.group(1))
             # Assume 20xx for years 00-99
-            year = f"20{year_2digit:02d}"
-            return year
+            year = 2000 + year_2digit
+            return f"{year}-{year + 1}"
 
         return "unknown"
 
@@ -409,17 +412,17 @@ class HybridContractExtractor:
 
         from datetime import datetime
 
-        # Determine current school year (as single year value - the ending year)
+        # Determine current school year
         # School year spans July-June, so if we're in July-Dec, it's year to year+1
         # If we're in Jan-June, it's year-1 to year
-        # We use the ending year value
         today = datetime.now()
-        if today.month >= 7:  # July or later (e.g., Nov 2025 = 2025-2026 school year)
-            current_year = today.year + 1  # Ending year
-        else:  # January-June (e.g., Jan 2025 = 2024-2025 school year)
-            current_year = today.year  # Ending year
+        if today.month >= 7:  # July or later
+            current_year_start = today.year
+        else:  # January-June
+            current_year_start = today.year - 1
+        current_school_year = f"{current_year_start}-{current_year_start + 1}"
 
-        logger.info(f"Current school year ending: {current_year}")
+        logger.info(f"Current school year: {current_school_year}")
 
         # Group records by year
         years_data = {}
@@ -437,10 +440,10 @@ class HybridContractExtractor:
             if year == 'unknown':
                 continue
 
-            # Parse year (now single value like "2025")
+            # Parse year (format: "YYYY-YYYY")
             try:
-                year_int = int(year)
-                if year_int < current_year:
+                year_start = int(year.split('-')[0])
+                if year_start < current_year_start:
                     past_years.append(year)
                 else:
                     current_future_years.append(year)
@@ -455,7 +458,7 @@ class HybridContractExtractor:
             logger.info(f"Including current/future years: {years_to_include}")
         elif past_years:
             # Only have past years - use most recent one
-            most_recent_past = max(past_years, key=lambda y: int(y))
+            most_recent_past = max(past_years)
             years_to_include = [most_recent_past]
             logger.info(f"Including most recent past year: {years_to_include}")
         else:

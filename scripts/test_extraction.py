@@ -14,70 +14,71 @@ def extract_year_from_text(text):
     """
     Extract year from text using multiple pattern matching strategies
 
-    Returns single year value (the ending/larger year of a school year range)
+    Returns school year in "YYYY-YYYY" format
 
     Examples:
-        "2024-2025" → "2025" (larger year)
-        "Effective July 1, 2024" → "2024"
-        "July 2024" → "2024"
-        "2024" → "2024"
-        "27" → "2027"
+        "2024-2025" → "2024-2025" (keep as is)
+        "2023" → "2023-2024" (convert to range)
+        "Effective July 1, 2027" → "2027-2028" (convert to range)
+        "July 2024" → "2024-2025" (convert to range)
+        "27" → "2027-2028" (expand and convert to range)
 
     Tries in order:
-    1. School year format: "2022-2023" → "2023"
-    2. Effective date with month: "Effective July 1, 2022" → "2022"
-    3. Month followed by year: "July 2022" → "2022"
-    4. Any 4-digit year in 1900-2099 range
-    5. 2-digit year: "27" → "2027"
+    1. School year format: "2022-2023" → "2022-2023" (keep as is)
+    2. Effective date with month: "Effective July 1, 2027" → "2027-2028"
+    3. Month followed by year: "July 2024" → "2024-2025"
+    4. Any 4-digit year: "2023" → "2023-2024"
+    5. 2-digit year: "27" → "2027-2028"
     """
     if not text:
         return "unknown"
 
     # Strategy 1: Look for YYYY-YYYY pattern (e.g., "2024-2025")
-    # Take the second/larger year
+    # Keep as is
     match = re.search(r'(\d{4})\s*[-–—]\s*(\d{4})', text)
     if match:
-        year2 = match.group(2)  # Take the ending year
-        return year2
+        year1 = match.group(1)
+        year2 = match.group(2)
+        return f"{year1}-{year2}"
 
     # Strategy 2: Look for "Effective [Month] [Day,] YYYY" pattern
-    # Matches: "Effective July 1, 2022" or "Effective September 1, 2023"
+    # Matches: "Effective July 1, 2027" → "2027-2028"
     match = re.search(
         r'Effective\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+(\d{4})',
         text,
         re.IGNORECASE
     )
     if match:
-        year = match.group(1)
-        return year
+        year = int(match.group(1))
+        return f"{year}-{year + 1}"
 
     # Strategy 3: Look for month name followed by year
-    # Matches: "July 2022" or "September 2023"
+    # Matches: "July 2024" → "2024-2025"
     match = re.search(
         r'(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})',
         text,
         re.IGNORECASE
     )
     if match:
-        year = match.group(1)
-        return year
+        year = int(match.group(1))
+        return f"{year}-{year + 1}"
 
     # Strategy 4: Look for any standalone 4-digit year (1900-2099)
-    # This is a fallback and less reliable
+    # Matches: "2023" → "2023-2024"
     years = re.findall(r'\b(19\d{2}|20\d{2})\b', text)
     if years:
         # Take the most recent year found
-        year = max(years)
-        if 2000 <= int(year) <= 2099:  # Reasonable range for school contracts
-            return year
+        year = int(max(years))
+        if 2000 <= year <= 2099:  # Reasonable range for school contracts
+            return f"{year}-{year + 1}"
 
-    # Strategy 5: Look for 2-digit year (expand to 4-digit)
+    # Strategy 5: Look for 2-digit year (e.g., "27" → "2027-2028")
     match = re.search(r'\b(\d{2})\b', text)
     if match:
         year_2digit = int(match.group(1))
         # Assume 2000s for years 00-99
-        year = f"20{year_2digit:02d}"
-        return year
+        year = 2000 + year_2digit
+        return f"{year}-{year + 1}"
 
     return "unknown"
 
@@ -190,21 +191,22 @@ def filter_records_by_year_and_period(records):
     3. Include all current and future years
     4. For each year, only include the period that sorts last alphabetically
 
-    Note: Years are now single values (e.g., "2025" not "2024-2025")
+    Note: Years are in "YYYY-YYYY" format (e.g., "2024-2025")
     """
     if not records:
         return records
 
     from datetime import datetime
 
-    # Determine current school year (as single year value - the ending year)
+    # Determine current school year
     today = datetime.now()
-    if today.month >= 7:  # July or later (e.g., Nov 2025 = 2025-2026 school year)
-        current_year = today.year + 1  # Ending year (2026)
-    else:  # January-June (e.g., Jan 2025 = 2024-2025 school year)
-        current_year = today.year  # Ending year (2025)
+    if today.month >= 7:  # July or later
+        current_year_start = today.year
+    else:  # January-June
+        current_year_start = today.year - 1
+    current_school_year = f"{current_year_start}-{current_year_start + 1}"
 
-    print(f"\nCurrent school year ending: {current_year}")
+    print(f"\nCurrent school year: {current_school_year}")
 
     # Group records by year
     years_data = {}
@@ -223,8 +225,8 @@ def filter_records_by_year_and_period(records):
             continue
 
         try:
-            year_int = int(year)
-            if year_int < current_year:
+            year_start = int(year.split('-')[0])
+            if year_start < current_year_start:
                 past_years.append(year)
             else:
                 current_future_years.append(year)
@@ -233,10 +235,10 @@ def filter_records_by_year_and_period(records):
 
     # Determine which years to include
     if current_future_years:
-        years_to_include = sorted(current_future_years, key=lambda y: int(y))
+        years_to_include = sorted(current_future_years)
         print(f"Including current/future years: {years_to_include}")
     elif past_years:
-        most_recent_past = max(past_years, key=lambda y: int(y))
+        most_recent_past = max(past_years)
         years_to_include = [most_recent_past]
         print(f"Including most recent past year: {years_to_include}")
     else:
