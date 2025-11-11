@@ -5,6 +5,7 @@ from typing import Optional
 from contextlib import asynccontextmanager
 import os
 import json
+import logging
 import boto3
 from boto3.dynamodb.conditions import Key
 from dotenv import load_dotenv
@@ -43,6 +44,10 @@ from slowapi.errors import RateLimitExceeded
 
 # Load environment from .env for local development
 load_dotenv()
+
+# Configure logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 @asynccontextmanager
