@@ -299,6 +299,166 @@ class ApiService {
       throw error;
     }
   }
+
+  /**
+   * Admin: Upload PDF salary schedule for a district
+   * @param {string} districtId - District ID
+   * @param {File} pdfFile - PDF file to upload
+   * @returns {Promise<Object>} - Job status with job_id
+   */
+  async uploadSalarySchedule(districtId, pdfFile) {
+    const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/upload`;
+
+    const formData = new FormData();
+    formData.append('file', pdfFile);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...this._getAuthHeaders(),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to upload salary schedule: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Admin: Get job status and preview data
+   * @param {string} districtId - District ID
+   * @param {string} jobId - Job ID
+   * @returns {Promise<Object>} - Job status with optional preview data
+   */
+  async getSalaryJob(districtId, jobId) {
+    const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/jobs/${jobId}`;
+
+    const response = await fetch(url, {
+      headers: {
+        ...this._getAuthHeaders(),
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to get job status: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Admin: Apply extracted salary data to district
+   * @param {string} districtId - District ID
+   * @param {string} jobId - Job ID
+   * @returns {Promise<Object>} - Application result with metadata change info
+   */
+  async applySalaryData(districtId, jobId) {
+    const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/apply/${jobId}`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        ...this._getAuthHeaders(),
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to apply salary data: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Admin: Delete a salary processing job
+   * @param {string} districtId - District ID
+   * @param {string} jobId - Job ID
+   * @returns {Promise<Object>} - Delete result
+   */
+  async deleteSalaryJob(districtId, jobId) {
+    const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/jobs/${jobId}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        ...this._getAuthHeaders(),
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to delete job: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Admin: Get normalization status
+   * @returns {Promise<Object>} - Normalization status
+   */
+  async getNormalizationStatus() {
+    const url = `${API_BASE_URL}/api/admin/global/normalization/status`;
+
+    const response = await fetch(url, {
+      headers: {
+        ...this._getAuthHeaders(),
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to get normalization status: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Admin: Start global normalization job
+   * @returns {Promise<Object>} - Job start result
+   */
+  async startNormalization() {
+    const url = `${API_BASE_URL}/api/admin/global/normalize`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...this._getAuthHeaders(),
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to start normalization: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
 }
 
 export default new ApiService();
