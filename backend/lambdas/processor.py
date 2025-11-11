@@ -12,13 +12,14 @@ from decimal import Decimal
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# Initialize AWS clients
-s3 = boto3.client('s3')
-dynamodb = boto3.resource('dynamodb')
-
 # Get environment variables
 TABLE_NAME = os.environ['DYNAMODB_TABLE_NAME']
 S3_BUCKET_NAME = os.environ['S3_BUCKET_NAME']
+AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+
+# Initialize AWS clients with explicit region
+s3 = boto3.client('s3', region_name=AWS_REGION)
+dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
 
 # Initialize table
 table = dynamodb.Table(TABLE_NAME)
@@ -66,7 +67,14 @@ def handler(event, context):
                 extractor = HybridContractExtractor()
 
                 # Extract with pdfplumber or Textract
-                records = extractor.extract_from_s3(S3_BUCKET_NAME, s3_pdf_key)
+                # extract_from_pdf returns (records, method_used)
+                records, method_used = extractor.extract_from_pdf(
+                    pdf_bytes=pdf_bytes,
+                    filename=s3_pdf_key.split('/')[-1],
+                    s3_bucket=S3_BUCKET_NAME,
+                    s3_key=s3_pdf_key
+                )
+                logger.info(f"Extraction method used: {method_used}")
 
                 if not records:
                     # No tables found

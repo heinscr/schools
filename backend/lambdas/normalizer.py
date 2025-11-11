@@ -14,11 +14,12 @@ from collections import defaultdict
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# Initialize AWS clients
-dynamodb = boto3.resource('dynamodb')
-
 # Get environment variables
 TABLE_NAME = os.environ['DYNAMODB_TABLE_NAME']
+AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+
+# Initialize AWS clients with explicit region
+dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
 
 # Initialize table
 table = dynamodb.Table(TABLE_NAME)
