@@ -177,13 +177,6 @@ resource "aws_api_gateway_rest_api" "main" {
   name        = "${var.project_name}-api"
   description = "API for ${var.project_name}"
 
-  # Configure binary media types for PDF uploads
-  # Note: Do NOT include "multipart/form-data" here - only include the content
-  # types of the binary parts within the multipart request
-  binary_media_types = [
-    "application/pdf"
-  ]
-
   endpoint_configuration {
     types = ["REGIONAL"]
   }
@@ -547,7 +540,6 @@ resource "aws_api_gateway_deployment" "main" {
 
   triggers = {
     redeployment = sha1(jsonencode([
-      aws_api_gateway_rest_api.main.binary_media_types,
       aws_api_gateway_resource.proxy.id,
       aws_api_gateway_method.proxy.id,
       aws_api_gateway_integration.lambda.id,
