@@ -137,6 +137,10 @@ API_GATEWAY_ID=$(terraform output -raw api_gateway_id)
 API_ENDPOINT=$(terraform output -raw api_endpoint)
 SALARY_API_ENDPOINT=$(terraform output -raw api_endpoint)
 
+# Salary processing Lambda functions (optional - may not exist in older deployments)
+SALARY_PROCESSOR_LAMBDA=$(terraform output -raw salary_processor_lambda_name 2>/dev/null || echo "")
+SALARY_NORMALIZER_LAMBDA=$(terraform output -raw salary_normalizer_lambda_name 2>/dev/null || echo "")
+
 echo -e "${GREEN}✓ Configuration loaded${NC}"
 echo "  S3 Bucket: $S3_BUCKET"
 echo "  Lambda Function: $LAMBDA_FUNCTION_NAME"
@@ -145,6 +149,12 @@ echo "  DynamoDB Table: $DYNAMODB_TABLE"
 echo "  CloudFront Domain: $CLOUDFRONT_DOMAIN"
 echo "  API Endpoint: $API_ENDPOINT"
 echo "  Salary API Endpoint: $SALARY_API_ENDPOINT"
+if [ -n "$SALARY_PROCESSOR_LAMBDA" ]; then
+    echo "  Salary Processor Lambda: $SALARY_PROCESSOR_LAMBDA"
+fi
+if [ -n "$SALARY_NORMALIZER_LAMBDA" ]; then
+    echo "  Salary Normalizer Lambda: $SALARY_NORMALIZER_LAMBDA"
+fi
 echo ""
 
 cd ../..
@@ -221,6 +231,116 @@ else
 fi
 
 echo -e "${GREEN}✓ Lambda function deployed${NC}"
+
+# Deploy Salary Processing Lambdas (if configured)
+if [ -n "$SALARY_PROCESSOR_LAMBDA" ]; then
+    echo -e "\n${YELLOW}=== Deploying Salary Processor Lambda ===${NC}"
+
+    echo "Creating Salary Processor Lambda deployment package..."
+    cd backend
+    rm -rf processor-package salary-processor.zip 2>/dev/null || true
+
+    # Install dependencies
+    $PIP_BUILD_CMD install boto3 pdfplumber -t processor-package/ --quiet
+
+    # Copy Lambda handler
+    cp lambdas/processor.py processor-package/
+
+    # Copy required services (HybridContractExtractor and dependencies)
+    mkdir -p processor-package/services
+    cp services/hybrid_extractor.py processor-package/services/
+    cp services/contract_processor.py processor-package/services/
+    cp services/table_extractor.py processor-package/services/
+    [ -f "services/__init__.py" ] && cp services/__init__.py processor-package/services/
+
+    # Create zip
+    cd processor-package
+    zip -r ../salary-processor.zip . -q
+    cd ..
+
+    echo -e "${GREEN}✓ Salary Processor Lambda package created${NC}"
+
+    # Upload to S3
+    echo "Uploading Salary Processor Lambda package to S3..."
+    aws s3 cp salary-processor.zip s3://$S3_BUCKET/backend/salary-processor.zip --region $AWS_REGION
+    echo -e "${GREEN}✓ Salary Processor Lambda package uploaded${NC}"
+
+    # Update Lambda function
+    if aws lambda get-function --function-name $SALARY_PROCESSOR_LAMBDA --region $AWS_REGION > /dev/null 2>&1; then
+        echo "Updating Salary Processor Lambda function code..."
+
+        # Wait for any pending updates
+        aws lambda wait function-updated --function-name $SALARY_PROCESSOR_LAMBDA --region $AWS_REGION 2>/dev/null || true
+
+        # Update function code
+        aws lambda update-function-code \
+            --function-name $SALARY_PROCESSOR_LAMBDA \
+            --s3-bucket $S3_BUCKET \
+            --s3-key backend/salary-processor.zip \
+            --region $AWS_REGION \
+            --output json > /dev/null
+
+        echo "Waiting for code update to complete..."
+        aws lambda wait function-updated --function-name $SALARY_PROCESSOR_LAMBDA --region $AWS_REGION 2>/dev/null || true
+
+        echo -e "${GREEN}✓ Salary Processor Lambda function deployed${NC}"
+    else
+        echo -e "${YELLOW}⚠ Salary Processor Lambda function does not exist (should be created by Terraform)${NC}"
+    fi
+
+    cd ..
+fi
+
+if [ -n "$SALARY_NORMALIZER_LAMBDA" ]; then
+    echo -e "\n${YELLOW}=== Deploying Salary Normalizer Lambda ===${NC}"
+
+    echo "Creating Salary Normalizer Lambda deployment package..."
+    cd backend
+    rm -rf normalizer-package salary-normalizer.zip 2>/dev/null || true
+
+    # Install dependencies (boto3 is included by AWS Lambda runtime, but include for completeness)
+    $PIP_BUILD_CMD install boto3 -t normalizer-package/ --quiet
+
+    # Copy Lambda handler
+    cp lambdas/normalizer.py normalizer-package/
+
+    # Create zip
+    cd normalizer-package
+    zip -r ../salary-normalizer.zip . -q
+    cd ..
+
+    echo -e "${GREEN}✓ Salary Normalizer Lambda package created${NC}"
+
+    # Upload to S3
+    echo "Uploading Salary Normalizer Lambda package to S3..."
+    aws s3 cp salary-normalizer.zip s3://$S3_BUCKET/backend/salary-normalizer.zip --region $AWS_REGION
+    echo -e "${GREEN}✓ Salary Normalizer Lambda package uploaded${NC}"
+
+    # Update Lambda function
+    if aws lambda get-function --function-name $SALARY_NORMALIZER_LAMBDA --region $AWS_REGION > /dev/null 2>&1; then
+        echo "Updating Salary Normalizer Lambda function code..."
+
+        # Wait for any pending updates
+        aws lambda wait function-updated --function-name $SALARY_NORMALIZER_LAMBDA --region $AWS_REGION 2>/dev/null || true
+
+        # Update function code
+        aws lambda update-function-code \
+            --function-name $SALARY_NORMALIZER_LAMBDA \
+            --s3-bucket $S3_BUCKET \
+            --s3-key backend/salary-normalizer.zip \
+            --region $AWS_REGION \
+            --output json > /dev/null
+
+        echo "Waiting for code update to complete..."
+        aws lambda wait function-updated --function-name $SALARY_NORMALIZER_LAMBDA --region $AWS_REGION 2>/dev/null || true
+
+        echo -e "${GREEN}✓ Salary Normalizer Lambda function deployed${NC}"
+    else
+        echo -e "${YELLOW}⚠ Salary Normalizer Lambda function does not exist (should be created by Terraform)${NC}"
+    fi
+
+    cd ..
+fi
 
 # Deploy Frontend
 

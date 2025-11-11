@@ -429,9 +429,19 @@ output "salary_processing_queue_url" {
   value       = aws_sqs_queue.salary_processing.url
 }
 
+output "salary_processor_lambda_name" {
+  description = "Name of the salary processor Lambda function"
+  value       = aws_lambda_function.salary_processor.function_name
+}
+
 output "salary_processor_lambda_arn" {
   description = "ARN of the salary processor Lambda function"
   value       = aws_lambda_function.salary_processor.arn
+}
+
+output "salary_normalizer_lambda_name" {
+  description = "Name of the salary normalizer Lambda function"
+  value       = aws_lambda_function.salary_normalizer.function_name
 }
 
 output "salary_normalizer_lambda_arn" {
