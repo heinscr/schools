@@ -261,7 +261,7 @@ function Login({ onAuthChange, onLoadingChange }) {
               <button
                 className="menu-button normalize-button"
                 onClick={handleNormalize}
-                disabled={isNormalizing || isNormalizationRunning}
+                disabled={!needsNormalization || isNormalizing || isNormalizationRunning}
               >
                 <svg className="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="23 4 23 10 17 10" />
