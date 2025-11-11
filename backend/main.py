@@ -64,6 +64,16 @@ app = FastAPI(
 # Add rate limiter state
 app.state.limiter = limiter
 
+# Add middleware to exempt OPTIONS requests from rate limiting (CORS preflight)
+@app.middleware("http")
+async def bypass_rate_limit_for_options(request: Request, call_next):
+    """Exempt OPTIONS requests (CORS preflight) from rate limiting"""
+    if request.method == "OPTIONS":
+        # Process the request without rate limiting
+        response = await call_next(request)
+        return response
+    return await call_next(request)
+
 # Register error handlers
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
