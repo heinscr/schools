@@ -463,7 +463,12 @@ async def upload_salary_schedule(
     try:
         # Read PDF content
         pdf_content = await file.read()
-        logger.info(f"Received PDF upload: {len(pdf_content)} bytes, type: {type(pdf_content)}")
+        logger.info(f"Received PDF upload: filename='{file.filename}', content_type='{file.content_type}', size={len(pdf_content)} bytes, type={type(pdf_content)}")
+
+        # Log first 20 bytes to diagnose encoding issues
+        if len(pdf_content) > 0:
+            first_bytes = pdf_content[:20]
+            logger.info(f"First 20 bytes: {first_bytes}")
 
         # Create processing job
         job = salary_jobs_service.create_job(

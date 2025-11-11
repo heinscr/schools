@@ -51,6 +51,8 @@ class SalaryJobsService:
 
         # Upload PDF to S3
         pdf_key = f"{self.contracts_prefix}/pdfs/{district_id}.pdf"
+        logger.info(f"Uploading PDF to S3: {len(pdf_content)} bytes, type: {type(pdf_content)}")
+
         self.s3.put_object(
             Bucket=self.bucket_name,
             Key=pdf_key,
@@ -62,6 +64,8 @@ class SalaryJobsService:
                 'uploaded_by': uploaded_by
             }
         )
+
+        logger.info(f"Successfully uploaded PDF to S3: {pdf_key}")
 
         # Create job record
         now = datetime.utcnow().isoformat()
