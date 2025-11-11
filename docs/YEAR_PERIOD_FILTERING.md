@@ -14,17 +14,22 @@ The contract extraction system automatically filters salary data to include only
 - Include only the **most recent** past year
 - Exclude all older past years
 
+**Year Format:**
+- Years are stored as single values (e.g., "2025" not "2024-2025")
+- When extracting "2024-2025", we take the ending/larger year: "2025"
+- When extracting "July 1, 2024", we take the year: "2024"
+
 **School Year Definition:**
 - School years run July to June
 - Current school year determined by:
-  - July-December: current_year to current_year+1
-  - January-June: current_year-1 to current_year
+  - July-December: current_year+1 (ending year)
+  - January-June: current_year (ending year)
 
 **Example (current date: November 2025):**
-- Current school year: **2025-2026**
-- Contract has: 2022-2023, 2023-2024, 2024-2025
+- Current school year ending: **2026** (for 2025-2026)
+- Contract has: 2022, 2023, 2024 (extracted from "2021-2022", "2022-2023", "2023-2024")
 - All are **past** years
-- Result: Include only **2024-2025** (most recent)
+- Result: Include only **2024** (most recent)
 
 ### 2. Period Selection
 
@@ -47,57 +52,57 @@ For each included year, only include the period that **sorts last alphabetically
 
 **Input:**
 - Current date: November 11, 2025
-- Current school year: 2025-2026
-- Contract years: 2022-2023, 2023-2024, 2024-2025
+- Current school year ending: 2026
+- Contract years: 2022, 2023, 2024 (from "2021-2022", "2022-2023", "2023-2024")
 - Periods: full-year (for all years)
 - Total records: 234 (78 per year)
 
 **Output:**
-- Selected year: **2024-2025** (most recent past)
+- Selected year: **2024** (most recent past)
 - Selected period: **full-year** (only period)
 - Total records: **78** (67% reduction)
 
 **Reasoning:**
 - All three years are in the past
-- Keep only most recent: 2024-2025
+- Keep only most recent: 2024
 - Only one period available: full-year
 
 ### Example 2: Mix of Past and Current Years
 
 **Input:**
 - Current date: November 11, 2025
-- Current school year: 2025-2026
-- Contract years: 2024-2025, 2025-2026, 2026-2027
+- Current school year ending: 2026
+- Contract years: 2025, 2026, 2027 (from "2024-2025", "2025-2026", "2026-2027")
 - Periods: full-year (for all years)
 - Total records: 234 (78 per year)
 
 **Output:**
-- Selected years: **2025-2026, 2026-2027** (current + future)
+- Selected years: **2026, 2027** (current + future)
 - Selected period: **full-year** (for each year)
 - Total records: **156** (33% reduction)
 
 **Reasoning:**
-- Have current (2025-2026) and future (2026-2027) years
-- Exclude past year (2024-2025)
+- Have current (2026) and future (2027) years
+- Exclude past year (2025)
 - Keep both current and future
 
 ### Example 3: Multiple Periods
 
 **Input:**
 - Current date: November 11, 2025
-- Current school year: 2025-2026
-- Contract years: 2025-2026
+- Current school year ending: 2026
+- Contract years: 2026 (from "2025-2026")
 - Periods: 10-month, full-year, summer
 - Records per period: 78
 - Total records: 234
 
 **Output:**
-- Selected year: **2025-2026** (current)
+- Selected year: **2026** (current)
 - Selected period: **summer** (sorts last: s > f > 1)
 - Total records: **78** (67% reduction)
 
 **Reasoning:**
-- Current year 2025-2026 is included
+- Current year 2026 is included
 - Three periods available
 - ASCII sort: "summer" > "full-year" > "10-month"
 - Keep only summer period
@@ -106,13 +111,13 @@ For each included year, only include the period that **sorts last alphabetically
 
 **Input:**
 - Current date: January 15, 2025
-- Current school year: 2024-2025
-- Contract years: 2025-2026, 2026-2027, 2027-2028
+- Current school year ending: 2025
+- Contract years: 2026, 2027, 2028 (from "2025-2026", "2026-2027", "2027-2028")
 - Periods: full-year (for all years)
 - Total records: 234 (78 per year)
 
 **Output:**
-- Selected years: **2025-2026, 2026-2027, 2027-2028** (all future)
+- Selected years: **2026, 2027, 2028** (all future)
 - Selected period: **full-year** (for each year)
 - Total records: **234** (no reduction)
 
@@ -161,9 +166,9 @@ Filtering happens in `test_extraction.py`:
 ```bash
 $ python3 test_extraction.py Bedford_contract_1_conf85.pdf
 
-Current school year: 2025-2026
-Including most recent past year: ['2024-2025']
-Year 2024-2025: selected period 'full-year' from ['full-year']
+Current school year ending: 2026
+Including most recent past year: ['2024']
+Year 2024: selected period 'full-year' from ['full-year']
 Filtered from 234 to 78 records
 ```
 
@@ -182,15 +187,15 @@ records = self.extract_with_pdfplumber(pdf_bytes, filename)
 The system logs filtering decisions:
 
 ```
-Current school year: 2025-2026
-Including most recent past year: ['2024-2025']
-Year 2024-2025: selected period 'full-year' from ['full-year']
+Current school year ending: 2026
+Including most recent past year: ['2024']
+Year 2024: selected period 'full-year' from ['full-year']
 Filtered from 234 to 78 records
 ```
 
 This helps you understand:
-- What the current school year is
-- Which years were selected
+- What the current school year ending is (e.g., 2026 for 2025-2026 school year)
+- Which years were selected (as single values)
 - Which period was chosen for each year
 - How many records were kept
 
