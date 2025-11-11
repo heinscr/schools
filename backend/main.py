@@ -458,6 +458,7 @@ async def upload_salary_schedule(
     try:
         # Read PDF content
         pdf_content = await file.read()
+        logger.info(f"Received PDF upload: {len(pdf_content)} bytes, type: {type(pdf_content)}")
 
         # Create processing job
         job = salary_jobs_service.create_job(
@@ -476,6 +477,7 @@ async def upload_salary_schedule(
         }
 
     except Exception as e:
+        logger.error(f"Upload failed: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
 
