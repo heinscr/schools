@@ -44,6 +44,9 @@ locals {
   s3_bucket_name  = "${var.project_name}-${local.account_id}"
   function_name   = "${var.project_name}-api"
 
+  # Flag to enable salary processing features (check if resources will exist)
+  enable_salary_processing = true
+
   common_tags = merge(
     var.tags,
     {
@@ -380,6 +383,55 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
   })
 }
 
+# IAM Policy for Lambda to access S3 (for salary processing PDFs and JSON)
+resource "aws_iam_role_policy" "lambda_s3" {
+  name = "${var.project_name}-lambda-s3"
+  role = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "${aws_s3_bucket.main.arn}/contracts/*"
+      }
+    ]
+  })
+}
+
+# IAM Policy for Lambda to access SQS and invoke other Lambdas
+resource "aws_iam_role_policy" "lambda_salary_processing" {
+  count = local.enable_salary_processing ? 1 : 0
+  name  = "${var.project_name}-lambda-salary-processing"
+  role  = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:GetQueueUrl"
+        ]
+        Resource = aws_sqs_queue.salary_processing.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Resource = aws_lambda_function.salary_normalizer.arn
+      }
+    ]
+  })
+}
+
 # Lambda Function
 resource "aws_lambda_function" "api" {
   function_name = local.function_name
@@ -403,12 +455,14 @@ resource "aws_lambda_function" "api" {
         COGNITO_USER_POOL_ID     = aws_cognito_user_pool.main.id
         COGNITO_CLIENT_ID        = aws_cognito_user_pool_client.frontend.id
         COGNITO_REGION           = var.aws_region
-        # Salary processing queue
-        SALARY_PROCESSING_QUEUE_URL = aws_sqs_queue.salary_processing.url
-        SALARY_NORMALIZER_LAMBDA_ARN = aws_lambda_function.salary_normalizer.arn
       },
       # Add custom domain if configured
-      var.cloudfront_domain_name != "" ? { CUSTOM_DOMAIN = var.cloudfront_domain_name } : {}
+      var.cloudfront_domain_name != "" ? { CUSTOM_DOMAIN = var.cloudfront_domain_name } : {},
+      # Add salary processing environment variables if enabled
+      local.enable_salary_processing ? {
+        SALARY_PROCESSING_QUEUE_URL = aws_sqs_queue.salary_processing.url
+        SALARY_NORMALIZER_LAMBDA_ARN = aws_lambda_function.salary_normalizer.arn
+      } : {}
     )
   }
 
