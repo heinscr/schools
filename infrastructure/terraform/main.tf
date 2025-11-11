@@ -178,9 +178,10 @@ resource "aws_api_gateway_rest_api" "main" {
   description = "API for ${var.project_name}"
 
   # Configure binary media types for PDF uploads
+  # Note: Do NOT include "multipart/form-data" here - only include the content
+  # types of the binary parts within the multipart request
   binary_media_types = [
-    "application/pdf",
-    "multipart/form-data"
+    "application/pdf"
   ]
 
   endpoint_configuration {
