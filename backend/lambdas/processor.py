@@ -35,7 +35,7 @@ def handler(event, context):
     Event format (from SQS):
     {
         "Records": [{
-            "body": "{\"job_id\": \"...\", \"district_id\": \"...\", \"s3_pdf_key\": \"...\", \"s3_json_key\": \"...\"}"
+            "body": "{\"job_id\": \"...\", \"district_id\": \"...\", \"district_name\": \"...\", \"s3_pdf_key\": \"...\", \"s3_json_key\": \"...\"}"
         }]
     }
     """
@@ -48,6 +48,7 @@ def handler(event, context):
             message = json.loads(record['body'])
             job_id = message['job_id']
             district_id = message['district_id']
+            district_name = message.get('district_name', district_id)  # Fallback to district_id if not provided
             s3_pdf_key = message['s3_pdf_key']
             s3_json_key = message['s3_json_key']
 
@@ -71,6 +72,7 @@ def handler(event, context):
                 records, method_used = extractor.extract_from_pdf(
                     pdf_bytes=pdf_bytes,
                     filename=s3_pdf_key.split('/')[-1],
+                    district_name=district_name,
                     s3_bucket=S3_BUCKET_NAME,
                     s3_key=s3_pdf_key
                 )

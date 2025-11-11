@@ -95,6 +95,7 @@ class SalaryJobsService:
             MessageBody=json.dumps({
                 'job_id': job_id,
                 'district_id': district_id,
+                'district_name': district_name,
                 's3_pdf_key': pdf_key,
                 's3_json_key': job['s3_json_key']
             })

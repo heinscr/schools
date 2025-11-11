@@ -181,13 +181,14 @@ class HybridContractExtractor:
 
         return records
 
-    def extract_with_pdfplumber(self, pdf_bytes: bytes, filename: str) -> Optional[List[Dict]]:
+    def extract_with_pdfplumber(self, pdf_bytes: bytes, filename: str, district_name: str) -> Optional[List[Dict]]:
         """
         Extract salary data using pdfplumber + regex
 
         Args:
             pdf_bytes: PDF file content
             filename: Original filename
+            district_name: District name to use in records
 
         Returns:
             List of salary records or None if extraction fails
@@ -195,8 +196,8 @@ class HybridContractExtractor:
         try:
             logger.info(f"Extracting with pdfplumber: {filename}")
 
-            # Extract district name from filename
-            district = Path(filename).stem.split('_')[0].title()
+            # Use provided district name
+            district = district_name
 
             # Extract tables
             all_records = []
@@ -221,13 +222,14 @@ class HybridContractExtractor:
             logger.error(f"pdfplumber extraction failed: {e}")
             return None
 
-    def extract_with_textract(self, pdf_bytes: bytes, filename: str, s3_bucket: str, s3_key: str) -> Optional[List[Dict]]:
+    def extract_with_textract(self, pdf_bytes: bytes, filename: str, district_name: str, s3_bucket: str, s3_key: str) -> Optional[List[Dict]]:
         """
         Extract salary data using AWS Textract
 
         Args:
             pdf_bytes: PDF file content
             filename: Original filename
+            district_name: District name to use in records
             s3_bucket: S3 bucket where PDF is stored
             s3_key: S3 key of the PDF
 
@@ -237,7 +239,8 @@ class HybridContractExtractor:
         try:
             logger.info(f"Extracting with AWS Textract: {filename}")
 
-            district = Path(filename).stem.split('_')[0].title()
+            # Use provided district name
+            district = district_name
 
             # Start Textract job for table extraction
             response = self.textract.start_document_analysis(
@@ -489,13 +492,14 @@ class HybridContractExtractor:
         logger.info(f"Filtered from {len(records)} to {len(filtered_records)} records")
         return filtered_records
 
-    def extract_from_pdf(self, pdf_bytes: bytes, filename: str, s3_bucket: str, s3_key: str) -> Tuple[List[Dict], str]:
+    def extract_from_pdf(self, pdf_bytes: bytes, filename: str, district_name: str, s3_bucket: str, s3_key: str) -> Tuple[List[Dict], str]:
         """
         Extract salary data using hybrid approach
 
         Args:
             pdf_bytes: PDF file content
             filename: Original filename
+            district_name: District name to use in records
             s3_bucket: S3 bucket where PDF is stored
             s3_key: S3 key of the PDF
 
@@ -505,7 +509,7 @@ class HybridContractExtractor:
         # Try pdfplumber first for text-based PDFs
         if self.is_text_based_pdf(pdf_bytes):
             logger.info(f"✓ Text-based PDF detected: {filename}")
-            records = self.extract_with_pdfplumber(pdf_bytes, filename)
+            records = self.extract_with_pdfplumber(pdf_bytes, filename, district_name)
             if records:
                 # Filter records by year and period
                 records = self.filter_records_by_year_and_period(records)
@@ -515,7 +519,7 @@ class HybridContractExtractor:
 
         # Fall back to Textract for image-based PDFs
         logger.info(f"⚠ Image-based PDF detected: {filename}")
-        records = self.extract_with_textract(pdf_bytes, filename, s3_bucket, s3_key)
+        records = self.extract_with_textract(pdf_bytes, filename, district_name, s3_bucket, s3_key)
         if records:
             # Filter records by year and period
             records = self.filter_records_by_year_and_period(records)
