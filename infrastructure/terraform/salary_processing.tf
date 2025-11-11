@@ -2,6 +2,76 @@
 # Handles PDF upload, extraction, and global normalization
 
 # =============================================================================
+# Placeholder Lambda Packages
+# =============================================================================
+
+# Placeholder for salary processor Lambda
+data "archive_file" "placeholder_salary_processor" {
+  type        = "zip"
+  output_path = "${path.module}/placeholder/salary-processor-placeholder.zip"
+
+  source {
+    content  = <<-EOT
+def handler(event, context):
+    return {
+        'statusCode': 503,
+        'body': 'Salary processor not deployed yet. Please run deploy.sh'
+    }
+EOT
+    filename = "processor.py"
+  }
+}
+
+# Upload placeholder to S3
+resource "aws_s3_object" "salary_processor_placeholder" {
+  bucket = aws_s3_bucket.main.id
+  key    = "backend/salary-processor.zip"
+  source = data.archive_file.placeholder_salary_processor.output_path
+  etag   = data.archive_file.placeholder_salary_processor.output_md5
+
+  # This will be replaced when deploy.sh runs
+  lifecycle {
+    ignore_changes = [
+      etag,
+      source
+    ]
+  }
+}
+
+# Placeholder for salary normalizer Lambda
+data "archive_file" "placeholder_salary_normalizer" {
+  type        = "zip"
+  output_path = "${path.module}/placeholder/salary-normalizer-placeholder.zip"
+
+  source {
+    content  = <<-EOT
+def handler(event, context):
+    return {
+        'statusCode': 503,
+        'body': 'Salary normalizer not deployed yet. Please run deploy.sh'
+    }
+EOT
+    filename = "normalizer.py"
+  }
+}
+
+# Upload placeholder to S3
+resource "aws_s3_object" "salary_normalizer_placeholder" {
+  bucket = aws_s3_bucket.main.id
+  key    = "backend/salary-normalizer.zip"
+  source = data.archive_file.placeholder_salary_normalizer.output_path
+  etag   = data.archive_file.placeholder_salary_normalizer.output_md5
+
+  # This will be replaced when deploy.sh runs
+  lifecycle {
+    ignore_changes = [
+      etag,
+      source
+    ]
+  }
+}
+
+# =============================================================================
 # SQS Queue for PDF Processing
 # =============================================================================
 
@@ -162,7 +232,8 @@ resource "aws_lambda_function" "salary_processor" {
 
   depends_on = [
     aws_iam_role_policy_attachment.salary_processor_basic,
-    aws_iam_role_policy.salary_processor_access
+    aws_iam_role_policy.salary_processor_access,
+    aws_s3_object.salary_processor_placeholder
   ]
 
   # Ignore changes to source code hash since deploy.sh will update the code
@@ -271,7 +342,8 @@ resource "aws_lambda_function" "salary_normalizer" {
 
   depends_on = [
     aws_iam_role_policy_attachment.salary_normalizer_basic,
-    aws_iam_role_policy.salary_normalizer_access
+    aws_iam_role_policy.salary_normalizer_access,
+    aws_s3_object.salary_normalizer_placeholder
   ]
 
   # Ignore changes to source code hash since deploy.sh will update the code
