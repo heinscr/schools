@@ -250,45 +250,72 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
                 matrix[edu_cred_key][target_step] = calculated_item
 
     # PHASE 2: Fill right (missing edu+credit combos)
+    # Process missing combos in order (by education level, then by credits low to high)
+    # This ensures we can use previously created combos as sources
     missing_combos = [c for c in all_edu_credit_combos if c not in matrix]
 
-    for missing_combo in missing_combos:
+    # Sort missing combos by education level, then by credits
+    def combo_sort_key(combo):
+        parts = combo.split('+')
+        edu = parts[0]
+        cred = int(parts[1])
+        return (edu_order.get(edu, 0), cred)
+
+    missing_combos_sorted = sorted(missing_combos, key=combo_sort_key)
+
+    for missing_combo in missing_combos_sorted:
         parts = missing_combo.split('+')
         target_edu = parts[0]
         target_cred = int(parts[1])
         target_cred_padded = pad_number(target_cred, 3)
 
-        # Find best source combo
+        # Find best source combo (closest lower credit from same or lower education level)
+        # Priority: same education level with highest credit < target, then lower education levels
         best_source = None
+        best_source_cred = -1
 
         for source_combo in matrix.keys():
             source_parts = source_combo.split('+')
             source_edu = source_parts[0]
             source_cred = int(source_parts[1])
 
-            # Check if valid fallback
+            # Check if this is a valid fallback
+            # Do not allow using a source from a higher education level
             if edu_order.get(source_edu, 0) > edu_order.get(target_edu, 0):
-                continue
-            if source_edu == target_edu and source_cred > target_cred:
-                continue
+                continue  # Can't fallback from higher edu
 
+            # Priority: same education level first, then lower education level
             if best_source is None:
                 best_source = source_combo
+                best_source_cred = source_cred
             else:
                 best_parts = best_source.split('+')
                 best_edu = best_parts[0]
                 best_cred = int(best_parts[1])
 
-                if edu_order.get(source_edu, 0) > edu_order.get(best_edu, 0):
+                # Prefer same education level over lower education level
+                if source_edu == target_edu and best_edu != target_edu:
+                    # Source is same edu, best is lower edu -> use source
                     best_source = source_combo
-                elif source_edu == best_edu and source_cred > best_cred:
-                    best_source = source_combo
+                    best_source_cred = source_cred
+                elif source_edu == target_edu and best_edu == target_edu:
+                    # Both same edu -> prefer highest credit < target
+                    if source_cred < target_cred and source_cred > best_cred:
+                        best_source = source_combo
+                        best_source_cred = source_cred
+                elif source_edu != target_edu and best_edu != target_edu:
+                    # Both lower edu -> prefer highest credit
+                    if source_cred > best_cred:
+                        best_source = source_combo
+                        best_source_cred = source_cred
 
         if not best_source:
             continue
 
-        # Copy all steps from source combo
+        # Copy all steps from source combo and add to matrix
         source_entries = matrix[best_source]
+        matrix[missing_combo] = {}  # Create entry in matrix for this new combo
+
         for step, source_entry in source_entries.items():
             step_padded = pad_number(step, 2)
 
@@ -314,6 +341,7 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
                 'GSI2SK': f'EDU#{target_edu}#CR#{target_cred_padded}#STEP#{step_padded}',
             }
             calculated_items.append(calculated_item)
+            matrix[missing_combo][step] = calculated_item  # Add to matrix so it can be used as source
 
     return calculated_items
 
