@@ -181,6 +181,16 @@ async def require_cognito_auth(
     Raises:
         HTTPException: 401 if authentication fails
     """
+    # Local dev shortcut: allow a fake user when LOCAL_DEV=1
+    if os.getenv("LOCAL_DEV", "0") == "1":
+        return {
+            "sub": "local-test-user",
+            "email": "local@localhost",
+            "groups": ["admins"],
+            "is_admin": True,
+            "username": "local"
+        }
+
     if not credentials:
         raise HTTPException(
             status_code=401,

@@ -301,8 +301,9 @@ if [ -n "$SALARY_NORMALIZER_LAMBDA" ]; then
     # Install dependencies (boto3 is included by AWS Lambda runtime, but include for completeness)
     $PIP_BUILD_CMD install boto3 -t normalizer-package/ --quiet
 
-    # Copy Lambda handler
+    # Copy Lambda handler and shared utilities
     cp lambdas/normalizer.py normalizer-package/
+    cp -r utils normalizer-package/
 
     # Create zip
     cd normalizer-package

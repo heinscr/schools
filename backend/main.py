@@ -18,7 +18,7 @@ from schemas import (
     DistrictListResponse
 )
 from services.dynamodb_district_service import DynamoDBDistrictService
-from services.salary_jobs import SalaryJobsService
+from services.salary_jobs import SalaryJobsService, LocalSalaryJobsService
 from config import (
     MAX_QUERY_LIMIT,
     DEFAULT_QUERY_LIMIT,
@@ -326,6 +326,10 @@ if main_table and S3_BUCKET_NAME and SQS_QUEUE_URL:
         queue_url=SQS_QUEUE_URL,
         bucket_name=S3_BUCKET_NAME
     )
+else:
+    # Local development fallback: use a file-backed stub so uploads work without AWS
+    local_storage = os.getenv("LOCAL_SALARY_STORAGE", "./backend/local_data")
+    salary_jobs_service = LocalSalaryJobsService(storage_dir=local_storage, dynamodb_table=main_table)
 
 # Import salary service functions
 from services.salary_service import (

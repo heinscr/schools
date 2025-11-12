@@ -4,11 +4,17 @@ Runs the normalization logic from scripts/normalize_salaries.py
 """
 import json
 import os
+import sys
 import logging
 import boto3
 from datetime import datetime
 from decimal import Decimal
 from collections import defaultdict
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.normalization import generate_calculated_entries
 
 # Configure logging
 logger = logging.getLogger()
@@ -59,11 +65,12 @@ def handler(event, context):
             logger.info(f"  Found {len(district_data)} districts with real data")
 
             # Generate calculated entries
+            edu_order = {'B': 1, 'M': 2, 'D': 3}
             all_calculated = []
             for district_id, real_entries in district_data.items():
                 district_name = real_entries[0]['district_name'] if real_entries else district_id
                 calculated = generate_calculated_entries(
-                    district_id, district_name, year, period, real_entries, max_step, edu_credit_combos
+                    district_id, district_name, year, period, real_entries, max_step, edu_credit_combos, edu_order
                 )
                 all_calculated.extend(calculated)
 
@@ -177,197 +184,6 @@ def get_district_data_for_year_period(year, period):
             district_data[district_id] = real_entries
 
     return district_data
-
-
-def pad_number(num, width):
-    """Pad a number with leading zeros"""
-    return str(num).zfill(width)
-
-
-def generate_calculated_entries(district_id, district_name, year, period, real_entries, max_step, all_edu_credit_combos):
-    """Generate calculated entries using matrix fill algorithm"""
-    calculated_items = []
-
-    # Education/credit hierarchy for fallback
-    edu_order = {'B': 1, 'M': 2, 'D': 3}
-
-    # PHASE 1: Fill down each column (existing combos)
-    by_edu_credit = defaultdict(list)
-    for entry in real_entries:
-        edu = entry['education']
-        cred = entry['credits']
-        key = f"{edu}+{cred}"
-        by_edu_credit[key].append(entry)
-
-    # Build complete matrix for existing columns
-    matrix = {}
-
-    for edu_cred_key, entries in by_edu_credit.items():
-        parts = edu_cred_key.split('+')
-        edu = parts[0]
-        cred = int(parts[1])
-        cred_padded = pad_number(cred, 3)
-
-        # Build lookup by step
-        entries_by_step = {int(e['step']): e for e in entries}
-        matrix[edu_cred_key] = {}
-
-        # Fill all steps for this column
-        for target_step in range(1, max_step + 1):
-            if target_step in entries_by_step:
-                matrix[edu_cred_key][target_step] = entries_by_step[target_step]
-            else:
-                # Find source: highest step <= target_step
-                lower_steps = [s for s in entries_by_step.keys() if s <= target_step]
-                if lower_steps:
-                    source_step = max(lower_steps)
-                else:
-                    source_step = min(entries_by_step.keys())
-
-                source_entry = entries_by_step[source_step]
-
-                # Track where this calculated value came from
-                if 'is_calculated_from' in source_entry:
-                    is_calculated_from = source_entry['is_calculated_from']
-                else:
-                    # Construct from source entry's actual values
-                    is_calculated_from = {
-                        'education': source_entry['education'],
-                        'credits': source_entry['credits'],
-                        'step': source_step
-                    }
-
-                # Create calculated entry
-                step_padded = pad_number(target_step, 2)
-                calculated_item = {
-                    'PK': f'DISTRICT#{district_id}',
-                    'SK': f'SCHEDULE#{year}#{period}#EDU#{edu}#CR#{cred_padded}#STEP#{step_padded}',
-                    'district_id': district_id,
-                    'district_name': district_name,
-                    'school_year': year,
-                    'period': period,
-                    'education': edu,
-                    'credits': cred,
-                    'step': target_step,
-                    'salary': source_entry['salary'],
-                    'is_calculated': True,
-                    'is_calculated_from': is_calculated_from,
-                    'source_step': source_step,
-                    'GSI1PK': f'YEAR#{year}#PERIOD#{period}#EDU#{edu}#CR#{cred_padded}',
-                    'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
-                    'GSI2PK': f'YEAR#{year}#PERIOD#{period}#DISTRICT#{district_id}',
-                    'GSI2SK': f'EDU#{edu}#CR#{cred_padded}#STEP#{step_padded}',
-                }
-                calculated_items.append(calculated_item)
-                matrix[edu_cred_key][target_step] = calculated_item
-
-    # PHASE 2: Fill right (missing edu+credit combos)
-    # Process missing combos in order (by education level, then by credits low to high)
-    # This ensures we can use previously created combos as sources
-    missing_combos = [c for c in all_edu_credit_combos if c not in matrix]
-
-    # Sort missing combos by education level, then by credits
-    def combo_sort_key(combo):
-        parts = combo.split('+')
-        edu = parts[0]
-        cred = int(parts[1])
-        return (edu_order.get(edu, 0), cred)
-
-    missing_combos_sorted = sorted(missing_combos, key=combo_sort_key)
-
-    for missing_combo in missing_combos_sorted:
-        parts = missing_combo.split('+')
-        target_edu = parts[0]
-        target_cred = int(parts[1])
-        target_cred_padded = pad_number(target_cred, 3)
-
-        # Find best source combo (closest lower credit from same or lower education level)
-        # Priority: same education level with highest credit < target, then lower education levels
-        best_source = None
-        best_source_cred = -1
-
-        for source_combo in matrix.keys():
-            source_parts = source_combo.split('+')
-            source_edu = source_parts[0]
-            source_cred = int(source_parts[1])
-
-            # Check if this is a valid fallback
-            # Do not allow using a source from a higher education level
-            if edu_order.get(source_edu, 0) > edu_order.get(target_edu, 0):
-                continue  # Can't fallback from higher edu
-
-            # Priority: same education level first, then lower education level
-            if best_source is None:
-                best_source = source_combo
-                best_source_cred = source_cred
-            else:
-                best_parts = best_source.split('+')
-                best_edu = best_parts[0]
-                best_cred = int(best_parts[1])
-
-                # Prefer same education level over lower education level
-                if source_edu == target_edu and best_edu != target_edu:
-                    # Source is same edu, best is lower edu -> use source
-                    best_source = source_combo
-                    best_source_cred = source_cred
-                elif source_edu == target_edu and best_edu == target_edu:
-                    # Both same edu -> prefer highest credit < target
-                    if source_cred < target_cred and source_cred > best_cred:
-                        best_source = source_combo
-                        best_source_cred = source_cred
-                elif source_edu != target_edu and best_edu != target_edu:
-                    # Both lower edu -> prefer highest credit
-                    if source_cred > best_cred:
-                        best_source = source_combo
-                        best_source_cred = source_cred
-
-        if not best_source:
-            continue
-
-        # Copy all steps from source combo and add to matrix
-        source_entries = matrix[best_source]
-        matrix[missing_combo] = {}  # Create entry in matrix for this new combo
-
-        for step, source_entry in source_entries.items():
-            step_padded = pad_number(step, 2)
-
-            source_was_calculated = source_entry.get('is_calculated', False)
-
-            # Track where this calculated value came from
-            if 'is_calculated_from' in source_entry:
-                is_calculated_from = source_entry['is_calculated_from']
-            else:
-                # Construct from source entry's actual values
-                is_calculated_from = {
-                    'education': source_entry['education'],
-                    'credits': source_entry['credits'],
-                    'step': source_entry['step']
-                }
-
-            calculated_item = {
-                'PK': f'DISTRICT#{district_id}',
-                'SK': f'SCHEDULE#{year}#{period}#EDU#{target_edu}#CR#{target_cred_padded}#STEP#{step_padded}',
-                'district_id': district_id,
-                'district_name': district_name,
-                'school_year': year,
-                'period': period,
-                'education': target_edu,
-                'credits': target_cred,
-                'step': step,
-                'salary': source_entry['salary'],
-                'is_calculated': True,
-                'is_calculated_from': is_calculated_from,
-                'source_edu_credit': best_source,
-                'source_step': source_entry.get('source_step') if source_was_calculated else step,
-                'GSI1PK': f'YEAR#{year}#PERIOD#{period}#EDU#{target_edu}#CR#{target_cred_padded}',
-                'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
-                'GSI2PK': f'YEAR#{year}#PERIOD#{period}#DISTRICT#{district_id}',
-                'GSI2SK': f'EDU#{target_edu}#CR#{target_cred_padded}#STEP#{step_padded}',
-            }
-            calculated_items.append(calculated_item)
-            matrix[missing_combo][step] = calculated_item  # Add to matrix so it can be used as source
-
-    return calculated_items
 
 
 def batch_write_items(items, description):

@@ -11,6 +11,7 @@ from typing import Dict, List, Optional, Tuple
 import boto3
 from boto3.dynamodb.conditions import Key
 import logging
+from utils.normalization import generate_calculated_entries, pad_number
 
 logger = logging.getLogger(__name__)
 
@@ -250,17 +251,22 @@ class SalaryJobsService:
         # Update availability metadata for year/period combinations
         self._update_availability_metadata(district_id, records)
 
+        # Normalize this specific district immediately
+        normalized_count = self._normalize_district(district_id, records)
+        logger.info(f"Normalized district {district_id}: {normalized_count} calculated entries created")
+
         # Update metadata if changed
         if metadata_changed:
             self._update_global_metadata(records)
 
-            # Set normalization flag
+            # Set normalization flag (for other districts that might need it)
             self._set_normalization_status(needs_normalization, job_id)
 
-        logger.info(f"Applied salary data for district {district_id}: {records_added} records")
+        logger.info(f"Applied salary data for district {district_id}: {records_added} records, {normalized_count} calculated")
 
         return True, {
             'records_added': records_added,
+            'calculated_entries': normalized_count,
             'metadata_changed': metadata_changed,
             'needs_global_normalization': needs_normalization
         }
@@ -398,8 +404,6 @@ class SalaryJobsService:
             'last_updated': datetime.utcnow().isoformat()
         })
 
-        logger.info(f"Updated global metadata: max_step={final_max_step}, combos={len(final_combos)}")
-
     def _update_availability_metadata(self, district_id: str, records: List[Dict]):
         """Update availability metadata to include this district for each year/period"""
         # Group records by year/period
@@ -450,6 +454,267 @@ class SalaryJobsService:
             # Save updated metadata
             self.table.put_item(Item=item)
             logger.info(f"Updated availability metadata for {year}/{period} to include district {district_id}")
+
+    def _normalize_district(self, district_id: str, records: List[Dict]) -> int:
+        """
+        Normalize salary data for a specific district
+
+        Args:
+            district_id: District UUID
+            records: List of salary records that were just loaded
+
+        Returns:
+            Number of calculated entries created
+        """
+        from collections import defaultdict
+
+        # Get global metadata for normalization
+        response = self.table.get_item(
+            Key={'PK': 'METADATA#MAXVALUES', 'SK': 'GLOBAL'}
+        )
+
+        if 'Item' not in response:
+            logger.warning(f"No global metadata found, skipping normalization for {district_id}")
+            return 0
+
+        metadata = response['Item']
+        max_step = int(metadata.get('max_step', 15))
+        edu_credit_combos = metadata.get('edu_credit_combos', [])
+
+        # Get district name from first record
+        district_name = records[0]['district_name'] if records else district_id
+
+        # Group records by year/period
+        by_year_period = defaultdict(list)
+        for record in records:
+            key = (record['school_year'], record['period'])
+            by_year_period[key].append(record)
+
+        total_calculated = 0
+
+        # Use shared normalization utility
+        edu_order = {'B': 1, 'M': 2, 'D': 3}
+
+        for (year, period), year_records in by_year_period.items():
+            calculated_items = generate_calculated_entries(
+                district_id, district_name, year, period,
+                year_records, max_step, edu_credit_combos, edu_order
+            )
+
+            # Write calculated entries in batches
+            if calculated_items:
+                with self.table.batch_writer() as batch:
+                    for item in calculated_items:
+                        batch.put_item(Item=item)
+
+                total_calculated += len(calculated_items)
+                logger.info(f"Created {len(calculated_items)} calculated entries for {district_id} {year}/{period}")
+
+        return total_calculated
+
+
+class LocalSalaryJobsService:
+    """A lightweight, file-backed stub of SalaryJobsService for local development.
+
+    - Stores uploaded PDFs and generated JSON under a local directory.
+    - Creates a completed job immediately with a small sample extracted JSON so admin flows can be exercised
+      without AWS resources (S3/SQS).
+    """
+
+    def __init__(self, storage_dir: Optional[str] = None, dynamodb_table=None):
+        """Initialize local storage paths.
+
+        By default the storage directory is set to <repo-root>/backend/local_data so files are
+        written to a deterministic location regardless of the current working directory.
+
+        If a storage_dir is provided and it's an absolute path, it will be used as-is. If it's
+        a relative path, it will be resolved relative to the repository backend directory.
+        """
+        from pathlib import Path
+
+        # Determine repository backend directory (two levels up from this file -> backend)
+        repo_backend_dir = Path(__file__).resolve().parent.parent
+
+        if storage_dir:
+            p = Path(storage_dir)
+            if not p.is_absolute():
+                # Resolve relative paths against the backend directory
+                p = (repo_backend_dir / p).resolve()
+            self.storage_dir = p
+        else:
+            # Default deterministic location: <repo-root>/backend/local_data
+            self.storage_dir = (repo_backend_dir / "local_data").resolve()
+
+        self.contracts_dir = self.storage_dir / "contracts"
+        self.pdfs_dir = self.contracts_dir / "pdfs"
+        self.json_dir = self.contracts_dir / "json"
+        self.jobs_file = self.storage_dir / "jobs.json"
+        self.table = dynamodb_table
+
+        # Ensure directories exist
+        self.pdfs_dir.mkdir(parents=True, exist_ok=True)
+        self.json_dir.mkdir(parents=True, exist_ok=True)
+        self.storage_dir.mkdir(parents=True, exist_ok=True)
+        if not self.jobs_file.exists():
+            self._write_jobs({})
+
+    def _read_jobs(self) -> Dict[str, Dict]:
+        try:
+            with open(self.jobs_file, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+
+    def _write_jobs(self, data: Dict[str, Dict]):
+        with open(self.jobs_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+
+    def create_job(self, district_id: str, district_name: str, pdf_content: bytes, filename: str, uploaded_by: str) -> Dict:
+        job_id = str(uuid.uuid4())
+        pdf_path = self.pdfs_dir / f"{district_id}.pdf"
+        json_path = self.json_dir / f"{district_id}.json"
+
+        # Save PDF locally
+        with open(pdf_path, "wb") as f:
+            f.write(pdf_content)
+
+        # Create a small sample extracted JSON so the admin preview flows work
+        sample_records = [
+            {
+                'district_id': district_id,
+                'district_name': district_name,
+                'school_year': '2024-2025',
+                'period': 'regular',
+                'education': 'B',
+                'credits': 0,
+                'step': 1,
+                'salary': 50000.0
+            },
+            {
+                'district_id': district_id,
+                'district_name': district_name,
+                'school_year': '2024-2025',
+                'period': 'regular',
+                'education': 'B',
+                'credits': 0,
+                'step': 2,
+                'salary': 52000.0
+            }
+        ]
+
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(sample_records, f)
+
+        now = datetime.utcnow().isoformat()
+        ttl = int(time.time()) + (30 * 24 * 60 * 60)
+
+        job = {
+            'PK': f'JOB#{job_id}',
+            'SK': 'METADATA',
+            'job_id': job_id,
+            'district_id': district_id,
+            'district_name': district_name,
+            'status': 'completed',
+            's3_pdf_key': str(pdf_path),
+            's3_json_key': str(json_path),
+            'original_filename': filename,
+            'uploaded_by': uploaded_by,
+            'created_at': now,
+            'updated_at': now,
+            'ttl': ttl,
+            'extracted_records_count': len(sample_records),
+            'years_found': ['2024-2025']
+        }
+
+        jobs = self._read_jobs()
+        jobs[job_id] = job
+        self._write_jobs(jobs)
+
+        logger.info(f"[LocalSalaryJobsService] Created local job {job_id} (district {district_id}) at {pdf_path}")
+        return job
+
+    def get_job(self, job_id: str) -> Optional[Dict]:
+        jobs = self._read_jobs()
+        return jobs.get(job_id)
+
+    def delete_job(self, job_id: str):
+        jobs = self._read_jobs()
+        job = jobs.pop(job_id, None)
+        if job:
+            # Attempt to remove local files if present
+            try:
+                from pathlib import Path
+                p = Path(job.get('s3_pdf_key'))
+                j = Path(job.get('s3_json_key'))
+                if p.exists():
+                    p.unlink()
+                if j.exists():
+                    j.unlink()
+            except Exception:
+                pass
+            self._write_jobs(jobs)
+
+    def get_extracted_data_preview(self, job_id: str, limit: Optional[int] = 10) -> Optional[List[Dict]]:
+        job = self.get_job(job_id)
+        if not job or job.get('status') != 'completed':
+            return None
+
+        try:
+            with open(job['s3_json_key'], 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            return data[:limit] if limit else data
+        except Exception as e:
+            logger.error(f"[LocalSalaryJobsService] Error reading local extracted data: {e}")
+            return None
+
+    def apply_salary_data(self, job_id: str, district_id: str, exclusions: Optional[Dict] = None) -> Tuple[bool, Dict]:
+        # For local stub, pretend we applied the data and return counts based on saved JSON
+        job = self.get_job(job_id)
+        if not job:
+            raise ValueError("Job not found")
+        try:
+            with open(job['s3_json_key'], 'r', encoding='utf-8') as f:
+                records = json.load(f)
+        except Exception as e:
+            raise
+
+        # Simple metadata result
+        records_added = len(records)
+        metadata_changed = True
+        needs_normalization = False
+
+        # Update job status
+        jobs = self._read_jobs()
+        job['status'] = 'completed'
+        job['extracted_records_count'] = records_added
+        jobs[job_id] = job
+        self._write_jobs(jobs)
+
+        logger.info(f"[LocalSalaryJobsService] Applied {records_added} local records for district {district_id}")
+        return True, {
+            'records_added': records_added,
+            'metadata_changed': metadata_changed,
+            'needs_global_normalization': needs_normalization
+        }
+
+    # Optional helper used by normalization endpoints
+    def start_normalization_job(self, lambda_client=None, normalizer_arn: str = None, triggered_by: str = None) -> str:
+        # No-op for local; return a deterministic job id
+        jid = f"local-normalize-{int(time.time())}"
+        logger.info(f"[LocalSalaryJobsService] start_normalization_job -> {jid}")
+        return jid
+
+    # Minimal implementations to satisfy admin endpoints in main.py
+    def get_normalization_status(self) -> Dict:
+        # Return a simple status object
+        return {
+            'job_running': False,
+            'last_run': None
+        }
+
+    def get_normalization_job(self) -> Optional[Dict]:
+        # No background job in local stub
+        return None
 
     def _set_normalization_status(self, needs_normalization: bool, triggered_by_job_id: str):
         """Set global normalization status"""
@@ -523,8 +788,3 @@ class SalaryJobsService:
             Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'}
         )
         return response.get('Item')
-
-
-def pad_number(num: int, width: int) -> str:
-    """Pad a number with leading zeros"""
-    return str(num).zfill(width)

@@ -180,6 +180,9 @@ def test_delete_district_not_found(monkeypatch):
 
 def test_create_district_unauthorized_no_api_key(monkeypatch):
     """Test that POST without authentication returns 401"""
+    # Clear any dependency overrides from previous tests
+    backend_main.app.dependency_overrides.clear()
+
     client = TestClient(backend_main.app)
 
     payload = {
@@ -196,6 +199,9 @@ def test_create_district_unauthorized_no_api_key(monkeypatch):
 
 def test_create_district_forbidden_invalid_api_key(monkeypatch):
     """Test that POST with invalid auth token returns 401"""
+    # Clear any dependency overrides from previous tests
+    backend_main.app.dependency_overrides.clear()
+
     # Mock get_cognito_keys to return valid keys structure
     # This prevents HTTP calls to Cognito in tests
     import cognito_auth
@@ -231,6 +237,9 @@ def test_create_district_forbidden_invalid_api_key(monkeypatch):
 
 def test_update_district_unauthorized_no_api_key(monkeypatch):
     """Test that PUT without API key returns 401"""
+    # Clear any dependency overrides from previous tests
+    backend_main.app.dependency_overrides.clear()
+
     client = TestClient(backend_main.app)
 
     payload = {'name': 'Updated District'}
@@ -240,6 +249,9 @@ def test_update_district_unauthorized_no_api_key(monkeypatch):
 
 def test_delete_district_unauthorized_no_api_key(monkeypatch):
     """Test that DELETE without API key returns 401"""
+    # Clear any dependency overrides from previous tests
+    backend_main.app.dependency_overrides.clear()
+
     client = TestClient(backend_main.app)
 
     r = client.delete('/api/districts/DIST%231')
