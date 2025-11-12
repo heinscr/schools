@@ -247,6 +247,9 @@ class SalaryJobsService:
         # Load new salary data
         records_added = self._load_salary_records(district_id, records)
 
+        # Update availability metadata for year/period combinations
+        self._update_availability_metadata(district_id, records)
+
         # Update metadata if changed
         if metadata_changed:
             self._update_global_metadata(records)
@@ -396,6 +399,57 @@ class SalaryJobsService:
         })
 
         logger.info(f"Updated global metadata: max_step={final_max_step}, combos={len(final_combos)}")
+
+    def _update_availability_metadata(self, district_id: str, records: List[Dict]):
+        """Update availability metadata to include this district for each year/period"""
+        # Group records by year/period
+        year_periods = {}
+        for record in records:
+            year = record['school_year']
+            period = record['period']
+            key = (year, period)
+
+            if key not in year_periods:
+                year_periods[key] = set()
+
+            # Track edu+credit combo
+            edu_credit = f"{record['education']}+{record['credits']}"
+            year_periods[key].add(edu_credit)
+
+        # Update availability metadata for each year/period
+        for (year, period), edu_credits in year_periods.items():
+            pk = 'METADATA#AVAILABILITY'
+            sk = f'YEAR#{year}#PERIOD#{period}'
+
+            # Get existing availability metadata
+            response = self.table.get_item(Key={'PK': pk, 'SK': sk})
+
+            if 'Item' in response:
+                # Update existing item
+                item = response['Item']
+                districts = item.get('districts', {})
+
+                # Add this district with its edu+credit combos
+                districts[district_id] = {combo: True for combo in edu_credits}
+
+                item['districts'] = districts
+                item['last_updated'] = datetime.utcnow().isoformat()
+            else:
+                # Create new availability metadata
+                item = {
+                    'PK': pk,
+                    'SK': sk,
+                    'school_year': year,
+                    'period': period,
+                    'districts': {
+                        district_id: {combo: True for combo in edu_credits}
+                    },
+                    'created_at': datetime.utcnow().isoformat()
+                }
+
+            # Save updated metadata
+            self.table.put_item(Item=item)
+            logger.info(f"Updated availability metadata for {year}/{period} to include district {district_id}")
 
     def _set_normalization_status(self, needs_normalization: bool, triggered_by_job_id: str):
         """Set global normalization status"""
