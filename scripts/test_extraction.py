@@ -91,12 +91,13 @@ def extract_tables_from_pdf(pdf_path):
         for page_num, page in enumerate(pdf.pages, 1):
             text = page.extract_text() or ""
             tables = page.extract_tables()
-
+            print(f"\n--- Page {page_num} ---")
+            
             # Check if this looks like a salary table page
             if re.search(r'(SALARY|COMPENSATION|TEACHERS?)\s+SCHEDULE', text, re.I):
                 # Extract year using improved logic
                 year = extract_year_from_text(text)
-
+                
                 print(f"\nPage {page_num}: Found salary table for {year}")
                 print(f"  Tables found: {len(tables)}")
 

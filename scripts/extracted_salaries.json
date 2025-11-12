@@ -1,782 +1,522 @@
 [
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
-    "credits": 0,
-    "step": 2,
-    "salary": 49605.0
+    "credits": 15,
+    "step": 1,
+    "salary": 44678.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 30,
+    "step": 1,
+    "salary": 46140.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 1,
+    "salary": 48214.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "D",
+    "credits": 0,
+    "step": 1,
+    "salary": 49684.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 2,
-    "salary": 50490.0
+    "salary": 49563.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 2,
-    "salary": 52548.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 2,
-    "salary": 53282.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 2,
-    "salary": 54020.0
+    "salary": 51193.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 2,
+    "salary": 53489.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 2,
-    "salary": 54755.0
+    "salary": 55041.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 3,
-    "salary": 52093.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 3,
-    "salary": 52974.0
+    "salary": 52189.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 3,
-    "salary": 55034.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 3,
-    "salary": 55770.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 3,
-    "salary": 56505.0
+    "salary": 53832.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 3,
+    "salary": 56730.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 3,
-    "salary": 57240.0
+    "salary": 58243.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 4,
-    "salary": 55405.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 4,
-    "salary": 56287.0
+    "salary": 55133.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 4,
-    "salary": 58345.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 4,
-    "salary": 59079.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 4,
-    "salary": 59817.0
+    "salary": 56947.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 4,
+    "salary": 60014.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 4,
-    "salary": 60551.0
+    "salary": 61566.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 5,
-    "salary": 58716.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 5,
-    "salary": 59599.0
+    "salary": 57895.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 5,
-    "salary": 61657.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 5,
-    "salary": 62391.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 5,
-    "salary": 63127.0
+    "salary": 60227.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 5,
+    "salary": 63381.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 5,
-    "salary": 63862.0
+    "salary": 64940.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 6,
-    "salary": 62028.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 6,
-    "salary": 62910.0
+    "salary": 60965.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 6,
-    "salary": 64969.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 6,
-    "salary": 65704.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 6,
-    "salary": 66440.0
+    "salary": 63691.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 6,
+    "salary": 66928.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 6,
-    "salary": 67174.0
+    "salary": 68437.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 7,
-    "salary": 65879.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 7,
-    "salary": 66761.0
+    "salary": 64326.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 7,
-    "salary": 68819.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 7,
-    "salary": 69931.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 7,
-    "salary": 70292.0
+    "salary": 67184.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 7,
+    "salary": 70377.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 7,
-    "salary": 71026.0
+    "salary": 71902.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 8,
-    "salary": 69730.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 8,
-    "salary": 70612.0
+    "salary": 67662.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 8,
-    "salary": 72671.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 8,
-    "salary": 73404.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 8,
-    "salary": 74142.0
+    "salary": 70726.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 8,
+    "salary": 74186.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 8,
-    "salary": 74878.0
+    "salary": 75781.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 9,
-    "salary": 72447.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 9,
-    "salary": 73328.0
+    "salary": 70985.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 9,
-    "salary": 75387.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 9,
-    "salary": 76122.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 9,
-    "salary": 76857.0
+    "salary": 74186.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 9,
+    "salary": 77684.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 9,
-    "salary": 77593.0
+    "salary": 79200.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 10,
-    "salary": 77533.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 10,
-    "salary": 78440.0
+    "salary": 74667.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 10,
-    "salary": 80561.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 10,
-    "salary": 81318.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 10,
-    "salary": 82075.0
+    "salary": 77901.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 10,
+    "salary": 81353.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 10,
-    "salary": 82833.0
+    "salary": 82870.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 11,
-    "salary": 80806.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 11,
-    "salary": 81752.0
+    "salary": 79219.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 11,
-    "salary": 83964.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 11,
-    "salary": 84753.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 11,
-    "salary": 85542.0
+    "salary": 82803.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 11,
+    "salary": 86865.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 11,
-    "salary": 86333.0
+    "salary": 88379.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 12,
-    "salary": 87640.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 12,
-    "salary": 88634.0
+    "salary": 80598.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 12,
-    "salary": 90951.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 12,
-    "salary": 91779.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 12,
-    "salary": 92605.0
+    "salary": 84218.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 12,
+    "salary": 88318.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 12,
-    "salary": 93435.0
+    "salary": 89849.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 13,
-    "salary": 88506.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "B",
     "credits": 15,
     "step": 13,
-    "salary": 89508.0
+    "salary": 81546.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 13,
-    "salary": 91849.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 13,
-    "salary": 92684.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "M",
     "credits": 30,
     "step": 13,
-    "salary": 93518.0
+    "salary": 85202.0
   },
   {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
+    "period": "full-year",
+    "education": "M",
+    "credits": 45,
+    "step": 13,
+    "salary": 89346.0
+  },
+  {
+    "district_id": "abington",
+    "district_name": "Abington",
+    "school_year": "2021-2022",
     "period": "full-year",
     "education": "D",
     "credits": 0,
     "step": 13,
-    "salary": 94356.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 0,
-    "step": 14,
-    "salary": 90494.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "B",
-    "credits": 15,
-    "step": 14,
-    "salary": 91518.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 0,
-    "step": 14,
-    "salary": 93912.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 15,
-    "step": 14,
-    "salary": 94766.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "M",
-    "credits": 30,
-    "step": 14,
-    "salary": 95619.0
-  },
-  {
-    "district_id": "bedford",
-    "district_name": "Bedford",
-    "school_year": "2024-2025",
-    "period": "full-year",
-    "education": "D",
-    "credits": 0,
-    "step": 14,
-    "salary": 96475.0
+    "salary": 90888.0
   }
 ]
