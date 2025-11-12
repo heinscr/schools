@@ -1,254 +1,474 @@
-# Deployment Guide - Quick Reference
+# Deployment Guide
+
+Complete guide for deploying the Massachusetts Teachers Contracts application to AWS.
 
 ## Prerequisites Checklist
 
 - [ ] AWS CLI installed (`aws --version`)
 - [ ] AWS credentials configured (`aws configure`)
-- [ ] jq installed (`jq --version`) - JSON processor for scripts
+- [ ] Terraform installed (`terraform --version`) - Version 1.0+
 - [ ] Node.js 18+ installed (`node --version`)
 - [ ] Python 3.12 installed (`python3 --version`)
+- [ ] jq installed (`jq --version`) - JSON processor
 
-### Installing jq
+### Installing Prerequisites
 
 ```bash
 # Ubuntu/Debian
-sudo apt-get install jq
+sudo apt-get update
+sudo apt-get install jq awscli
+
+# Install Terraform
+wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip
+unzip terraform_1.6.0_linux_amd64.zip
+sudo mv terraform /usr/local/bin/
 
 # macOS
-brew install jq
+brew install jq awscli terraform
 ```
 
-## First Time Setup
+## Deployment Methods
 
-### 1. Configure AWS Credentials
+### Method 1: One-Command Deployment (Recommended for First Time)
+
+The `recreate.sh` script handles everything:
 
 ```bash
-aws configure
+./recreate.sh
 ```
 
-Enter:
-- AWS Access Key ID
-- AWS Secret Access Key
-- Default region (e.g., `us-east-1`)
-- Output format: `json`
+This script will:
+1. Initialize and apply Terraform configuration
+2. Prompt for admin user creation (email/password)
+3. Deploy backend and frontend code
+4. Import district data (optional)
 
-### 2. Create Infrastructure
+### Method 2: Manual Step-by-Step Deployment
+
+For more control over the deployment process:
+
+#### Step 1: Configure Terraform Variables
 
 ```bash
-cd infrastructure/scripts
-./setup-infrastructure.sh
+cd infrastructure/terraform
+cp terraform.tfvars.example terraform.tfvars
 ```
 
-Wait for completion (5-10 minutes). This creates:
-- S3 buckets
+Edit `terraform.tfvars` with your values:
+
+```hcl
+aws_region = "us-east-1"
+project_name = "ma-teachers-contracts"
+
+# Optional: Custom domain
+custom_domain = "contracts.example.com"
+use_custom_domain = true
+
+# Lambda settings
+lambda_memory_size = 512
+lambda_timeout = 30
+```
+
+#### Step 2: Initialize Terraform
+
+```bash
+terraform init
+```
+
+This downloads required providers (AWS) and initializes the backend.
+
+#### Step 3: Review Infrastructure Plan
+
+```bash
+terraform plan
+```
+
+Review the resources that will be created:
+- S3 bucket
 - CloudFront distribution
 - API Gateway
-- IAM roles
+- 3 Lambda functions
+- DynamoDB table
+- SQS queue
+- Cognito user pool
+- IAM roles and policies
 
-### 3. Verify Configuration
+#### Step 4: Create Infrastructure
 
 ```bash
-cat ../config/aws-config.json
+terraform apply
 ```
 
-Save this file securely - it contains your deployment configuration.
+Type `yes` when prompted. This takes 5-10 minutes due to CloudFront distribution creation.
 
-## Regular Deployments
+#### Step 5: Create Admin User (Optional)
 
-### Deploy Backend Changes
+```bash
+cd ../..
+aws cognito-idp admin-create-user \
+  --user-pool-id $(cd infrastructure/terraform && terraform output -raw cognito_user_pool_id) \
+  --username admin@example.com \
+  --user-attributes Name=email,Value=admin@example.com Name=email_verified,Value=true \
+  --message-action SUPPRESS
+
+# Set permanent password
+aws cognito-idp admin-set-user-password \
+  --user-pool-id $(cd infrastructure/terraform && terraform output -raw cognito_user_pool_id) \
+  --username admin@example.com \
+  --password YourSecurePassword123! \
+  --permanent
+
+# Add to admin group
+aws cognito-idp admin-add-user-to-group \
+  --user-pool-id $(cd infrastructure/terraform && terraform output -raw cognito_user_pool_id) \
+  --username admin@example.com \
+  --group-name admins
+```
+
+#### Step 6: Deploy Application Code
+
+```bash
+./deploy.sh
+```
+
+This script:
+- Runs backend and frontend tests
+- Packages Lambda code
+- Uploads to S3
+- Updates Lambda functions
+- Builds frontend with correct API endpoint
+- Uploads frontend to S3
+- Invalidates CloudFront cache
+
+Skip tests for faster deployment:
+```bash
+./deploy.sh --no-tests
+```
+
+#### Step 7: Import District Data (Optional)
+
+```bash
+cd backend
+source venv/bin/activate
+python scripts/import_districts.py
+```
+
+## Regular Deployments (After Initial Setup)
+
+### Deploy All Changes
+
+```bash
+./deploy.sh
+```
+
+### Deploy Backend Only
 
 ```bash
 cd infrastructure/scripts
-./deploy-backend.sh
+./deploy-backend-tf.sh
 ```
 
-Time: ~2-3 minutes
-
-### Deploy Frontend Changes
+### Deploy Frontend Only
 
 ```bash
 cd infrastructure/scripts
-./deploy-frontend.sh
+./deploy-frontend-tf.sh
 ```
 
-Time: ~3-5 minutes (includes build + upload + CloudFront invalidation)
+## Accessing Your Application
 
-## Testing Deployments
-
-### Test Backend
+### Get Application URLs
 
 ```bash
-# Get API endpoint
-API_ENDPOINT=$(jq -r '.backend.api_endpoint' ../config/aws-config.json)
+cd infrastructure/terraform
 
-# Test endpoints
-curl $API_ENDPOINT/
-curl $API_ENDPOINT/health
+# Get CloudFront URL
+terraform output cloudfront_domain
+
+# Get API Gateway URL
+terraform output api_gateway_url
+
+# Get Cognito details
+terraform output cognito_user_pool_id
+terraform output cognito_client_id
 ```
 
-### Test Frontend
+### Test Deployment
 
 ```bash
-# Get website URL
-WEBSITE_URL=$(jq -r '.frontend.website_url' ../config/aws-config.json)
+# Test backend
+API_URL=$(cd infrastructure/terraform && terraform output -raw api_gateway_url)
+curl $API_URL/health
 
-# Open in browser
-echo $WEBSITE_URL
+# Test frontend - open in browser
+FRONTEND_URL=$(cd infrastructure/terraform && terraform output -raw cloudfront_domain)
+echo "https://$FRONTEND_URL"
 ```
 
-## Common Workflows
+## Monitoring & Debugging
 
-### Full Deployment (Backend + Frontend)
-
-```bash
-cd infrastructure/scripts
-
-# Deploy backend first
-./deploy-backend.sh
-
-# Wait for deployment
-sleep 10
-
-# Deploy frontend
-./deploy-frontend.sh
-```
-
-### View Backend Logs
+### View Lambda Logs
 
 ```bash
+# Main API Lambda
 aws logs tail /aws/lambda/ma-teachers-contracts-api --follow
+
+# PDF Processor Lambda
+aws logs tail /aws/lambda/ma-teachers-contracts-salary-processor --follow
+
+# Normalizer Lambda
+aws logs tail /aws/lambda/ma-teachers-contracts-salary-normalizer --follow
 ```
 
-### Force CloudFront Cache Refresh
+### Check SQS Queue
 
 ```bash
-CF_DIST=$(jq -r '.frontend.cloudfront_distribution_id' ../config/aws-config.json)
+aws sqs get-queue-attributes \
+  --queue-url $(cd infrastructure/terraform && terraform output -raw sqs_queue_url) \
+  --attribute-names All
+```
+
+### DynamoDB Table Stats
+
+```bash
+aws dynamodb describe-table \
+  --table-name $(cd infrastructure/terraform && terraform output -raw dynamodb_table_name)
+```
+
+### Force CloudFront Cache Invalidation
+
+```bash
+CF_DIST=$(cd infrastructure/terraform && terraform output -raw cloudfront_distribution_id)
 aws cloudfront create-invalidation --distribution-id $CF_DIST --paths "/*"
+```
+
+## Updating Infrastructure
+
+When you modify Terraform files:
+
+```bash
+cd infrastructure/terraform
+
+# Preview changes
+terraform plan
+
+# Apply changes
+terraform apply
+```
+
+After infrastructure changes, redeploy application code:
+```bash
+cd ../..
+./deploy.sh
 ```
 
 ## Troubleshooting
 
-### Script fails with "config not found"
-**Solution**: Run `setup-infrastructure.sh` first
+### Terraform State Issues
 
-### Backend returns 500 errors
-**Solution**: Check Lambda logs:
-```bash
-aws logs tail /aws/lambda/ma-teachers-contracts-api --since 10m
-```
-
-### Frontend shows old version
-**Solution**: Wait 5-10 minutes for CloudFront cache invalidation, or force invalidation
-
-### Permission denied on scripts
-**Solution**: Make scripts executable:
-```bash
-chmod +x infrastructure/scripts/*.sh
-```
-
-## Configuration Backup
-
-### Backup Configuration
+If Terraform state is corrupted:
 
 ```bash
-# Backup config to secure location
-cp infrastructure/config/aws-config.json ~/aws-config-backup-$(date +%Y%m%d).json
+cd infrastructure/terraform
+terraform refresh
+terraform plan  # Verify state
 ```
 
-### Restore Configuration
+### Lambda Function Not Updating
 
-```bash
-# Restore from backup
-cp ~/aws-config-backup-YYYYMMDD.json infrastructure/config/aws-config.json
-```
-
-## Team Collaboration
-
-### For Team Lead
-
-1. Run `setup-infrastructure.sh` once
-2. Share `aws-config.json` securely with team (encrypted email/secure file share)
-3. Commit code changes (scripts are safe to commit)
-
-### For Team Members
-
-1. Receive `aws-config.json` from team lead
-2. Place in `infrastructure/config/aws-config.json`
-3. Run deployment scripts as needed
-
-## Security Reminders
-
-- ✓ Scripts are safe to commit to git
-- ✗ **NEVER** commit `aws-config.json`
-- ✗ **NEVER** commit `.env` files
-- ✓ Use `.gitignore` to prevent accidental commits
-- ✓ Share configs through secure channels only
-
-## Cleanup & Reset
-
-### Remove All AWS Resources
-
-To delete everything and start fresh:
+Manually update Lambda code:
 
 ```bash
 cd infrastructure/scripts
-./cleanup-infrastructure.sh
+./deploy-backend-tf.sh
 ```
 
-The script will:
-1. Ask for confirmation (type `yes` to proceed)
-2. Delete Lambda function
-3. Delete API Gateway
-4. Disable CloudFront (takes 15-30 minutes to fully delete)
-5. Empty and delete S3 buckets
-6. Delete IAM role
-7. Remove config file
+### CloudFront Shows Old Frontend
 
-After cleanup completes, you can run `./setup-infrastructure.sh` again to create fresh resources.
+Invalidate cache:
+```bash
+CF_DIST=$(cd infrastructure/terraform && terraform output -raw cloudfront_distribution_id)
+aws cloudfront create-invalidation --distribution-id $CF_DIST --paths "/*"
+```
 
-### Quick Cleanup (if you know what you're doing)
+Wait 5-10 minutes for invalidation to complete.
+
+### Backend Tests Failing
 
 ```bash
-# Get current resource IDs
-FRONTEND_BUCKET=$(jq -r '.frontend.s3_bucket' ../config/aws-config.json)
-BACKEND_BUCKET=$(jq -r '.backend.s3_bucket' ../config/aws-config.json)
-
-# Delete S3 buckets (fastest cleanup)
-aws s3 rm s3://$FRONTEND_BUCKET --recursive && aws s3 rb s3://$FRONTEND_BUCKET
-aws s3 rm s3://$BACKEND_BUCKET --recursive && aws s3 rb s3://$BACKEND_BUCKET
-
-# Delete config to re-run setup
-rm ../config/aws-config.json
+cd backend
+source venv/bin/activate
+pytest -v  # Run tests with verbose output
 ```
 
-## Cost Monitoring
+Check for:
+- Missing dependencies
+- Environment variable issues
+- DynamoDB local connection issues
 
-Check current AWS costs:
-```bash
-aws ce get-cost-and-usage \
-    --time-period Start=$(date -d '1 month ago' +%Y-%m-%d),End=$(date +%Y-%m-%d) \
-    --granularity MONTHLY \
-    --metrics BlendedCost
-```
-
-## Quick Commands Reference
+### Frontend Tests Failing
 
 ```bash
-# View all resources
-jq '.' infrastructure/config/aws-config.json
-
-# Get API endpoint
-jq -r '.backend.api_endpoint' infrastructure/config/aws-config.json
-
-# Get website URL
-jq -r '.frontend.website_url' infrastructure/config/aws-config.json
-
-# List Lambda functions
-aws lambda list-functions --query 'Functions[?starts_with(FunctionName, `ma-teachers`)]'
-
-# List S3 buckets
-aws s3 ls | grep ma-teachers
-
-# Check CloudFront distributions
-aws cloudfront list-distributions --query 'DistributionList.Items[].{ID:Id,Domain:DomainName}'
+cd frontend
+npm test -- --run  # Run tests once
+npm run test:coverage  # Generate coverage report
 ```
+
+### Permission Denied on Scripts
+
+```bash
+chmod +x deploy.sh recreate.sh dev.sh
+chmod +x infrastructure/scripts/*.sh
+```
+
+### AWS Permissions Issues
+
+Your AWS user/role needs these permissions:
+- `AmazonS3FullAccess`
+- `CloudFrontFullAccess`
+- `AWSLambda_FullAccess`
+- `AmazonAPIGatewayAdministrator`
+- `AmazonDynamoDBFullAccess`
+- `AmazonSQSFullAccess`
+- `AWSCognitoAdminAccess`
+- `IAMFullAccess` (or specific permissions for role creation)
+
+## Cleanup & Teardown
+
+### Remove All Resources
+
+**WARNING**: This deletes all data permanently.
+
+```bash
+cd infrastructure/terraform
+
+# Preview what will be deleted
+terraform plan -destroy
+
+# Delete all resources
+terraform destroy
+```
+
+Type `yes` when prompted.
+
+### Manual Cleanup (if Terraform fails)
+
+If `terraform destroy` fails:
+
+1. Empty S3 bucket manually:
+```bash
+BUCKET=$(terraform output -raw s3_bucket_name)
+aws s3 rm s3://$BUCKET --recursive
+```
+
+2. Try destroy again:
+```bash
+terraform destroy
+```
+
+3. Manually delete stuck resources via AWS Console if needed.
+
+## CI/CD Integration
+
+### GitHub Actions Example
+
+```yaml
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Deploy
+        run: ./deploy.sh --no-tests
+```
+
+## Production Best Practices
+
+### Security
+
+1. **Enable CloudFront logging**:
+```hcl
+# In terraform/main.tf CloudFront resource
+logging_config {
+  bucket = aws_s3_bucket.logs.bucket_domain_name
+  prefix = "cloudfront/"
+}
+```
+
+2. **Enable DynamoDB point-in-time recovery**:
+```hcl
+# In terraform/main.tf DynamoDB resource
+point_in_time_recovery {
+  enabled = true
+}
+```
+
+3. **Use custom domain with ACM certificate**:
+- Set `use_custom_domain = true` in `terraform.tfvars`
+- Create ACM certificate in `us-east-1` (required for CloudFront)
+- Set `custom_domain` to your domain
+
+4. **Rotate Cognito secrets regularly**
+5. **Enable AWS WAF on CloudFront** (additional cost)
+
+### Performance
+
+1. **Increase Lambda memory** for better performance:
+```hcl
+lambda_memory_size = 1024  # In terraform.tfvars
+```
+
+2. **Enable DynamoDB auto-scaling** (already configured in main.tf)
+
+3. **Monitor CloudWatch metrics**:
+   - Lambda duration and errors
+   - API Gateway latency
+   - DynamoDB read/write capacity
+
+### Cost Optimization
+
+1. **Enable S3 lifecycle policies** for old contract PDFs
+2. **Use CloudFront caching effectively** (already configured)
+3. **Monitor AWS Cost Explorer** for unexpected charges
+4. **Consider Reserved Capacity** for DynamoDB if usage is predictable
+
+## Deployment Checklist
+
+Before deploying to production:
+
+- [ ] Configure custom domain and SSL certificate
+- [ ] Set up CloudWatch alarms for errors
+- [ ] Enable DynamoDB point-in-time recovery
+- [ ] Configure backup strategy for S3 bucket
+- [ ] Test admin user login
+- [ ] Test PDF upload functionality
+- [ ] Run full test suite
+- [ ] Review IAM policies for least privilege
+- [ ] Enable CloudFront logging
+- [ ] Document admin credentials securely
+- [ ] Set up monitoring dashboard
+
+## Support Resources
+
+- **Terraform AWS Provider Docs**: https://registry.terraform.io/providers/hashicorp/aws/latest/docs
+- **AWS Lambda Docs**: https://docs.aws.amazon.com/lambda/
+- **CloudFront Docs**: https://docs.aws.amazon.com/cloudfront/
+- **DynamoDB Docs**: https://docs.aws.amazon.com/dynamodb/
+- **Project Documentation**: See `/docs` directory
