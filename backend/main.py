@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, Query, Request, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from typing import Optional
+from typing import Optional, List
 from contextlib import asynccontextmanager
 import os
 import json
@@ -663,6 +663,83 @@ async def start_normalization(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to start normalization: {str(e)}")
+
+
+@app.get("/api/admin/backup/list")
+@limiter.limit(GENERAL_RATE_LIMIT)
+async def list_backups(
+    request: Request,
+    user: dict = Depends(require_admin_role)
+):
+    """
+    List all salary data backup files
+    Requires admin authentication
+    """
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    try:
+        backups = salary_jobs_service.list_backups()
+        return {
+            "success": True,
+            "backups": backups,
+            "count": len(backups)
+        }
+
+    except Exception as e:
+        logger.error(f"Error listing backups: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to list backups: {str(e)}")
+
+
+@app.post("/api/admin/backup/reapply")
+@limiter.limit(WRITE_RATE_LIMIT)
+async def reapply_backups(
+    request: Request,
+    filenames: List[str],
+    user: dict = Depends(require_admin_role)
+):
+    """
+    Re-apply salary data from backup files
+    Requires admin authentication
+
+    Body:
+        filenames: List of backup filenames to re-apply (e.g., ["Springfield.json", "Boston.json"])
+    """
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    if not filenames or len(filenames) == 0:
+        raise HTTPException(status_code=400, detail="No files specified")
+
+    results = []
+    errors = []
+
+    for filename in filenames:
+        try:
+            success, result = salary_jobs_service.re_apply_from_backup(filename)
+            results.append({
+                "filename": filename,
+                "success": True,
+                "district_id": result['district_id'],
+                "district_name": result['district_name'],
+                "records_added": result['records_added'],
+                "calculated_entries": result['calculated_entries']
+            })
+        except Exception as e:
+            logger.error(f"Error re-applying backup {filename}: {e}")
+            errors.append({
+                "filename": filename,
+                "success": False,
+                "error": str(e)
+            })
+
+    return {
+        "success": len(errors) == 0,
+        "results": results,
+        "errors": errors,
+        "total_processed": len(results),
+        "total_errors": len(errors)
+    }
 
 
 # Lambda handler (only needed for AWS deployment)

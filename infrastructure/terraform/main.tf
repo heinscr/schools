@@ -404,6 +404,18 @@ resource "aws_iam_role_policy" "lambda_s3" {
           "s3:DeleteObject"
         ]
         Resource = "${aws_s3_bucket.main.arn}/contracts/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = aws_s3_bucket.main.arn
+        Condition = {
+          StringLike = {
+            "s3:prefix" = ["contracts/*"]
+          }
+        }
       }
     ]
   })

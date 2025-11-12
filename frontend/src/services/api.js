@@ -464,6 +464,58 @@ class ApiService {
 
     return response.json();
   }
+
+  /**
+   * Admin: List all backup files
+   * @returns {Promise<Object>} - List of backup files
+   */
+  async listBackups() {
+    const url = `${API_BASE_URL}/api/admin/backup/list`;
+
+    const response = await fetch(url, {
+      headers: {
+        ...this._getAuthHeaders(),
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to list backups: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Admin: Re-apply salary data from backup files
+   * @param {Array<string>} filenames - Array of backup filenames to re-apply
+   * @returns {Promise<Object>} - Re-apply results
+   */
+  async reapplyBackups(filenames) {
+    const url = `${API_BASE_URL}/api/admin/backup/reapply`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this._getAuthHeaders(),
+      },
+      body: JSON.stringify(filenames),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to re-apply backups: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
 }
 
 export default new ApiService();

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import authService from '../services/auth';
 import api from '../services/api';
 import { logger } from '../utils/logger';
+import BackupManager from './BackupManager';
 import './Login.css';
 
 function Login({ onAuthChange, onLoadingChange }) {
@@ -15,6 +16,7 @@ function Login({ onAuthChange, onLoadingChange }) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [normalizationStatus, setNormalizationStatus] = useState(null);
   const [isNormalizing, setIsNormalizing] = useState(false);
+  const [showBackupManager, setShowBackupManager] = useState(false);
 
   useEffect(() => {
     initAuth();
@@ -166,6 +168,19 @@ function Login({ onAuthChange, onLoadingChange }) {
     }
   };
 
+  const handleOpenBackupManager = () => {
+    setShowBackupManager(true);
+    setShowMenu(false);
+  };
+
+  const handleCloseBackupManager = () => {
+    setShowBackupManager(false);
+  };
+
+  const handleBackupSuccess = (result) => {
+    alert(`Successfully re-applied ${result.total_processed} backup(s).`);
+  };
+
   // Don't render the loading overlay here - parent handles it
   if (loading) {
     return null;
@@ -274,6 +289,18 @@ function Login({ onAuthChange, onLoadingChange }) {
                   : 'Normalize All Districts'}
                 {needsNormalization && <span className="badge-dot"></span>}
               </button>
+              <button
+                className="menu-button backup-button"
+                onClick={handleOpenBackupManager}
+              >
+                <svg className="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <path d="M12 18v-6" />
+                  <path d="m9 15 3 3 3-3" />
+                </svg>
+                Backup Manager
+              </button>
               <hr />
             </>
           )}
@@ -286,6 +313,14 @@ function Login({ onAuthChange, onLoadingChange }) {
             Logout
           </button>
         </div>
+      )}
+
+      {/* Backup Manager Modal */}
+      {showBackupManager && (
+        <BackupManager
+          onClose={handleCloseBackupManager}
+          onSuccess={handleBackupSuccess}
+        />
       )}
     </div>
   );

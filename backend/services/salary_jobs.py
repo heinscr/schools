@@ -264,6 +264,13 @@ class SalaryJobsService:
 
         logger.info(f"Applied salary data for district {district_id}: {records_added} records, {normalized_count} calculated")
 
+        # Save backup to S3
+        try:
+            self._save_applied_backup(district_id, records)
+        except Exception as e:
+            logger.error(f"Error saving backup for district {district_id}: {e}")
+            # Don't fail the apply operation if backup fails
+
         return True, {
             'records_added': records_added,
             'calculated_entries': normalized_count,
@@ -404,6 +411,194 @@ class SalaryJobsService:
             'last_updated': datetime.utcnow().isoformat()
         })
 
+    def list_backups(self) -> List[Dict]:
+        """
+        List all backup files in S3
+        Returns list of backup metadata
+        """
+        backups = []
+        prefix = f"{self.contracts_prefix}/applied_data/"
+
+        try:
+            response = self.s3.list_objects_v2(
+                Bucket=self.bucket_name,
+                Prefix=prefix
+            )
+
+            if 'Contents' in response:
+                for obj in response['Contents']:
+                    # Extract district name from filename
+                    key = obj['Key']
+                    filename = key.split('/')[-1]
+                    if filename.endswith('.json'):
+                        district_name = filename[:-5]  # Remove .json extension
+
+                        backups.append({
+                            'filename': filename,
+                            'district_name': district_name,
+                            'key': key,
+                            'size': obj['Size'],
+                            'last_modified': obj['LastModified'].isoformat()
+                        })
+
+            logger.info(f"Found {len(backups)} backup files")
+            return backups
+
+        except Exception as e:
+            logger.error(f"Error listing backups: {e}")
+            raise
+
+    def re_apply_from_backup(self, backup_filename: str) -> Tuple[bool, Dict]:
+        """
+        Re-apply salary data from a backup file
+
+        Args:
+            backup_filename: Filename of the backup (e.g., "Springfield.json")
+
+        Returns:
+            (success, result_info)
+        """
+        # Load backup from S3
+        backup_key = f"{self.contracts_prefix}/applied_data/{backup_filename}"
+
+        try:
+            response = self.s3.get_object(
+                Bucket=self.bucket_name,
+                Key=backup_key
+            )
+            backup_data = json.loads(response['Body'].read())
+        except Exception as e:
+            logger.error(f"Error loading backup {backup_filename}: {e}")
+            raise ValueError(f"Backup file not found: {backup_filename}")
+
+        # Extract data
+        district_id = backup_data.get('district_id')
+        district_name = backup_data.get('district_name')
+        records = backup_data.get('records', [])
+
+        if not district_id or not records:
+            raise ValueError(f"Invalid backup file: missing district_id or records")
+
+        logger.info(f"Re-applying backup for {district_name} ({district_id}): {len(records)} records")
+
+        # Verify district still exists
+        district_check = self._get_district_name(district_id)
+        if district_check == district_id:  # Returns district_id if not found
+            # Try to find by name
+            district_id_from_name = self._get_district_id_by_name(district_name)
+            if district_id_from_name:
+                logger.info(f"District ID changed, using current ID: {district_id_from_name}")
+                district_id = district_id_from_name
+            else:
+                raise ValueError(f"District not found: {district_name}")
+
+        # Check if metadata will change
+        metadata_changed, needs_normalization = self._check_metadata_change(records)
+
+        # Delete existing salary data for this district
+        self._delete_district_salary_data(district_id)
+
+        # Load salary data
+        records_added = self._load_salary_records(district_id, records)
+
+        # Update availability metadata
+        self._update_availability_metadata(district_id, records)
+
+        # Normalize this specific district
+        normalized_count = self._normalize_district(district_id, records)
+
+        # Update metadata if changed
+        if metadata_changed:
+            self._update_global_metadata(records)
+            self._set_normalization_status(needs_normalization, f"backup-reapply-{backup_filename}")
+
+        logger.info(f"Re-applied backup for {district_name}: {records_added} records, {normalized_count} calculated")
+
+        return True, {
+            'district_id': district_id,
+            'district_name': district_name,
+            'records_added': records_added,
+            'calculated_entries': normalized_count,
+            'metadata_changed': metadata_changed
+        }
+
+    def _get_district_id_by_name(self, district_name: str) -> Optional[str]:
+        """
+        Look up district_id by district name
+        Uses scan with filter - not ideal for large datasets but works for this use case
+        """
+        try:
+            # Query using name_lower for case-insensitive matching
+            response = self.table.scan(
+                FilterExpression='#name_lower = :name_lower AND #sk = :sk',
+                ExpressionAttributeNames={
+                    '#name_lower': 'name_lower',
+                    '#sk': 'SK'
+                },
+                ExpressionAttributeValues={
+                    ':name_lower': district_name.lower(),
+                    ':sk': 'METADATA'
+                }
+            )
+
+            if 'Items' in response and len(response['Items']) > 0:
+                district_id = response['Items'][0].get('district_id')
+                logger.info(f"Found district_id {district_id} for name {district_name}")
+                return district_id
+
+        except Exception as e:
+            logger.error(f"Error looking up district by name: {e}")
+
+        return None
+
+    def _get_district_name(self, district_id: str) -> str:
+        """Get district name from DynamoDB"""
+        try:
+            response = self.table.get_item(
+                Key={'PK': f'DISTRICT#{district_id}', 'SK': 'METADATA'}
+            )
+            if 'Item' in response:
+                return response['Item'].get('name', district_id)
+        except Exception as e:
+            logger.error(f"Error getting district name: {e}")
+        return district_id
+
+    def _save_applied_backup(self, district_id: str, records: List[Dict]):
+        """
+        Save a backup of applied salary data to S3
+        Filename format: contracts/applied_data/<district_name>.json
+        """
+        from datetime import timezone
+
+        # Get district name
+        district_name = self._get_district_name(district_id)
+
+        # Create backup object
+        now_utc = datetime.now(timezone.utc).isoformat()
+        backup_data = {
+            'district_id': district_id,
+            'district_name': district_name,
+            'applied_at': now_utc,
+            'records_count': len(records),
+            'records': records
+        }
+
+        # Save to S3
+        backup_key = f"{self.contracts_prefix}/applied_data/{district_name}.json"
+        self.s3.put_object(
+            Bucket=self.bucket_name,
+            Key=backup_key,
+            Body=json.dumps(backup_data, indent=2, default=str),
+            ContentType='application/json',
+            Metadata={
+                'district_id': district_id,
+                'district_name': district_name,
+                'applied_at': now_utc
+            }
+        )
+
+        logger.info(f"Saved backup to S3: {backup_key} ({len(records)} records)")
+
     def _update_availability_metadata(self, district_id: str, records: List[Dict]):
         """Update availability metadata to include this district for each year/period"""
         # Group records by year/period
@@ -511,6 +706,17 @@ class SalaryJobsService:
                 logger.info(f"Created {len(calculated_items)} calculated entries for {district_id} {year}/{period}")
 
         return total_calculated
+
+    def _set_normalization_status(self, needs_normalization: bool, triggered_by_job_id: str):
+        """Set global normalization status"""
+        from datetime import timezone
+        self.table.put_item(Item={
+            'PK': 'METADATA#NORMALIZATION',
+            'SK': 'STATUS',
+            'needs_normalization': needs_normalization,
+            'triggered_by_job_id': triggered_by_job_id,
+            'last_checked': datetime.now(timezone.utc).isoformat()
+        })
 
 
 class LocalSalaryJobsService:
