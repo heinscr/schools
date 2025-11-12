@@ -182,7 +182,8 @@ async def require_cognito_auth(
         HTTPException: 401 if authentication fails
     """
     # Local dev shortcut: allow a fake user when LOCAL_DEV=1
-    if os.getenv("LOCAL_DEV", "0") == "1":
+    # but disable this shortcut when running tests (pytest sets PYTEST_CURRENT_TEST)
+    if os.getenv("LOCAL_DEV", "0") == "1" and os.getenv("PYTEST_CURRENT_TEST") is None:
         return {
             "sub": "local-test-user",
             "email": "local@localhost",

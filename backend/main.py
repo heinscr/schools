@@ -220,11 +220,12 @@ async def get_district(
 async def create_district(
     request: Request,
     district: DistrictCreate,
-    table = Depends(get_table),
-    user: dict = Depends(require_admin_role)
+    user: dict = Depends(require_admin_role),
 ):
     """Create a new district (requires admin authentication)"""
     try:
+        # Lazily get the table after auth to avoid accessing DynamoDB for unauthorized requests
+        table = get_table()
         district_dict = DynamoDBDistrictService.create_district(table=table, district_data=district)
         return DistrictResponse(**district_dict)
     except Exception as e:
@@ -237,13 +238,13 @@ async def update_district(
     request: Request,
     district_id: str,
     district: DistrictUpdate,
-    table = Depends(get_table),
-    user: dict = Depends(require_admin_role)
+    user: dict = Depends(require_admin_role),
 ):
     """Update a district (requires admin authentication)"""
     # Validate district ID
     validated_district_id = validate_district_id(district_id)
 
+    table = get_table()
     district_dict = DynamoDBDistrictService.update_district(
         table=table,
         district_id=validated_district_id,
@@ -260,13 +261,13 @@ async def update_district(
 async def delete_district(
     request: Request,
     district_id: str,
-    table = Depends(get_table),
-    user: dict = Depends(require_admin_role)
+    user: dict = Depends(require_admin_role),
 ):
     """Delete a district (requires admin authentication)"""
     # Validate district ID
     validated_district_id = validate_district_id(district_id)
 
+    table = get_table()
     success = DynamoDBDistrictService.delete_district(table=table, district_id=validated_district_id)
     if not success:
         raise HTTPException(status_code=404, detail="District not found")
