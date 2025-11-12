@@ -272,7 +272,18 @@ export function DataCacheProvider({ children, autoLoad = true }) {
   }, [buildTownMap]);
 
   /**
-   * Auto-load on mount if enabled
+   * Load geojson immediately on mount
+   */
+  useEffect(() => {
+    if (!municipalitiesGeojson) {
+      loadMunicipalitiesGeojson().catch(err => {
+        logger.error('Failed to preload geojson:', err);
+      });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /**
+   * Auto-load districts on mount if enabled
    */
   useEffect(() => {
     if (autoLoad && status === 'idle') {

@@ -5,6 +5,8 @@ Import districts from data/districts.json into DynamoDB.
 This script reads the districts.json file and imports all districts
 (regional academic, regional vocational, county agricultural, and other districts)
 into the DynamoDB table using the DynamoDBDistrictService.
+
+It also ensures the GSI_METADATA index exists for efficient querying.
 """
 
 import json
@@ -12,6 +14,8 @@ import os
 import sys
 import subprocess
 from pathlib import Path
+import boto3
+from dotenv import load_dotenv
 
 # Add the backend directory to the path so we can import our modules
 backend_path = Path(__file__).parent.parent
@@ -20,6 +24,75 @@ sys.path.insert(0, str(backend_path))
 from services.dynamodb_district_service import DynamoDBDistrictService
 from schemas import DistrictCreate
 from database import table
+
+# Load environment variables
+load_dotenv()
+AWS_REGION = os.getenv('AWS_REGION', 'us-east-2')
+TABLE_NAME = os.getenv('DYNAMODB_TABLE_NAME')
+
+
+def ensure_gsi_metadata_exists():
+    """Ensure the GSI_METADATA index exists on the table."""
+    dynamodb = boto3.client('dynamodb', region_name=AWS_REGION)
+    
+    try:
+        # Check if GSI already exists
+        response = dynamodb.describe_table(TableName=TABLE_NAME)
+        gsi_list = response['Table'].get('GlobalSecondaryIndexes', [])
+        
+        for gsi in gsi_list:
+            if gsi['IndexName'] == 'GSI_METADATA':
+                print("✓ GSI_METADATA index already exists")
+                return True
+        
+        # GSI doesn't exist, create it
+        print("Creating GSI_METADATA index...")
+        dynamodb.update_table(
+            TableName=TABLE_NAME,
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'SK',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'name_lower',
+                    'AttributeType': 'S'
+                }
+            ],
+            GlobalSecondaryIndexUpdates=[
+                {
+                    'Create': {
+                        'IndexName': 'GSI_METADATA',
+                        'KeySchema': [
+                            {
+                                'AttributeName': 'SK',
+                                'KeyType': 'HASH'
+                            },
+                            {
+                                'AttributeName': 'name_lower',
+                                'KeyType': 'RANGE'
+                            }
+                        ],
+                        'Projection': {
+                            'ProjectionType': 'ALL'
+                        }
+                    }
+                }
+            ]
+        )
+        print("✓ GSI_METADATA index creation initiated (will take 5-10 minutes)")
+        return True
+        
+    except Exception as e:
+        if "already exists" in str(e).lower():
+            print("✓ GSI_METADATA index already exists")
+            return True
+        elif "ResourceInUseException" in str(e):
+            print("⚠️  Table is currently being updated, GSI may already be in progress")
+            return True
+        else:
+            print(f"⚠️  Warning: Could not ensure GSI_METADATA exists: {e}")
+            return False
 
 
 def load_districts_json(filepath: str) -> dict:
@@ -173,6 +246,13 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # Ensure GSI_METADATA exists before importing
+    if not args.dry_run:
+        print(f"\n{'='*60}")
+        print("Checking GSI_METADATA Index")
+        print(f"{'='*60}")
+        ensure_gsi_metadata_exists()
 
     # Resolve the file path
     script_dir = Path(__file__).parent

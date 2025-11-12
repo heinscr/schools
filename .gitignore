@@ -103,3 +103,4 @@ backend/scripts/all_results.csv
 backend/scripts/remaining_comprehensive_results.csv
 extracted_salaries.json
 backend/backend/local_data/jobs.json
+backend/scripts/add_entity_type_gsi.py

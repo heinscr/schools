@@ -201,45 +201,42 @@ class DynamoDBDistrictService:
 
     @staticmethod
     def _get_all_districts(table, limit: int, offset: int) -> Tuple[List[dict], int]:
-        """Get all districts with proper DynamoDB pagination"""
+        """Get all districts using GSI_METADATA index for efficient querying"""
         districts = []
         last_evaluated_key = None
-        items_scanned = 0
 
-        # Scan all districts, handling DynamoDB pagination
+        # Query GSI_METADATA to get all district items (SK='METADATA')
+        # This is much faster than scanning because it uses the index
         while True:
-            scan_kwargs = {
-                'FilterExpression': Attr('entity_type').eq('district'),
-                'Limit': MAX_DYNAMODB_FETCH_LIMIT  # Scan in chunks
+            query_kwargs = {
+                'IndexName': 'GSI_METADATA',
+                'KeyConditionExpression': Key('SK').eq('METADATA')
             }
 
             if last_evaluated_key:
-                scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
+                query_kwargs['ExclusiveStartKey'] = last_evaluated_key
 
-            response = table.scan(**scan_kwargs)
+            response = table.query(**query_kwargs)
 
-            # Add items from this scan
+            # Add items from this query (already sorted by name_lower in the GSI)
             districts.extend([
                 DynamoDBDistrictService._item_to_dict(item)
                 for item in response.get('Items', [])
             ])
 
-            items_scanned += len(response.get('Items', []))
-
-            # Check if there are more items to scan
+            # Check if there are more items to query
             last_evaluated_key = response.get('LastEvaluatedKey')
             if not last_evaluated_key:
                 break
 
-            # Safety check to prevent infinite loops in case of data issues
-            if items_scanned >= MAX_DYNAMODB_FETCH_LIMIT:
-                break
-
-        # Apply offset and limit to the complete result set
+        # GSI already sorts by name_lower, but ensure consistency
+        districts.sort(key=lambda d: d.get('name', '').lower())
+        
+        # Apply offset and limit to the result set
+        paginated_districts = districts[offset:offset + limit]
         total = len(districts)
-        districts = districts[offset:offset + limit]
-
-        return districts, total
+        
+        return paginated_districts, total
 
     @staticmethod
     def update_district(
@@ -370,30 +367,37 @@ class DynamoDBDistrictService:
             )
 
             # Combine results (maintain order, avoid duplicates)
-            district_ids = []
+            districts_map = {}
             seen_ids = set()
 
-            # Add districts from name search first
+            # Add districts from name search first (these are already full district items)
             for item in name_results.get('Items', []):
-                if item['district_id'] not in seen_ids:
-                    district_ids.append(item['district_id'])
-                    seen_ids.add(item['district_id'])
+                district_id = item['district_id']
+                if district_id not in seen_ids:
+                    districts_map[district_id] = DynamoDBDistrictService._item_to_dict(item)
+                    seen_ids.add(district_id)
 
-            # Add districts from town search
+            # Add districts from town search (need to fetch full items for these)
+            town_district_ids = []
             for item in town_results.get('Items', []):
                 if 'district_id' in item and item['district_id'] not in seen_ids:
-                    district_ids.append(item['district_id'])
+                    town_district_ids.append(item['district_id'])
                     seen_ids.add(item['district_id'])
 
-            # Fetch only the district IDs we need (after offset, up to limit)
-            districts = []
-            for district_id in district_ids[offset:offset + limit]:
-                district = DynamoDBDistrictService.get_district(table, district_id)
-                if district:
-                    districts.append(district)
+            # Batch fetch town-based districts
+            if town_district_ids:
+                for district_id in town_district_ids:
+                    district = DynamoDBDistrictService.get_district(table, district_id)
+                    if district:
+                        districts_map[district_id] = district
+
+            # Sort by insertion order and apply pagination
+            all_district_ids = list(districts_map.keys())
+            paginated_ids = all_district_ids[offset:offset + limit]
+            districts = [districts_map[did] for did in paginated_ids]
 
             # Return actual count
-            total = len(district_ids)
+            total = len(all_district_ids)
 
             return districts, total
         except ClientError as e:
