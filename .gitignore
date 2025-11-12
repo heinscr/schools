@@ -25,6 +25,9 @@ build/
 backend/package/
 backend/lambda-deployment.zip
 backend/*.zip
+backend/normalizer-package/*
+backend/processor-package/*
+
 
 # Environment files
 .env
@@ -115,3 +118,6 @@ backend/scripts/search_contracts_comprehensive.py
 infrastructure/terraform/backend_env.tftpl
 backend/scripts/download_teacher_contacts.py
 backend/scripts/comprehensive_results.csv
+backend/scripts/all_results.csv
+backend/scripts/remaining_comprehensive_results.csv
+extracted_salaries.json

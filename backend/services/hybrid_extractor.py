@@ -1,6 +1,9 @@
 """
 Hybrid PDF Contract Extraction with S3 Integration
-Uses pdfplumber for text-based PDFs, AWS Textract for image-based PDFs
+Extraction order:
+1. pdfplumber (fast, works for most PDFs)
+2. PyMuPDF (better text extraction, handles column-oriented layouts)
+3. AWS Textract (for image-based/scanned PDFs)
 """
 import io
 import json
@@ -13,6 +16,13 @@ from decimal import Decimal
 
 import boto3
 import pdfplumber
+
+try:
+    import fitz  # PyMuPDF
+    PYMUPDF_AVAILABLE = True
+except ImportError:
+    PYMUPDF_AVAILABLE = False
+    logging.warning("PyMuPDF not installed - fallback to PyMuPDF disabled")
 
 # Configure logging
 logging.basicConfig(
@@ -292,6 +302,157 @@ class HybridContractExtractor:
             logger.error(f"pdfplumber extraction failed: {e}")
             return None
 
+    def parse_column_oriented_table(self, lines: List[str]) -> Optional[List[List[str]]]:
+        """
+        Parse a table where each value is on its own line (column-oriented)
+
+        Example:
+            Step
+            15
+            M+30
+            M+45
+            DOC
+            1
+            $44,678
+            $46,140
+            ...
+        """
+        # Find header line
+        header_idx = None
+        for i, line in enumerate(lines):
+            if re.match(r'^\s*step\s*$', line, re.I):
+                header_idx = i
+                break
+
+        if header_idx is None:
+            return None
+
+        # Collect header columns (education levels)
+        header = ['Step']
+        i = header_idx + 1
+        while i < len(lines):
+            edu = lines[i].strip()
+
+            # Stop if we hit what looks like a step number
+            if re.match(r'^\d{1,2}$', edu) and not re.search(r'[A-Z]', edu, re.I):
+                # If next line is a salary, this is step 1
+                if i + 1 < len(lines) and re.match(r'^\$[\d,]+$', lines[i + 1].strip()):
+                    break
+                # Otherwise might be education level
+                else:
+                    header.append(edu)
+                    i += 1
+                    continue
+
+            # Check if it's an education level
+            if edu and re.match(r'^[A-Z0-9+]+$', edu, re.I):
+                header.append(edu)
+                i += 1
+            else:
+                break
+
+        if len(header) < 2:
+            return None
+
+        num_cols = len(header)
+
+        # Parse data rows
+        table_data = [header]
+        current_row = []
+
+        # Start from first step number
+        while i < len(lines):
+            line = lines[i].strip()
+
+            # Check if it's a step number
+            if re.match(r'^\d+$', line):
+                # If we have a complete row, add it
+                if current_row and len(current_row) == num_cols:
+                    table_data.append(current_row)
+                # Start new row
+                current_row = [line]
+
+            # Check if it's a salary value
+            elif re.match(r'^\$[\d,]+$', line):
+                current_row.append(line)
+
+                # If row is complete, we're done with this row
+                if len(current_row) == num_cols:
+                    table_data.append(current_row)
+                    current_row = []
+
+            # Stop if we hit non-table content
+            elif line and not re.match(r'^\$?[\d,]+$', line):
+                break
+
+            i += 1
+
+        # Add last row if complete
+        if current_row and len(current_row) == num_cols:
+            table_data.append(current_row)
+
+        return table_data if len(table_data) > 1 else None
+
+    def extract_with_pymupdf(self, pdf_bytes: bytes, filename: str, district_name: str) -> Optional[List[Dict]]:
+        """
+        Extract salary data using PyMuPDF
+
+        Args:
+            pdf_bytes: PDF file content
+            filename: Original filename
+            district_name: District name to use in records
+
+        Returns:
+            List of salary records or None if extraction fails
+        """
+        if not PYMUPDF_AVAILABLE:
+            logger.warning("PyMuPDF not available, skipping")
+            return None
+
+        try:
+            logger.info(f"Extracting with PyMuPDF: {filename}")
+
+            district = district_name
+            all_records = []
+
+            doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
+            for page_num, page in enumerate(doc, 1):
+                text = page.get_text()
+
+                # Check if this looks like a salary table page
+                if not re.search(r'(SALARY|COMPENSATION|TEACHERS?|SCHEDULE|STEP)', text, re.I):
+                    continue
+
+                year = self.extract_year_from_text(text)
+
+                # Try built-in table detection first
+                tables = page.find_tables()
+                if tables and tables.tables:
+                    logger.debug(f"Page {page_num}: PyMuPDF found {len(tables.tables)} tables with built-in detection")
+                    for table_obj in tables.tables:
+                        table_data = table_obj.extract()
+                        if table_data and len(table_data) > 1:
+                            records = self.parse_salary_table(table_data, district, year)
+                            all_records.extend(records)
+                else:
+                    # Fallback: Parse text as column-oriented table
+                    logger.debug(f"Page {page_num}: Trying column-oriented parsing")
+                    lines = text.split('\n')
+                    table_data = self.parse_column_oriented_table(lines)
+
+                    if table_data:
+                        logger.debug(f"Page {page_num}: Successfully parsed column-oriented table")
+                        records = self.parse_salary_table(table_data, district, year)
+                        all_records.extend(records)
+
+            doc.close()
+            return all_records if all_records else None
+
+        except Exception as e:
+            logger.error(f"PyMuPDF extraction failed: {e}", exc_info=True)
+            return None
+
     def extract_with_textract(self, pdf_bytes: bytes, filename: str, district_name: str, s3_bucket: str, s3_key: str) -> Optional[List[Dict]]:
         """
         Extract salary data using AWS Textract
@@ -566,6 +727,11 @@ class HybridContractExtractor:
         """
         Extract salary data using hybrid approach
 
+        Extraction order:
+        1. pdfplumber (fast, works for most text PDFs)
+        2. PyMuPDF (better text extraction, handles encoding issues and column-oriented layouts)
+        3. AWS Textract (for image-based/scanned PDFs)
+
         Args:
             pdf_bytes: PDF file content
             filename: Original filename
@@ -585,10 +751,25 @@ class HybridContractExtractor:
                 records = self.filter_records_by_year_and_period(records)
                 return records, "pdfplumber"
             else:
-                logger.warning("pdfplumber extraction failed, falling back to Textract")
+                logger.warning("pdfplumber extraction returned no records")
 
-        # Fall back to Textract for image-based PDFs
-        logger.info(f"⚠ Image-based PDF detected: {filename}")
+            # Try PyMuPDF as fallback before Textract
+            if PYMUPDF_AVAILABLE:
+                logger.info(f"Trying PyMuPDF fallback: {filename}")
+                records = self.extract_with_pymupdf(pdf_bytes, filename, district_name)
+                if records:
+                    # Filter records by year and period
+                    records = self.filter_records_by_year_and_period(records)
+                    return records, "pymupdf"
+                else:
+                    logger.warning("PyMuPDF extraction returned no records, falling back to Textract")
+            else:
+                logger.warning("PyMuPDF not available, falling back to Textract")
+        else:
+            logger.info(f"⚠ Image-based PDF detected: {filename}")
+
+        # Fall back to Textract for image-based PDFs or when other methods fail
+        logger.info(f"Using AWS Textract for: {filename}")
         records = self.extract_with_textract(pdf_bytes, filename, district_name, s3_bucket, s3_key)
         if records:
             # Filter records by year and period
@@ -636,6 +817,7 @@ class HybridContractExtractor:
             'successful': 0,
             'failed': 0,
             'pdfplumber_count': 0,
+            'pymupdf_count': 0,
             'textract_count': 0,
             'files': []
         }
@@ -651,8 +833,11 @@ class HybridContractExtractor:
                 pdf_obj = self.s3.get_object(Bucket=input_bucket, Key=pdf_key)
                 pdf_bytes = pdf_obj['Body'].read()
 
+                # Extract district name from filename
+                district_name = Path(filename).stem.split('_')[0].title()
+
                 # Extract data
-                records, method = self.extract_from_pdf(pdf_bytes, filename, input_bucket, pdf_key)
+                records, method = self.extract_from_pdf(pdf_bytes, filename, district_name, input_bucket, pdf_key)
 
                 if records:
                     # Upload JSON to output bucket
@@ -680,6 +865,8 @@ class HybridContractExtractor:
                     results['successful'] += 1
                     if method == 'pdfplumber':
                         results['pdfplumber_count'] += 1
+                    elif method == 'pymupdf':
+                        results['pymupdf_count'] += 1
                     elif method == 'textract':
                         results['textract_count'] += 1
 
@@ -715,6 +902,7 @@ class HybridContractExtractor:
         logger.info(f"Successful:       {results['successful']}")
         logger.info(f"Failed:           {results['failed']}")
         logger.info(f"pdfplumber:       {results['pdfplumber_count']}")
+        logger.info(f"PyMuPDF:          {results['pymupdf_count']}")
         logger.info(f"AWS Textract:     {results['textract_count']}")
         logger.info(f"{'='*60}")
 
