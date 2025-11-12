@@ -903,6 +903,85 @@ class LocalSalaryJobsService:
             'needs_global_normalization': needs_normalization
         }
 
+    def list_backups(self) -> List[Dict]:
+        """
+        List all backup files in local storage
+        Returns list of backup metadata
+        """
+        from pathlib import Path
+
+        backups = []
+        applied_data_dir = self.contracts_dir / "applied_data"
+
+        # Create directory if it doesn't exist
+        applied_data_dir.mkdir(parents=True, exist_ok=True)
+
+        # List all JSON files in the applied_data directory
+        for backup_file in applied_data_dir.glob("*.json"):
+            try:
+                # Get file stats
+                stat = backup_file.stat()
+
+                # Extract district name from filename
+                district_name = backup_file.stem  # Remove .json extension
+
+                backups.append({
+                    'filename': backup_file.name,
+                    'district_name': district_name,
+                    'key': str(backup_file),
+                    'size': stat.st_size,
+                    'last_modified': datetime.fromtimestamp(stat.st_mtime).isoformat()
+                })
+            except Exception as e:
+                logger.error(f"Error reading backup file {backup_file}: {e}")
+
+        logger.info(f"[LocalSalaryJobsService] Found {len(backups)} backup files")
+        return backups
+
+    def re_apply_from_backup(self, backup_filename: str) -> Tuple[bool, Dict]:
+        """
+        Re-apply salary data from a backup file
+
+        Args:
+            backup_filename: Filename of the backup (e.g., "Springfield.json")
+
+        Returns:
+            (success, result_info)
+        """
+        from pathlib import Path
+
+        # Load backup from local storage
+        backup_path = self.contracts_dir / "applied_data" / backup_filename
+
+        if not backup_path.exists():
+            raise ValueError(f"Backup file not found: {backup_filename}")
+
+        try:
+            with open(backup_path, 'r', encoding='utf-8') as f:
+                backup_data = json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading backup {backup_filename}: {e}")
+            raise ValueError(f"Failed to read backup file: {backup_filename}")
+
+        # Extract data
+        district_id = backup_data.get('district_id')
+        district_name = backup_data.get('district_name')
+        records = backup_data.get('records', [])
+
+        if not district_id or not records:
+            raise ValueError(f"Invalid backup file: missing district_id or records")
+
+        logger.info(f"[LocalSalaryJobsService] Re-applying backup for {district_name} ({district_id}): {len(records)} records")
+
+        # For local stub, just return success with counts
+        return True, {
+            'district_id': district_id,
+            'district_name': district_name,
+            'records_added': len(records),
+            'calculated_entries': 0,
+            'metadata_changed': False
+        }
+
     # Optional helper used by normalization endpoints
     def start_normalization_job(self, lambda_client=None, normalizer_arn: str = None, triggered_by: str = None) -> str:
         # No-op for local; return a deterministic job id

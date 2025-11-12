@@ -27,6 +27,7 @@ backend/lambda-deployment.zip
 backend/*.zip
 backend/normalizer-package/*
 backend/processor-package/*
+backend/backend/*
 
 
 # Environment files

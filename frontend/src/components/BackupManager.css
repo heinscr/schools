@@ -182,6 +182,7 @@
 
 .results-message p {
   margin: 0.5rem 0;
+  color: #000;
 }
 
 .results-message p.error {
