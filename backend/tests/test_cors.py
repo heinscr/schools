@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import pytest
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
@@ -13,13 +14,25 @@ load_dotenv(BACKEND_DIR / ".env")
 from fastapi.testclient import TestClient
 import main as backend_main
 
-# Get custom domain from environment
+# Get custom domain from environment, or use a test domain
 CUSTOM_DOMAIN = os.getenv("CUSTOM_DOMAIN")
-CUSTOM_ORIGIN = f"https://{CUSTOM_DOMAIN}"
+if CUSTOM_DOMAIN:
+    CUSTOM_ORIGIN = f"https://{CUSTOM_DOMAIN}"
+else:
+    # Use CloudFront domain or a test domain as fallback
+    CLOUDFRONT_DOMAIN = os.getenv("CLOUDFRONT_DOMAIN")
+    if CLOUDFRONT_DOMAIN:
+        CUSTOM_ORIGIN = f"https://{CLOUDFRONT_DOMAIN}"
+    else:
+        # Skip tests that require a custom domain
+        CUSTOM_ORIGIN = None
 
 
 def test_cors_allowed_origin():
     """Test that requests from allowed origins include CORS headers"""
+    if CUSTOM_ORIGIN is None:
+        pytest.skip("CUSTOM_DOMAIN or CLOUDFRONT_DOMAIN not set in environment")
+
     client = TestClient(backend_main.app)
 
     # Test with allowed origin
@@ -48,6 +61,9 @@ def test_cors_disallowed_origin():
 
 def test_cors_preflight_allowed_origin():
     """Test CORS preflight (OPTIONS) request for allowed origin"""
+    if CUSTOM_ORIGIN is None:
+        pytest.skip("CUSTOM_DOMAIN or CLOUDFRONT_DOMAIN not set in environment")
+
     client = TestClient(backend_main.app)
 
     headers = {
@@ -66,6 +82,9 @@ def test_cors_preflight_allowed_origin():
 
 def test_cors_no_credentials():
     """Test that credentials are not allowed (security measure)"""
+    if CUSTOM_ORIGIN is None:
+        pytest.skip("CUSTOM_DOMAIN or CLOUDFRONT_DOMAIN not set in environment")
+
     client = TestClient(backend_main.app)
 
     headers = {"Origin": CUSTOM_ORIGIN}
@@ -78,6 +97,9 @@ def test_cors_no_credentials():
 
 def test_cors_allowed_methods():
     """Test that only allowed methods are permitted"""
+    if CUSTOM_ORIGIN is None:
+        pytest.skip("CUSTOM_DOMAIN or CLOUDFRONT_DOMAIN not set in environment")
+
     client = TestClient(backend_main.app)
 
     headers = {
@@ -102,6 +124,9 @@ def test_cors_allowed_methods():
 
 def test_cors_allowed_headers():
     """Test that only allowed headers are permitted"""
+    if CUSTOM_ORIGIN is None:
+        pytest.skip("CUSTOM_DOMAIN or CLOUDFRONT_DOMAIN not set in environment")
+
     client = TestClient(backend_main.app)
 
     headers = {
@@ -138,6 +163,9 @@ def test_cors_localhost_allowed():
 
 def test_cors_max_age_set():
     """Test that preflight cache time is set"""
+    if CUSTOM_ORIGIN is None:
+        pytest.skip("CUSTOM_DOMAIN or CLOUDFRONT_DOMAIN not set in environment")
+
     client = TestClient(backend_main.app)
 
     headers = {

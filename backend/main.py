@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException, Query, Request
+from fastapi import FastAPI, Depends, HTTPException, Query, Request, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from typing import Optional
 from contextlib import asynccontextmanager
 import os
 import json
+import logging
 import boto3
 from boto3.dynamodb.conditions import Key
 from dotenv import load_dotenv
@@ -17,6 +18,7 @@ from schemas import (
     DistrictListResponse
 )
 from services.dynamodb_district_service import DynamoDBDistrictService
+from services.salary_jobs import SalaryJobsService
 from config import (
     MAX_QUERY_LIMIT,
     DEFAULT_QUERY_LIMIT,
@@ -42,6 +44,10 @@ from slowapi.errors import RateLimitExceeded
 
 # Load environment from .env for local development
 load_dotenv()
+
+# Configure logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 @asynccontextmanager
@@ -293,10 +299,33 @@ async def get_current_user(
 
 # Salary endpoints - Native FastAPI implementation
 # Initialize DynamoDB for salary data
-dynamodb = boto3.resource('dynamodb')
+# AWS_REGION is automatically provided by Lambda runtime, fallback to us-east-1 for local dev
+AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
+dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
 TABLE_NAME = os.getenv('DYNAMODB_TABLE_NAME')
 
 main_table = dynamodb.Table(TABLE_NAME) if TABLE_NAME else None
+
+# Initialize S3, SQS, and Lambda clients for salary processing
+s3_client = boto3.client('s3', region_name=AWS_REGION)
+sqs_client = boto3.client('sqs', region_name=AWS_REGION)
+lambda_client = boto3.client('lambda', region_name=AWS_REGION)
+
+# Get environment variables for salary processing
+S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+SQS_QUEUE_URL = os.getenv('SALARY_PROCESSING_QUEUE_URL')
+NORMALIZER_LAMBDA_ARN = os.getenv('SALARY_NORMALIZER_LAMBDA_ARN')
+
+# Initialize salary jobs service
+salary_jobs_service = None
+if main_table and S3_BUCKET_NAME and SQS_QUEUE_URL:
+    salary_jobs_service = SalaryJobsService(
+        dynamodb_table=main_table,
+        s3_client=s3_client,
+        sqs_client=sqs_client,
+        queue_url=SQS_QUEUE_URL,
+        bucket_name=S3_BUCKET_NAME
+    )
 
 # Import salary service functions
 from services.salary_service import (
@@ -402,6 +431,234 @@ async def get_global_salary_metadata_route(request: Request):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# Admin Salary Processing Endpoints
+# ============================================================================
+
+@app.post("/api/admin/districts/{district_id}/salary-schedule/upload")
+@limiter.limit(WRITE_RATE_LIMIT)
+async def upload_salary_schedule(
+    request: Request,
+    district_id: str,
+    file: UploadFile = File(...),
+    table = Depends(get_table),
+    user: dict = Depends(require_admin_role)
+):
+    """Upload a PDF contract for processing"""
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    # Validate file type
+    if not file.filename.endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+
+    # Validate district exists
+    from services.dynamodb_district_service import DynamoDBDistrictService
+    district = DynamoDBDistrictService.get_district(table=table, district_id=district_id)
+    if not district:
+        raise HTTPException(status_code=404, detail="District not found")
+
+    try:
+        # Read PDF content
+        pdf_content = await file.read()
+        logger.info(f"Received PDF upload: filename='{file.filename}', content_type='{file.content_type}', size={len(pdf_content)} bytes, type={type(pdf_content)}")
+
+        # Log first 20 bytes to diagnose encoding issues
+        if len(pdf_content) > 0:
+            first_bytes = pdf_content[:20]
+            logger.info(f"First 20 bytes: {first_bytes}")
+
+        # Create processing job
+        job = salary_jobs_service.create_job(
+            district_id=district_id,
+            district_name=district['name'],
+            pdf_content=pdf_content,
+            filename=file.filename,
+            uploaded_by=user['sub']
+        )
+
+        return {
+            "job_id": job['job_id'],
+            "status": job['status'],
+            "district_id": district_id,
+            "district_name": district['name']
+        }
+
+    except Exception as e:
+        logger.error(f"Upload failed: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+
+@app.get("/api/admin/districts/{district_id}/salary-schedule/jobs/{job_id}")
+@limiter.limit(GENERAL_RATE_LIMIT)
+async def get_job_status(
+    request: Request,
+    district_id: str,
+    job_id: str,
+    user: dict = Depends(require_admin_role)
+):
+    """Get job status and extracted data preview"""
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    job = salary_jobs_service.get_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    if job['district_id'] != district_id:
+        raise HTTPException(status_code=400, detail="Job district_id does not match")
+
+    response = {
+        "job_id": job['job_id'],
+        "district_id": job['district_id'],
+        "district_name": job['district_name'],
+        "status": job['status'],
+        "created_at": job['created_at'],
+        "updated_at": job['updated_at']
+    }
+
+    if job['status'] == 'completed':
+        response['records_count'] = job.get('extracted_records_count', 0)
+        response['years_found'] = job.get('years_found', [])
+
+        # Get preview data (all records)
+        preview = salary_jobs_service.get_extracted_data_preview(job_id, limit=None)
+        if preview:
+            response['preview_records'] = preview
+
+    elif job['status'] == 'failed':
+        response['error'] = job.get('error_message', 'Unknown error')
+
+    return response
+
+
+@app.put("/api/admin/districts/{district_id}/salary-schedule/apply/{job_id}")
+@limiter.limit(WRITE_RATE_LIMIT)
+async def apply_salary_schedule(
+    request: Request,
+    district_id: str,
+    job_id: str,
+    user: dict = Depends(require_admin_role)
+):
+    """Apply extracted salary data to district"""
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    # Parse optional exclusions from request body
+    exclusions = None
+    try:
+        body = await request.json()
+        if body:
+            exclusions = {
+                'excluded_steps': body.get('excluded_steps', []),
+                'excluded_columns': body.get('excluded_columns', [])
+            }
+    except:
+        # No body or invalid JSON - that's fine, no exclusions
+        pass
+
+    try:
+        success, metadata = salary_jobs_service.apply_salary_data(job_id, district_id, exclusions)
+
+        return {
+            "success": success,
+            "records_added": metadata['records_added'],
+            "metadata_changed": metadata['metadata_changed'],
+            "needs_global_normalization": metadata['needs_global_normalization']
+        }
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Apply failed: {str(e)}")
+
+
+@app.delete("/api/admin/districts/{district_id}/salary-schedule/jobs/{job_id}")
+@limiter.limit(WRITE_RATE_LIMIT)
+async def reject_salary_schedule(
+    request: Request,
+    district_id: str,
+    job_id: str,
+    user: dict = Depends(require_admin_role)
+):
+    """Reject and delete a processing job"""
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    job = salary_jobs_service.get_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    if job['district_id'] != district_id:
+        raise HTTPException(status_code=400, detail="Job district_id does not match")
+
+    try:
+        salary_jobs_service.delete_job(job_id)
+        return {"success": True, "message": "Job deleted"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
+
+
+@app.get("/api/admin/global/normalization/status")
+@limiter.limit(GENERAL_RATE_LIMIT)
+async def get_normalization_status_route(
+    request: Request,
+    user: dict = Depends(require_admin_role)
+):
+    """Get global normalization status"""
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    try:
+        status = salary_jobs_service.get_normalization_status()
+
+        # Check if normalization job is running
+        job = salary_jobs_service.get_normalization_job()
+        if job:
+            status['job_running'] = True
+            status['job_started_at'] = job.get('started_at')
+        else:
+            status['job_running'] = False
+
+        return status
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/admin/global/normalize")
+@limiter.limit(WRITE_RATE_LIMIT)
+async def start_normalization(
+    request: Request,
+    user: dict = Depends(require_admin_role)
+):
+    """Start global normalization job"""
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    if not NORMALIZER_LAMBDA_ARN:
+        raise HTTPException(status_code=503, detail="Normalizer Lambda not configured")
+
+    try:
+        job_id = salary_jobs_service.start_normalization_job(
+            lambda_client=lambda_client,
+            normalizer_arn=NORMALIZER_LAMBDA_ARN,
+            triggered_by=user['sub']
+        )
+
+        return {
+            "success": True,
+            "job_id": job_id,
+            "message": "Normalization job started"
+        }
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to start normalization: {str(e)}")
 
 
 # Lambda handler (only needed for AWS deployment)

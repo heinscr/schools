@@ -207,6 +207,28 @@
   border: 2px solid white;
 }
 
+/* Normalization badge */
+.normalization-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ef4444; /* red */
+  border: 2px solid white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 /* User Menu */
 .user-menu {
   position: relative;
@@ -266,7 +288,8 @@
   border-top: 1px solid #eee;
 }
 
-.logout-button {
+/* Menu buttons (shared styles) */
+.menu-button {
   width: 100%;
   padding: 12px 16px;
   background: transparent;
@@ -279,15 +302,45 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  position: relative;
 }
 
-.logout-button:hover {
+.menu-button:hover:not(:disabled) {
   background: #f5f5f5;
+}
+
+.menu-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.menu-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.logout-button {
+  /* Inherits from .menu-button */
 }
 
 .logout-icon {
   width: 18px;
   height: 18px;
+}
+
+.normalize-button {
+  /* Inherits from .menu-button */
+}
+
+/* Badge dot for normalize button */
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  margin-left: auto;
+  animation: pulse 2s infinite;
 }
 
 /* Close dropdown when clicking outside */

@@ -44,6 +44,9 @@ locals {
   s3_bucket_name  = "${var.project_name}-${local.account_id}"
   function_name   = "${var.project_name}-api"
 
+  # Flag to enable salary processing features (check if resources will exist)
+  enable_salary_processing = true
+
   common_tags = merge(
     var.tags,
     {
@@ -173,6 +176,10 @@ resource "aws_s3_bucket_policy" "main" {
 resource "aws_api_gateway_rest_api" "main" {
   name        = "${var.project_name}-api"
   description = "API for ${var.project_name}"
+
+  # Treat all content types as binary to prevent UTF-8 decoding issues
+  # This forces API Gateway to base64 encode the body, which Mangum then decodes correctly
+  binary_media_types = ["*/*"]
 
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -338,6 +345,12 @@ resource "aws_dynamodb_table" "main" {
     enabled = true
   }
 
+  # TTL for automatic cleanup of temporary items (jobs)
+  ttl {
+    attribute_name = "ttl"
+    enabled        = true
+  }
+
   tags = merge(
     local.common_tags,
     {
@@ -363,12 +376,62 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
           "dynamodb:DeleteItem",
           "dynamodb:Query",
           "dynamodb:Scan",
-          "dynamodb:BatchGetItem"
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem"
         ]
         Resource = [
           aws_dynamodb_table.main.arn,
           "${aws_dynamodb_table.main.arn}/index/*"
         ]
+      }
+    ]
+  })
+}
+
+# IAM Policy for Lambda to access S3 (for salary processing PDFs and JSON)
+resource "aws_iam_role_policy" "lambda_s3" {
+  name = "${var.project_name}-lambda-s3"
+  role = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "${aws_s3_bucket.main.arn}/contracts/*"
+      }
+    ]
+  })
+}
+
+# IAM Policy for Lambda to access SQS and invoke other Lambdas
+resource "aws_iam_role_policy" "lambda_salary_processing" {
+  count = local.enable_salary_processing ? 1 : 0
+  name  = "${var.project_name}-lambda-salary-processing"
+  role  = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:GetQueueUrl"
+        ]
+        Resource = aws_sqs_queue.salary_processing.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Resource = aws_lambda_function.salary_normalizer.arn
       }
     ]
   })
@@ -392,13 +455,19 @@ resource "aws_lambda_function" "api" {
       {
         DYNAMODB_TABLE_NAME      = aws_dynamodb_table.main.name
         CLOUDFRONT_DOMAIN        = aws_cloudfront_distribution.frontend.domain_name
+        S3_BUCKET_NAME           = aws_s3_bucket.main.id
         # Cognito configuration for JWT validation
         COGNITO_USER_POOL_ID     = aws_cognito_user_pool.main.id
         COGNITO_CLIENT_ID        = aws_cognito_user_pool_client.frontend.id
         COGNITO_REGION           = var.aws_region
       },
       # Add custom domain if configured
-      var.cloudfront_domain_name != "" ? { CUSTOM_DOMAIN = var.cloudfront_domain_name } : {}
+      var.cloudfront_domain_name != "" ? { CUSTOM_DOMAIN = var.cloudfront_domain_name } : {},
+      # Add salary processing environment variables if enabled
+      local.enable_salary_processing ? {
+        SALARY_PROCESSING_QUEUE_URL = aws_sqs_queue.salary_processing.url
+        SALARY_NORMALIZER_LAMBDA_ARN = aws_lambda_function.salary_normalizer.arn
+      } : {}
     )
   }
 
@@ -475,6 +544,7 @@ resource "aws_api_gateway_deployment" "main" {
 
   triggers = {
     redeployment = sha1(jsonencode([
+      aws_api_gateway_rest_api.main.binary_media_types,
       aws_api_gateway_resource.proxy.id,
       aws_api_gateway_method.proxy.id,
       aws_api_gateway_integration.lambda.id,

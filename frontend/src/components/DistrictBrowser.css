@@ -467,6 +467,46 @@
   grid-column: 1 / -1; /* Span both columns */
 }
 
+.salary-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.salary-section-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #1e3a5f;
+  font-weight: 700;
+}
+
+.upload-salary-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-salary-button:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.upload-icon {
+  width: 18px;
+  height: 18px;
+}
+
 /* District Detail */
 .district-detail {
   border: 1px solid #e2e8f0;
