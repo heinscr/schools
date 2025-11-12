@@ -10,6 +10,7 @@ import './ChoroplethMap.css';
 const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTypeOptions }) => {
   // Data cache for districts
   const cache = useDataCache();
+  const isDistrictsLoading = cache.status === 'loading' || cache.status === 'idle';
 
   // Detect mobile devices
   const [isMobile, setIsMobile] = useState(false);
@@ -53,6 +54,17 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Re-render when loading status changes
+  useEffect(() => {
+    // Force re-render by triggering dimensions update
+    if (containerRef.current) {
+      setDimensions({
+        width: containerRef.current.clientWidth,
+        height: containerRef.current.clientHeight
+      });
+    }
+  }, [isDistrictsLoading]);
 
   // Hide tooltip when mouse leaves the map container
   useEffect(() => {
@@ -224,6 +236,11 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         const props = d.properties;
         const townName = normalizeTownName(props.TOWN || props.NAME || props.TOWN_NAME);
 
+        // If districts are still loading, show dimmed colors
+        if (isDistrictsLoading) {
+          return '#d0d0d0'; // Light gray for all towns when loading
+        }
+
         // Clicked town takes precedence with orange/amber color
         if (normalizedClickedTown && townName === normalizedClickedTown) {
           return '#ff7f00'; // Orange color for clicked town
@@ -234,6 +251,8 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         return isSelected ? '#7a0177' : '#e7e7e7';
       })
       .on('mouseover', function(event, d) {
+        // Skip hover interactions if districts are still loading
+        if (isDistrictsLoading) return;
         const props = d.properties;
         const townName = props.TOWN || props.NAME || props.TOWN_NAME || 'Unknown';
 
@@ -373,6 +392,9 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         tooltip.style('left', `${left}px`).style('top', `${top}px`);
       })
       .on('mouseout', function() {
+        // Skip if districts are loading
+        if (isDistrictsLoading) return;
+        
         // Remove highlight
         d3.select(this)
           .attr('stroke-width', 0.5)
@@ -382,6 +404,9 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         tooltip.style('opacity', 0);
       })
       .on('click', function(event, d) {
+        // Skip if districts are loading
+        if (isDistrictsLoading) return;
+        
         // Only handle click if not dragging (prevents clicks during pan)
         if (dragRef.current.hasMoved) {
           return;
@@ -394,7 +419,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
         }
       });
 
-    }, [geojson, selectedTowns, normalizedClickedTown, handleTownClickCallback, zoom, dimensions, pan, isMobile, cache, districtTypeOptions, onTownClick]);
+    }, [geojson, selectedTowns, normalizedClickedTown, handleTownClickCallback, zoom, dimensions, pan, isMobile, cache, districtTypeOptions, onTownClick, isDistrictsLoading]);
 
   // Zoom controls - memoize to prevent recreation on every render
   const handleZoomIn = useCallback(() => {
@@ -419,6 +444,36 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
 
   return (
     <div ref={containerRef} className="choropleth-container" style={{ position: 'relative' }}>
+      {isDistrictsLoading && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '20px 30px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 1000,
+          fontSize: '1.1em',
+          fontWeight: 500,
+          color: '#333',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          pointerEvents: 'none'
+        }}>
+          <div style={{
+            width: '20px',
+            height: '20px',
+            border: '3px solid #e0e0e0',
+            borderTop: '3px solid #7a0177',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          Loading districts...
+        </div>
+      )}
       {!isMobile && (
         <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
