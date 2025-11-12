@@ -361,16 +361,19 @@ class ApiService {
    * Admin: Apply extracted salary data to district
    * @param {string} districtId - District ID
    * @param {string} jobId - Job ID
+   * @param {Object} exclusions - Optional exclusions {excluded_steps: [], excluded_columns: []}
    * @returns {Promise<Object>} - Application result with metadata change info
    */
-  async applySalaryData(districtId, jobId) {
+  async applySalaryData(districtId, jobId, exclusions = null) {
     const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/apply/${jobId}`;
 
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
         ...this._getAuthHeaders(),
+        ...(exclusions ? { 'Content-Type': 'application/json' } : {}),
       },
+      ...(exclusions ? { body: JSON.stringify(exclusions) } : {}),
     });
 
     if (!response.ok) {

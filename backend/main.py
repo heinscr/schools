@@ -523,8 +523,8 @@ async def get_job_status(
         response['records_count'] = job.get('extracted_records_count', 0)
         response['years_found'] = job.get('years_found', [])
 
-        # Get preview data
-        preview = salary_jobs_service.get_extracted_data_preview(job_id, limit=10)
+        # Get preview data (all records)
+        preview = salary_jobs_service.get_extracted_data_preview(job_id, limit=None)
         if preview:
             response['preview_records'] = preview
 
@@ -546,8 +546,21 @@ async def apply_salary_schedule(
     if not salary_jobs_service:
         raise HTTPException(status_code=503, detail="Salary processing service not configured")
 
+    # Parse optional exclusions from request body
+    exclusions = None
     try:
-        success, metadata = salary_jobs_service.apply_salary_data(job_id, district_id)
+        body = await request.json()
+        if body:
+            exclusions = {
+                'excluded_steps': body.get('excluded_steps', []),
+                'excluded_columns': body.get('excluded_columns', [])
+            }
+    except:
+        # No body or invalid JSON - that's fine, no exclusions
+        pass
+
+    try:
+        success, metadata = salary_jobs_service.apply_salary_data(job_id, district_id, exclusions)
 
         return {
             "success": success,

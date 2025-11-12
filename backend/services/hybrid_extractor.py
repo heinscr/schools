@@ -73,13 +73,16 @@ class HybridContractExtractor:
         if not text:
             return "unknown"
 
-        # Strategy 1: Look for YYYY-YYYY pattern (e.g., "2024-2025")
+        # Strategy 1: Look for YYYY-YYYY pattern (e.g., "2024-2025" or "July 1, 2024 - June 30, 2025")
         # Keep as is
-        match = re.search(r'(\d{4})\s*[-–—]\s*(\d{4})', text)
+        # Look for two 4-digit years with a dash/hyphen between them (may have text before/after)
+        match = re.search(r'(20\d{2})\s*,?\s*[-–—]\s*.{0,15}?(20\d{2})', text)
         if match:
             year1 = match.group(1)
             year2 = match.group(2)
-            return f"{year1}-{year2}"
+            # Only return if they're consecutive school years (year2 = year1 + 1)
+            if int(year2) == int(year1) + 1:
+                return f"{year1}-{year2}"
 
         # Strategy 2: Look for "Effective [Month] [Day,] YYYY" pattern
         # Matches: "Effective July 1, 2027" → "2027-2028"
@@ -133,18 +136,40 @@ class HybridContractExtractor:
             'MA+15': ('M', 15), 'M+15': ('M', 15),
             'MA+30': ('M', 30), 'M+30': ('M', 30),
             'MA+45': ('M', 45), 'M+45': ('M', 45), 'MA+45/CAGS': ('M', 45),
-            'CAGS': ('M', 60), 'CAGS/DOC': ('D', 0),
+            'CAGS': ('M', 60), 'M+60': ('M', 60), 'CAGS/DOC': ('D', 0),
             'DOC': ('D', 0), 'DOCTORATE': ('D', 0),
         }
 
         records = []
 
-        # Parse header
-        header = [str(h).strip().upper().replace(' ', '') for h in table[0]]
-        edu_columns = [h for h in header if h and h not in ['', 'STEPS', 'STEP']]
+        # Find header row - look for a row with 'Step' and education columns
+        header_idx = 0
+        header = []
+        for idx, row in enumerate(table):
+            if not row:
+                continue
+            # Normalize row values
+            normalized_row = [str(h).strip().upper().replace(' ', '') for h in row]
+            # Check if this looks like a header (has 'STEP' and at least one education column)
+            has_step = 'STEP' in normalized_row or 'STEPS' in normalized_row
+            has_education = any(col in edu_map for col in normalized_row)
 
-        # Parse data rows
-        for row in table[1:]:
+            if has_step and has_education:
+                header_idx = idx
+                header = normalized_row
+                logger.debug(f"Found header at row {idx}: {header}")
+                break
+
+        # If no header found, try using first row as fallback
+        if not header:
+            header = [str(h).strip().upper().replace(' ', '') for h in table[0]]
+            header_idx = 0
+            logger.debug(f"Using first row as header: {header}")
+
+        edu_columns = [h for h in header if h and h not in ['', 'STEPS', 'STEP', 'NONE']]
+
+        # Parse data rows (start from row after header)
+        for row in table[header_idx + 1:]:
             if not row or len(row) < 2:
                 continue
 
@@ -181,6 +206,38 @@ class HybridContractExtractor:
 
         return records
 
+    def is_salary_table(self, table: List[List[str]]) -> bool:
+        """
+        Check if a table looks like a salary table based on structure
+
+        Returns True if table has:
+        - A 'Step' column
+        - At least one education level column (B, M, MA, etc.)
+        """
+        if not table or len(table) < 2:
+            return False
+
+        # Education patterns to look for
+        edu_patterns = ['B', 'M', 'BA', 'MA', 'B+', 'M+', 'CAGS', 'DOC']
+
+        # Check all rows for potential headers
+        for row in table[:5]:  # Check first 5 rows
+            if not row:
+                continue
+            normalized_row = [str(h).strip().upper().replace(' ', '') for h in row]
+
+            # Check if this row has Step and education columns
+            has_step = any('STEP' in col for col in normalized_row)
+            has_education = any(
+                any(edu in col for edu in edu_patterns)
+                for col in normalized_row
+            )
+
+            if has_step and has_education:
+                return True
+
+        return False
+
     def extract_with_pdfplumber(self, pdf_bytes: bytes, filename: str, district_name: str) -> Optional[List[Dict]]:
         """
         Extract salary data using pdfplumber + regex
@@ -206,15 +263,28 @@ class HybridContractExtractor:
                     text = page.extract_text() or ""
                     tables = page.extract_tables()
 
-                    # Check if this is a salary table page
-                    if re.search(r'(SALARY|COMPENSATION|TEACHERS?)\s+SCHEDULE', text, re.I):
+                    # Check if this is a salary table page (by keyword OR by table structure)
+                    # Allow up to 3 words between keyword and "SCHEDULE" (e.g., "Teacher Salary Schedule", "Compensation and Benefits Schedule")
+                    has_keyword = re.search(r'(SALARY|COMPENSATION|TEACHERS?)(?:\s+\w+){0,3}\s+SCHEDULE', text, re.I)
+
+                    if has_keyword:
                         year = self.extract_year_from_text(text)
 
                         for table in tables:
                             if table and len(table) > 1:
                                 records = self.parse_salary_table(table, district, year)
                                 all_records.extend(records)
-                                logger.debug(f"Page {page_num}: extracted {len(records)} records")
+                                logger.debug(f"Page {page_num}: extracted {len(records)} records (keyword match)")
+                    else:
+                        # No keyword, but check if tables look like salary tables
+                        year = self.extract_year_from_text(text)
+
+                        for table in tables:
+                            if table and len(table) > 1 and self.is_salary_table(table):
+                                records = self.parse_salary_table(table, district, year)
+                                if records:  # Only extend if we got records
+                                    all_records.extend(records)
+                                    logger.debug(f"Page {page_num}: extracted {len(records)} records (structure match)")
 
             return all_records if all_records else None
 

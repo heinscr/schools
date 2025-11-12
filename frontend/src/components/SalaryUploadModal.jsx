@@ -12,6 +12,8 @@ function SalaryUploadModal({ district, onClose, onSuccess }) {
   const [error, setError] = useState(null);
   const [polling, setPolling] = useState(false);
   const [applying, setApplying] = useState(false);
+  const [excludedRows, setExcludedRows] = useState(new Set());
+  const [excludedColumns, setExcludedColumns] = useState(new Set());
 
   // Poll for job status when job is processing
   useEffect(() => {
@@ -70,7 +72,13 @@ function SalaryUploadModal({ district, onClose, onSuccess }) {
       setApplying(true);
       setError(null);
 
-      const result = await api.applySalaryData(district.id, jobId);
+      // Convert Sets to Arrays for API
+      const exclusions = {
+        excluded_steps: Array.from(excludedRows),
+        excluded_columns: Array.from(excludedColumns)
+      };
+
+      const result = await api.applySalaryData(district.id, jobId, exclusions);
 
       // Show success and close modal
       if (onSuccess) {
@@ -177,9 +185,61 @@ function SalaryUploadModal({ district, onClose, onSuccess }) {
 
     // Step 4: Completed - Show preview
     if (jobStatus?.status === 'completed') {
+      // Structure data similar to SalaryTable
+      const records = jobStatus.preview_records || [];
+
+      // Group by year and period
+      const scheduleGroups = {};
+      records.forEach(record => {
+        const key = `${record.school_year}#${record.period}`;
+        if (!scheduleGroups[key]) {
+          scheduleGroups[key] = {
+            school_year: record.school_year,
+            period: record.period,
+            salariesByStep: {},
+            eduCreditsSet: new Set()
+          };
+        }
+
+        const step = record.step;
+        const eduCredKey = record.credits > 0 ? `${record.education}+${record.credits}` : record.education;
+
+        if (!scheduleGroups[key].salariesByStep[step]) {
+          scheduleGroups[key].salariesByStep[step] = {};
+        }
+        scheduleGroups[key].salariesByStep[step][eduCredKey] = record.salary;
+        scheduleGroups[key].eduCreditsSet.add(JSON.stringify({
+          education: record.education,
+          credits: record.credits,
+          key: eduCredKey
+        }));
+      });
+
+      const schedules = Object.values(scheduleGroups);
+
+      const toggleRow = (step) => {
+        const newExcluded = new Set(excludedRows);
+        if (newExcluded.has(step)) {
+          newExcluded.delete(step);
+        } else {
+          newExcluded.add(step);
+        }
+        setExcludedRows(newExcluded);
+      };
+
+      const toggleColumn = (colKey) => {
+        const newExcluded = new Set(excludedColumns);
+        if (newExcluded.has(colKey)) {
+          newExcluded.delete(colKey);
+        } else {
+          newExcluded.add(colKey);
+        }
+        setExcludedColumns(newExcluded);
+      };
+
       return (
         <div className="preview-step">
-          <h3>Preview Extracted Data</h3>
+          <h3>Preview & Edit Extracted Data</h3>
           <p className="district-name">{district.name}</p>
 
           <div className="extraction-summary">
@@ -189,42 +249,85 @@ function SalaryUploadModal({ district, onClose, onSuccess }) {
             <p>
               <strong>School years found:</strong> {jobStatus.years_found?.join(', ') || 'N/A'}
             </p>
-            <p>
-              <strong>Processed:</strong> {new Date(jobStatus.completed_at).toLocaleString()}
+            <p className="preview-hint">
+              Click on row or column headers with × to remove them from import
             </p>
           </div>
 
-          {jobStatus.preview_records && jobStatus.preview_records.length > 0 && (
-            <div className="preview-table-container">
-              <h4>Preview (first 10 records)</h4>
-              <Suspense fallback={<div className="loading">Loading preview...</div>}>
-                <table className="preview-table">
-                  <thead>
-                    <tr>
-                      <th>Year</th>
-                      <th>Period</th>
-                      <th>Education</th>
-                      <th>Credits</th>
-                      <th>Step</th>
-                      <th>Salary</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {jobStatus.preview_records.map((record, idx) => (
-                      <tr key={idx}>
-                        <td>{record.school_year}</td>
-                        <td>{record.period}</td>
-                        <td>{record.education_level}</td>
-                        <td>{record.additional_credits}</td>
-                        <td>{record.step}</td>
-                        <td>${record.salary.toLocaleString()}</td>
+          {schedules.map((schedule, scheduleIdx) => {
+            // Sort education columns
+            const eduOrder = { 'B': 1, 'M': 2, 'D': 3 };
+            const sortedColumns = Array.from(schedule.eduCreditsSet)
+              .map(str => JSON.parse(str))
+              .sort((a, b) => {
+                const eduA = eduOrder[a.education] || 99;
+                const eduB = eduOrder[b.education] || 99;
+                if (eduA !== eduB) return eduA - eduB;
+                return a.credits - b.credits;
+              })
+              .filter(col => !excludedColumns.has(col.key));
+
+            const sortedSteps = Object.keys(schedule.salariesByStep)
+              .sort((a, b) => Number(a) - Number(b))
+              .filter(step => !excludedRows.has(Number(step)));
+
+            return (
+              <div key={scheduleIdx} className="preview-table-container">
+                <h4>{schedule.school_year} - {schedule.period}</h4>
+                <div className="salary-table-wrapper">
+                  <table className="preview-table salary-table">
+                    <thead>
+                      <tr>
+                        <th>Step</th>
+                        {sortedColumns.map(col => (
+                          <th key={col.key}>
+                            <div className="th-content">
+                              <span>{col.key}</span>
+                              <button
+                                className="remove-btn"
+                                onClick={() => toggleColumn(col.key)}
+                                title={`Remove ${col.key} column`}
+                                type="button"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Suspense>
-            </div>
-          )}
+                    </thead>
+                    <tbody>
+                      {sortedSteps.map(step => (
+                        <tr key={step}>
+                          <td className="step-cell">
+                            <div className="td-content">
+                              <span>{step}</span>
+                              <button
+                                className="remove-btn"
+                                onClick={() => toggleRow(Number(step))}
+                                title={`Remove step ${step}`}
+                                type="button"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          </td>
+                          {sortedColumns.map(col => {
+                            const salary = schedule.salariesByStep[step]?.[col.key];
+                            return (
+                              <td key={col.key} className="salary-cell">
+                                {salary ? `$${salary.toLocaleString()}` : '-'}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
 
           {jobStatus.metadata_will_change && (
             <div className="warning-message">

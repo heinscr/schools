@@ -165,7 +165,7 @@ class SalaryJobsService:
         self.table.delete_item(Key={'PK': f'JOB#{job_id}', 'SK': 'METADATA'})
         logger.info(f"Deleted job {job_id}")
 
-    def get_extracted_data_preview(self, job_id: str, limit: int = 10) -> Optional[List[Dict]]:
+    def get_extracted_data_preview(self, job_id: str, limit: Optional[int] = 10) -> Optional[List[Dict]]:
         """Get preview of extracted data from S3 JSON"""
         job = self.get_job(job_id)
         if not job or job['status'] != 'completed':
@@ -177,14 +177,25 @@ class SalaryJobsService:
                 Key=job['s3_json_key']
             )
             data = json.loads(response['Body'].read())
-            return data[:limit]
+            return data[:limit] if limit else data
         except Exception as e:
             logger.error(f"Error reading extracted data for job {job_id}: {e}")
             return None
 
-    def apply_salary_data(self, job_id: str, district_id: str) -> Tuple[bool, Dict]:
+    def _get_edu_key(self, education: str, credits: int) -> str:
+        """Get education column key (e.g., 'B', 'B+15', 'M+30')"""
+        if credits > 0:
+            return f"{education}+{credits}"
+        return education
+
+    def apply_salary_data(self, job_id: str, district_id: str, exclusions: Optional[Dict] = None) -> Tuple[bool, Dict]:
         """
         Apply salary data from job to district
+
+        Args:
+            job_id: Job ID
+            district_id: District ID
+            exclusions: Optional dict with 'excluded_steps' and 'excluded_columns' lists
 
         Returns:
             (success, metadata_info)
@@ -213,6 +224,19 @@ class SalaryJobsService:
         except Exception as e:
             logger.error(f"Error loading extracted data: {e}")
             raise
+
+        # Apply exclusions if provided
+        if exclusions:
+            excluded_steps = set(exclusions.get('excluded_steps', []))
+            excluded_columns = set(exclusions.get('excluded_columns', []))
+
+            original_count = len(records)
+            records = [
+                r for r in records
+                if r['step'] not in excluded_steps
+                and self._get_edu_key(r['education'], r['credits']) not in excluded_columns
+            ]
+            logger.info(f"Applied exclusions: {original_count} -> {len(records)} records (excluded {original_count - len(records)})")
 
         # Check if metadata will change
         metadata_changed, needs_normalization = self._check_metadata_change(records)
