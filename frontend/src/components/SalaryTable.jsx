@@ -188,11 +188,22 @@ function SalaryTable({ districtId, highlight = null }) {
         
         // Get sorted steps
         const sortedSteps = Object.keys(salariesByStep).sort((a, b) => Number(a) - Number(b));
-        
+
         // Filter out columns where every step is calculated (suppress fully-calculated columns)
         const visibleColumns = sortedColumns.filter(col => {
           if (sortedSteps.length === 0) return true;
           const allCalculated = sortedSteps.every(step => {
+            const cellEntry = salariesByStep[step] && salariesByStep[step][col.key];
+            // Only count as calculated if entry exists and is marked calculated
+            return cellEntry && cellEntry.isCalculated;
+          });
+          return !allCalculated;
+        });
+
+        // Filter out rows (steps) where all visible columns are calculated (suppress fully-calculated rows)
+        const visibleSteps = sortedSteps.filter(step => {
+          if (visibleColumns.length === 0) return true;
+          const allCalculated = visibleColumns.every(col => {
             const cellEntry = salariesByStep[step] && salariesByStep[step][col.key];
             // Only count as calculated if entry exists and is marked calculated
             return cellEntry && cellEntry.isCalculated;
@@ -243,6 +254,7 @@ function SalaryTable({ districtId, highlight = null }) {
           logger.log('highlight-debug', {
             highlight,
             visibleColumns: visibleColumns.map(c => c.key),
+            visibleSteps,
             fallbackHighlight,
             highlightMode
           });
@@ -284,7 +296,7 @@ function SalaryTable({ districtId, highlight = null }) {
                 </tr>
               </thead>
               <tbody>
-                {sortedSteps.map(step => (
+                {visibleSteps.map(step => (
                   <tr key={step}>
                     <td className="step-cell">{step}</td>
                         {visibleColumns.map(col => {
