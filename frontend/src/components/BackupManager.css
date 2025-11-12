@@ -131,7 +131,29 @@
   cursor: pointer;
   width: 20px;
   height: 20px;
-  background-color: white;
+  background-color: white !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 2px solid #666;
+  border-radius: 3px;
+  position: relative;
+}
+
+.backup-item input[type="checkbox"]:checked {
+  background-color: #1976d2 !important;
+  border-color: #1976d2;
+}
+
+.backup-item input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .backup-info {
@@ -182,11 +204,11 @@
 
 .results-message p {
   margin: 0.5rem 0;
-  color: #000;
+  color: #000 !important;
 }
 
 .results-message p.error {
-  color: #d32f2f;
+  color: #d32f2f !important;
 }
 
 .results-list,
@@ -212,10 +234,11 @@
 .errors-list li {
   margin: 0.25rem 0;
   font-size: 0.9rem;
+  color: #000 !important;
 }
 
 .errors-list li.error {
-  color: #d32f2f;
+  color: #d32f2f !important;
 }
 
 .error-message {

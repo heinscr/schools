@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import api from '../services/api';
 import DistrictEditor from './DistrictEditor';
 import SalaryUploadModal from './SalaryUploadModal';
+import Toast from './Toast';
 import ErrorBoundary from './ErrorBoundary';
 import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
@@ -18,6 +19,7 @@ function DistrictBrowser({ user }) {
   const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'salaries'
   const [editingDistrict, setEditingDistrict] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [toast, setToast] = useState({ isOpen: false, message: '', variant: 'success' });
   // District type filters
   const [selectedTypes, setSelectedTypes] = useState(DISTRICT_TYPE_OPTIONS.map(opt => opt.value));
 
@@ -168,12 +170,17 @@ function DistrictBrowser({ user }) {
   const handleUploadSuccess = (result) => {
     // Refresh the salary table after successful upload
     if (result.needs_global_normalization) {
-      alert(
-        `Salary data applied successfully! ${result.records_added} records added.\n\n` +
-        `Global metadata has changed. Please run normalization from the user menu.`
-      );
+      setToast({
+        isOpen: true,
+        message: `Salary data applied successfully! ${result.records_added} records added.\n\nGlobal metadata has changed. Please run normalization from the user menu.`,
+        variant: 'warning'
+      });
     } else {
-      alert(`Salary data applied successfully! ${result.records_added} records added.`);
+      setToast({
+        isOpen: true,
+        message: `Salary data applied successfully! ${result.records_added} records added.`,
+        variant: 'success'
+      });
     }
     // Force re-render of salary table by updating selected district
     if (selectedDistrict) {
@@ -205,24 +212,33 @@ function DistrictBrowser({ user }) {
   };
 
   return (
-    <div className="district-browser">
-      <header className="browser-header">
-        <h1>Massachusetts School Districts</h1>
-        <div className="tab-navigation">
-          <button 
-            className={`tab-button ${activeTab === 'districts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('districts')}
-          >
-            🗺️ District Browser
-          </button>
-          <button 
-            className={`tab-button ${activeTab === 'salaries' ? 'active' : ''}`}
-            onClick={() => setActiveTab('salaries')}
-          >
-            💰 Compare Salaries
-          </button>
-        </div>
-      </header>
+    <>
+      <Toast
+        isOpen={toast.isOpen}
+        message={toast.message}
+        variant={toast.variant}
+        duration={6000}
+        onClose={() => setToast({ ...toast, isOpen: false })}
+      />
+
+      <div className="district-browser">
+        <header className="browser-header">
+          <h1>Massachusetts School Districts</h1>
+          <div className="tab-navigation">
+            <button
+              className={`tab-button ${activeTab === 'districts' ? 'active' : ''}`}
+              onClick={() => setActiveTab('districts')}
+            >
+              🗺️ District Browser
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'salaries' ? 'active' : ''}`}
+              onClick={() => setActiveTab('salaries')}
+            >
+              💰 Compare Salaries
+            </button>
+          </div>
+        </header>
 
       {activeTab === 'districts' ? (
         <>
@@ -444,6 +460,7 @@ function DistrictBrowser({ user }) {
         </div>
       )}
     </div>
+    </>
   );
 }
 

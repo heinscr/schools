@@ -1,0 +1,116 @@
+/* Confirm dialog backdrop */
+.confirm-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Confirm dialog container */
+.confirm-dialog {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90vw;
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Confirm dialog header */
+.confirm-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.confirm-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Confirm dialog body */
+.confirm-body {
+  padding: 1.5rem;
+}
+
+.confirm-body p {
+  margin: 0;
+  color: #000 !important;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+/* Confirm dialog footer */
+.confirm-footer {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.confirm-footer .btn-primary,
+.confirm-footer .btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirm-footer .btn-primary {
+  background-color: #1976d2;
+  color: white;
+}
+
+.confirm-footer .btn-primary:hover:not(:disabled) {
+  background-color: #1565c0;
+}
+
+.confirm-footer .btn-primary.btn-danger {
+  background-color: #d32f2f;
+}
+
+.confirm-footer .btn-primary.btn-danger:hover:not(:disabled) {
+  background-color: #c62828;
+}
+
+.confirm-footer .btn-secondary {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.confirm-footer .btn-secondary:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}

@@ -3,6 +3,8 @@ import authService from '../services/auth';
 import api from '../services/api';
 import { logger } from '../utils/logger';
 import BackupManager from './BackupManager';
+import ConfirmDialog from './ConfirmDialog';
+import Toast from './Toast';
 import './Login.css';
 
 function Login({ onAuthChange, onLoadingChange }) {
@@ -17,6 +19,8 @@ function Login({ onAuthChange, onLoadingChange }) {
   const [normalizationStatus, setNormalizationStatus] = useState(null);
   const [isNormalizing, setIsNormalizing] = useState(false);
   const [showBackupManager, setShowBackupManager] = useState(false);
+  const [showNormalizeConfirm, setShowNormalizeConfirm] = useState(false);
+  const [toast, setToast] = useState({ isOpen: false, message: '', variant: 'success' });
 
   useEffect(() => {
     initAuth();
@@ -143,26 +147,33 @@ function Login({ onAuthChange, onLoadingChange }) {
     setShowMenu(!showMenu);
   };
 
-  const handleNormalize = async () => {
+  const handleNormalize = () => {
     if (isNormalizing) return;
+    setShowNormalizeConfirm(true);
+  };
 
-    const confirmed = window.confirm(
-      'This will normalize salary data across all districts. This may take several minutes. Continue?'
-    );
-
-    if (!confirmed) return;
+  const confirmNormalize = async () => {
+    setShowNormalizeConfirm(false);
 
     try {
       setIsNormalizing(true);
       await api.startNormalization();
-      alert('Normalization started successfully. This will take a few minutes to complete.');
+      setToast({
+        isOpen: true,
+        message: 'Normalization started successfully. This will take a few minutes to complete.',
+        variant: 'success'
+      });
       setShowMenu(false);
 
       // Check status immediately
       const status = await api.getNormalizationStatus();
       setNormalizationStatus(status);
     } catch (err) {
-      alert(`Failed to start normalization: ${err.message}`);
+      setToast({
+        isOpen: true,
+        message: `Failed to start normalization: ${err.message}`,
+        variant: 'error'
+      });
     } finally {
       setIsNormalizing(false);
     }
@@ -178,7 +189,11 @@ function Login({ onAuthChange, onLoadingChange }) {
   };
 
   const handleBackupSuccess = (result) => {
-    alert(`Successfully re-applied ${result.total_processed} backup(s).`);
+    setToast({
+      isOpen: true,
+      message: `Successfully re-applied ${result.total_processed} backup(s).`,
+      variant: 'success'
+    });
   };
 
   // Don't render the loading overlay here - parent handles it
@@ -253,16 +268,35 @@ function Login({ onAuthChange, onLoadingChange }) {
   const isNormalizationRunning = normalizationStatus?.is_running || false;
 
   return (
-    <div className="user-menu">
-      <button className="user-icon-button logged-in" onClick={toggleMenu} title={user.email}>
-        <svg className="user-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" />
-          <circle cx="12" cy="10" r="3" />
-          <path d="M6.168 18.849A4 4 0 0 1 10 16h4a4 4 0 0 1 3.834 2.855" />
-        </svg>
-        {user.is_admin && <span className="admin-dot"></span>}
-        {needsNormalization && <span className="normalization-badge" title="Normalization needed"></span>}
-      </button>
+    <>
+      <ConfirmDialog
+        isOpen={showNormalizeConfirm}
+        title="Normalize All Districts"
+        message="This will normalize salary data across all districts. This may take several minutes. Continue?"
+        confirmText="Start Normalization"
+        cancelText="Cancel"
+        variant="default"
+        onConfirm={confirmNormalize}
+        onCancel={() => setShowNormalizeConfirm(false)}
+      />
+
+      <Toast
+        isOpen={toast.isOpen}
+        message={toast.message}
+        variant={toast.variant}
+        onClose={() => setToast({ ...toast, isOpen: false })}
+      />
+
+      <div className="user-menu">
+        <button className="user-icon-button logged-in" onClick={toggleMenu} title={user.email}>
+          <svg className="user-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="10" r="3" />
+            <path d="M6.168 18.849A4 4 0 0 1 10 16h4a4 4 0 0 1 3.834 2.855" />
+          </svg>
+          {user.is_admin && <span className="admin-dot"></span>}
+          {needsNormalization && <span className="normalization-badge" title="Normalization needed"></span>}
+        </button>
 
       {showMenu && (
         <div className="user-dropdown">
@@ -323,6 +357,7 @@ function Login({ onAuthChange, onLoadingChange }) {
         />
       )}
     </div>
+    </>
   );
 }
 

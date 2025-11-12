@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import ConfirmDialog from './ConfirmDialog';
+import LoadingOverlay from './LoadingOverlay';
 import './BackupManager.css';
 
 function BackupManager({ onClose, onSuccess }) {
@@ -9,6 +11,7 @@ function BackupManager({ onClose, onSuccess }) {
   const [selectedBackups, setSelectedBackups] = useState(new Set());
   const [reapplying, setReapplying] = useState(false);
   const [results, setResults] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Load backups on mount
   useEffect(() => {
@@ -46,17 +49,17 @@ function BackupManager({ onClose, onSuccess }) {
     }
   };
 
-  const handleReapply = async () => {
+  const handleReapply = () => {
     if (selectedBackups.size === 0) {
       setError('Please select at least one backup to re-apply');
       return;
     }
 
-    const confirmed = window.confirm(
-      `Are you sure you want to re-apply ${selectedBackups.size} backup(s)? This will replace existing salary data for these districts.`
-    );
+    setShowConfirm(true);
+  };
 
-    if (!confirmed) return;
+  const confirmReapply = async () => {
+    setShowConfirm(false);
 
     try {
       setReapplying(true);
@@ -91,14 +94,31 @@ function BackupManager({ onClose, onSuccess }) {
   };
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-container backup-manager">
-        <div className="modal-header">
-          <h2>Backup Manager</h2>
-          <button className="modal-close" onClick={onClose} aria-label="Close">
-            &times;
-          </button>
-        </div>
+    <>
+      <LoadingOverlay
+        isOpen={reapplying}
+        message={`Re-applying ${selectedBackups.size} backup(s)...\nThis may take a moment.`}
+      />
+
+      <ConfirmDialog
+        isOpen={showConfirm}
+        title="Confirm Re-apply"
+        message={`Are you sure you want to re-apply ${selectedBackups.size} backup(s)? This will replace existing salary data for these districts.`}
+        confirmText="Re-apply"
+        cancelText="Cancel"
+        variant="warning"
+        onConfirm={confirmReapply}
+        onCancel={() => setShowConfirm(false)}
+      />
+
+      <div className="modal-backdrop">
+        <div className="modal-container backup-manager">
+          <div className="modal-header">
+            <h2>Backup Manager</h2>
+            <button className="modal-close" onClick={onClose} aria-label="Close">
+              &times;
+            </button>
+          </div>
 
         <div className="modal-body">
           {error && (
@@ -196,11 +216,12 @@ function BackupManager({ onClose, onSuccess }) {
             onClick={handleReapply}
             disabled={selectedBackups.size === 0 || reapplying || loading}
           >
-            {reapplying ? 'Re-applying...' : `Re-apply Selected (${selectedBackups.size})`}
+            Re-apply Selected ({selectedBackups.size})
           </button>
         </div>
       </div>
     </div>
+    </>
   );
 }
 
