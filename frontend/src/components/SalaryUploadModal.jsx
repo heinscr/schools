@@ -108,6 +108,7 @@ function SalaryUploadModal({ district, onClose, onSuccess }) {
       return (
         <div className="upload-step">
           <h3>Upload Salary Schedule PDF</h3>
+          <h4>It will be parsed for salary data. May take a while. After processing new data can be applied. </h4>
           <p className="district-name">{district.name}</p>
 
           <div className="file-input-wrapper">
