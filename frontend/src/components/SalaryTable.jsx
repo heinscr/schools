@@ -161,11 +161,12 @@ function SalaryTable({ districtId, highlight = null }) {
           if (!salariesByStep[step]) {
             salariesByStep[step] = {};
           }
-          // Preserve salary value and whether it was calculated (some APIs use isCalculated or is_calculated)
+          // Preserve salary value, whether it was calculated, and where it was calculated from
           salariesByStep[step][eduCredKey] = {
             value: item.salary,
             // support both camelCase and snake_case flags
-            isCalculated: !!(item.isCalculated || item.is_calculated)
+            isCalculated: !!(item.isCalculated || item.is_calculated),
+            isCalculatedFrom: item.is_calculated_from || item.isCalculatedFrom
           };
           educationCreditsSet.add(JSON.stringify({ 
             education: item.education, 
@@ -199,76 +200,27 @@ function SalaryTable({ districtId, highlight = null }) {
           return !allCalculated;
         });
 
-        // Compute fallback highlight when the requested highlight cell is calculated
+        // Compute fallback highlight using is_calculated_from field
         let fallbackHighlight = null;
-  let highlightMode = null; // 'exact' | 'fallback' | null
+        let highlightMode = null; // 'exact' | 'fallback' | null
         if (highlight) {
           try {
-            // Find the target column among all columns (sortedColumns) to preserve relative ordering
-            const allColumns = sortedColumns;
-            const targetColIndex = allColumns.findIndex(c =>
-              String(c.education) === String(highlight.education) && Number(c.credits) === Number(highlight.credits)
-            );
+            const targetEdKey = highlight.credits > 0 ? `${highlight.education}+${highlight.credits}` : highlight.education;
+            const targetStepKey = String(highlight.step);
+            const targetEntry = salariesByStep[targetStepKey] && salariesByStep[targetStepKey][targetEdKey];
 
-            const targetStepIndex = sortedSteps.findIndex(s => String(s) === String(highlight.step));
-
-            // Helper to check a cell at (colIndex, stepIndex) for non-calculated
-            const findInColumnUpwards = (colIndex, stepIndex = targetStepIndex) => {
-              const col = allColumns[colIndex];
-              if (!col) return null;
-              // Only consider columns that are visible (not fully-calculated)
-              const visibleCol = visibleColumns.find(vc => vc.key === col.key);
-              if (!visibleCol) return null;
-              // Search upwards from stepIndex down to 0
-              for (let si = stepIndex; si >= 0; si--) {
-                const stepKey = sortedSteps[si];
-                const entry = salariesByStep[stepKey] && salariesByStep[stepKey][visibleCol.key];
-                if (entry && !entry.isCalculated) {
-                  return { education: visibleCol.education, credits: visibleCol.credits, step: stepKey };
-                }
-              }
-              return null;
-            };
-
-            if (targetStepIndex !== -1) {
-              if (targetColIndex !== -1) {
-                // Target column exists: check it then scan leftwards
-                logger.log('highlight-search', { allColumns: allColumns.map(c => c.key), visibleColumns: visibleColumns.map(c => c.key), targetColIndex, targetStepIndex });
-                let found = findInColumnUpwards(targetColIndex, targetStepIndex);
-                logger.log('highlight-search-check', { col: allColumns[targetColIndex]?.key, found });
-                if (found) {
-                  fallbackHighlight = found;
-                } else {
-                  for (let li = targetColIndex - 1; li >= 0; li--) {
-                    logger.log('highlight-search-left', { checkingIndex: li, col: allColumns[li]?.key });
-                    found = findInColumnUpwards(li, targetStepIndex);
-                    logger.log('highlight-search-left-result', { index: li, col: allColumns[li]?.key, found });
-                    if (found) { fallbackHighlight = found; break; }
-                  }
-                }
-              } else {
-                // Target column missing: compute insertion index in allColumns and start left from there
-                const targetObj = { education: String(highlight.education), credits: Number(highlight.credits) };
-                const compareCols = (a, b) => {
-                  const ea = eduOrder[a.education] || 99;
-                  const eb = eduOrder[b.education] || 99;
-                  if (ea !== eb) return ea - eb;
-                  return a.credits - b.credits;
-                };
-                let insertionIndex = allColumns.findIndex(c => compareCols(c, targetObj) > 0);
-                if (insertionIndex === -1) insertionIndex = allColumns.length;
-                logger.log('highlight-search-missing', { allColumns: allColumns.map(c => c.key), visibleColumns: visibleColumns.map(c => c.key), targetObj, insertionIndex, targetStepIndex });
-                for (let li = insertionIndex - 1; li >= 0; li--) {
-                  logger.log('highlight-search-missing-left', { checkingIndex: li, col: allColumns[li]?.key });
-                  const found = findInColumnUpwards(li, targetStepIndex);
-                  logger.log('highlight-search-missing-left-result', { index: li, col: allColumns[li]?.key, found });
-                  if (found) { fallbackHighlight = found; break; }
-                }
-              }
+            // If target cell exists and is calculated, use is_calculated_from to find the source
+            if (targetEntry && targetEntry.isCalculated && targetEntry.isCalculatedFrom) {
+              // is_calculated_from is an object: {education, credits, step}
+              fallbackHighlight = {
+                education: targetEntry.isCalculatedFrom.education,
+                credits: targetEntry.isCalculatedFrom.credits,
+                step: targetEntry.isCalculatedFrom.step
+              };
+              logger.log('highlight-fallback', { target: highlight, calculated_from: targetEntry.isCalculatedFrom, fallback: fallbackHighlight });
             }
           } catch (e) {
             // defensive: don't break rendering on unexpected issues
-            // leave fallbackHighlight as null
             console.error('Error computing fallback highlight', e);
           }
         }

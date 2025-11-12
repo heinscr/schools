@@ -1,63 +1,136 @@
-#!/usr/bin/env python3
 """
-Normalize salary data by filling in missing entries with calculated values.
-
-This script:
-1. Reads METADATA#MAXVALUES to get global max step and edu+credit combos
-2. For each district/year/period, fills in missing steps using fallback logic
-3. Optionally fills in missing edu+credit combos using cross-education fallback
-4. Marks all generated entries with is_calculated=True
-
-Usage:
-    python normalize_salaries.py [table_name] [--with-cross-edu-fallback]
+Lambda function to normalize salary data across all districts
+Runs the normalization logic from scripts/normalize_salaries.py
 """
-
-import sys
+import json
+import os
+import logging
 import boto3
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
 from collections import defaultdict
-from pathlib import Path
 
-dynamodb = boto3.resource('dynamodb')
+# Configure logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
-def pad_number(num, width):
-    """Pad a number with leading zeros"""
-    return str(num).zfill(width)
+# Get environment variables
+TABLE_NAME = os.environ['DYNAMODB_TABLE_NAME']
+AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
 
-def get_max_values(table):
+# Initialize AWS clients with explicit region
+dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
+
+# Initialize table
+table = dynamodb.Table(TABLE_NAME)
+
+
+def handler(event, context):
+    """
+    Lambda handler for global salary normalization
+
+    Event format:
+    {
+        "job_id": "normalization-job-uuid"
+    }
+    """
+    logger.info(f"Starting normalization: {json.dumps(event)}")
+
+    job_id = event.get('job_id', 'unknown')
+
+    try:
+        # Get max values
+        max_step, edu_credit_combos = get_max_values()
+        logger.info(f"Max values: max_step={max_step}, combos={len(edu_credit_combos)}")
+
+        # Get all year/periods
+        year_periods = get_all_year_periods()
+        logger.info(f"Found {len(year_periods)} year/period combinations")
+
+        # Process each year/period
+        total_calculated = 0
+        all_combos_set = set(edu_credit_combos)
+
+        for year, period in year_periods:
+            logger.info(f"Processing {year}/{period}...")
+
+            # Get district data
+            district_data = get_district_data_for_year_period(year, period)
+            logger.info(f"  Found {len(district_data)} districts with real data")
+
+            # Generate calculated entries
+            all_calculated = []
+            for district_id, real_entries in district_data.items():
+                district_name = real_entries[0]['district_name'] if real_entries else district_id
+                calculated = generate_calculated_entries(
+                    district_id, district_name, year, period, real_entries, max_step, edu_credit_combos
+                )
+                all_calculated.extend(calculated)
+
+                # Track combos created
+                for entry in calculated:
+                    combo = f"{entry['education']}+{entry['credits']}"
+                    all_combos_set.add(combo)
+
+            logger.info(f"  Generated {len(all_calculated)} calculated entries")
+
+            # Write calculated entries
+            if all_calculated:
+                batch_write_items(all_calculated, f"{year}/{period}")
+                total_calculated += len(all_calculated)
+
+        logger.info(f"Normalization complete: {total_calculated} calculated entries created")
+
+        # Update METADATA#MAXVALUES with all combos
+        update_global_metadata(max_step, list(all_combos_set))
+
+        # Update normalization status
+        update_normalization_status(job_id)
+
+        # Mark job as complete
+        complete_normalization_job(job_id, total_calculated)
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'message': 'Normalization complete',
+                'records_created': total_calculated
+            })
+        }
+
+    except Exception as e:
+        logger.error(f"Normalization failed: {str(e)}")
+
+        # Mark job as failed
+        fail_normalization_job(job_id, str(e))
+
+        return {
+            'statusCode': 500,
+            'body': json.dumps({
+                'message': 'Normalization failed',
+                'error': str(e)
+            })
+        }
+
+
+def get_max_values():
     """Get global max values from metadata"""
-    print("Reading max values metadata...")
-
     response = table.get_item(
         Key={'PK': 'METADATA#MAXVALUES', 'SK': 'GLOBAL'}
     )
 
     if 'Item' not in response:
-        raise Exception("METADATA#MAXVALUES not found. Run load_salary_data.py first.")
+        raise Exception("METADATA#MAXVALUES not found")
 
     item = response['Item']
-    max_step_raw = item.get('max_step', 15)
-    # DynamoDB may return numbers as Decimal; ensure we have a plain int
-    try:
-        if isinstance(max_step_raw, Decimal):
-            max_step = int(max_step_raw)
-        else:
-            max_step = int(max_step_raw)
-    except Exception:
-        max_step = 15
-
+    max_step = int(item.get('max_step', 15))
     edu_credit_combos = item.get('edu_credit_combos', [])
-
-    print(f"  max_step: {max_step}")
-    print(f"  edu_credit_combos: {len(edu_credit_combos)} combinations (only what exists in data)")
 
     return max_step, edu_credit_combos
 
-def get_all_year_periods(table):
-    """Get all year/period combinations from metadata"""
-    print("Reading year/period metadata...")
 
+def get_all_year_periods():
+    """Get all year/period combinations from metadata"""
     response = table.query(
         KeyConditionExpression=boto3.dynamodb.conditions.Key('PK').eq('METADATA#SCHEDULES')
     )
@@ -67,18 +140,12 @@ def get_all_year_periods(table):
         for item in response.get('Items', [])
     ]
 
-    print(f"  Found {len(year_periods)} year/period combinations")
     return year_periods
 
-def get_district_data_for_year_period(table, year, period):
-    """
-    Get all real salary entries for a specific year/period.
-    Returns: dict of district_id -> list of salary entries
-    """
-    print(f"  Querying salaries for {year}/{period}...")
 
-    # Query using GSI2 is too slow, instead scan the main table filtered
-    # Actually, we can use the availability index more efficiently
+def get_district_data_for_year_period(year, period):
+    """Get all real salary entries for a specific year/period"""
+    # Get availability index
     response = table.get_item(
         Key={'PK': 'METADATA#AVAILABILITY', 'SK': f'YEAR#{year}#PERIOD#{period}'}
     )
@@ -109,28 +176,22 @@ def get_district_data_for_year_period(table, year, period):
         if real_entries:
             district_data[district_id] = real_entries
 
-    print(f"    Found {len(district_data)} districts with real data")
     return district_data
 
+
+def pad_number(num, width):
+    """Pad a number with leading zeros"""
+    return str(num).zfill(width)
+
+
 def generate_calculated_entries(district_id, district_name, year, period, real_entries, max_step, all_edu_credit_combos):
-    """
-    Generate calculated entries using matrix fill algorithm.
-
-    Phase 1: Fill down each column (existing edu+credit combos)
-        - For each edu+credit combo the district has
-        - Fill missing steps 1 to max_step from nearest lower step
-
-    Phase 2: Fill right (missing edu+credit combos)
-        - For each missing edu+credit combo
-        - Copy from highest available combo to the left (fallback hierarchy)
-    """
+    """Generate calculated entries using matrix fill algorithm"""
     calculated_items = []
 
     # Education/credit hierarchy for fallback
     edu_order = {'B': 1, 'M': 2, 'D': 3}
 
     # PHASE 1: Fill down each column (existing combos)
-    # Group real entries by edu+credit
     by_edu_credit = defaultdict(list)
     for entry in real_entries:
         edu = entry['education']
@@ -139,10 +200,9 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
         by_edu_credit[key].append(entry)
 
     # Build complete matrix for existing columns
-    matrix = {}  # edu_cred_key -> {step -> entry}
+    matrix = {}
 
     for edu_cred_key, entries in by_edu_credit.items():
-        # Parse edu+credit
         parts = edu_cred_key.split('+')
         edu = parts[0]
         cred = int(parts[1])
@@ -155,7 +215,6 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
         # Fill all steps for this column
         for target_step in range(1, max_step + 1):
             if target_step in entries_by_step:
-                # Real entry exists - add to matrix
                 matrix[edu_cred_key][target_step] = entries_by_step[target_step]
             else:
                 # Find source: highest step <= target_step
@@ -163,10 +222,20 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
                 if lower_steps:
                     source_step = max(lower_steps)
                 else:
-                    # All steps are higher - use lowest
                     source_step = min(entries_by_step.keys())
 
                 source_entry = entries_by_step[source_step]
+
+                # Track where this calculated value came from
+                if 'is_calculated_from' in source_entry:
+                    is_calculated_from = source_entry['is_calculated_from']
+                else:
+                    # Construct from source entry's actual values
+                    is_calculated_from = {
+                        'education': source_entry['education'],
+                        'credits': source_entry['credits'],
+                        'step': source_step
+                    }
 
                 # Create calculated entry
                 step_padded = pad_number(target_step, 2)
@@ -182,6 +251,7 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
                     'step': target_step,
                     'salary': source_entry['salary'],
                     'is_calculated': True,
+                    'is_calculated_from': is_calculated_from,
                     'source_step': source_step,
                     'GSI1PK': f'YEAR#{year}#PERIOD#{period}#EDU#{edu}#CR#{cred_padded}',
                     'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
@@ -206,7 +276,6 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
     missing_combos_sorted = sorted(missing_combos, key=combo_sort_key)
 
     for missing_combo in missing_combos_sorted:
-        # Parse edu+credit
         parts = missing_combo.split('+')
         target_edu = parts[0]
         target_cred = int(parts[1])
@@ -253,7 +322,6 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
                         best_source_cred = source_cred
 
         if not best_source:
-            # No valid source found - skip this combo
             continue
 
         # Copy all steps from source combo and add to matrix
@@ -263,8 +331,18 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
         for step, source_entry in source_entries.items():
             step_padded = pad_number(step, 2)
 
-            # Determine if source was real or calculated
             source_was_calculated = source_entry.get('is_calculated', False)
+
+            # Track where this calculated value came from
+            if 'is_calculated_from' in source_entry:
+                is_calculated_from = source_entry['is_calculated_from']
+            else:
+                # Construct from source entry's actual values
+                is_calculated_from = {
+                    'education': source_entry['education'],
+                    'credits': source_entry['credits'],
+                    'step': source_entry['step']
+                }
 
             calculated_item = {
                 'PK': f'DISTRICT#{district_id}',
@@ -278,7 +356,8 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
                 'step': step,
                 'salary': source_entry['salary'],
                 'is_calculated': True,
-                'source_edu_credit': best_source,  # Track where it came from
+                'is_calculated_from': is_calculated_from,
+                'source_edu_credit': best_source,
                 'source_step': source_entry.get('source_step') if source_was_calculated else step,
                 'GSI1PK': f'YEAR#{year}#PERIOD#{period}#EDU#{target_edu}#CR#{target_cred_padded}',
                 'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
@@ -291,17 +370,15 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
     return calculated_items
 
 
-def batch_write_items(table, items, description):
+def batch_write_items(items, description):
     """Write items to DynamoDB in batches"""
     if not items:
-        print(f"  No items to write for {description}")
         return
 
-    print(f"  Writing {len(items)} items for {description}...")
+    logger.info(f"Writing {len(items)} items for {description}...")
 
     batch_size = 25
     written = 0
-    failed = 0
 
     for i in range(0, len(items), batch_size):
         batch = items[i:i + batch_size]
@@ -313,106 +390,72 @@ def batch_write_items(table, items, description):
 
             written += len(batch)
             if written % 500 == 0:
-                print(f"    Progress: {written}/{len(items)} items written")
+                logger.info(f"  Progress: {written}/{len(items)} items written")
 
         except Exception as e:
-            print(f"    ✗ Error writing batch: {e}")
-            failed += len(batch)
+            logger.error(f"Error writing batch: {e}")
 
-    print(f"  ✓ {description} complete: {written} written, {failed} failed")
-    return written, failed
+    logger.info(f"  Completed: {written} written")
 
-def main():
-    import os
-    from dotenv import load_dotenv
 
-    # Load environment variables from /backend/.env file
-    backend_dir = Path(__file__).parent.parent
-    env_path = backend_dir / '.env'
-    load_dotenv(dotenv_path=env_path)
+def update_global_metadata(max_step, edu_credit_combos):
+    """Update global metadata with all combos"""
+    table.put_item(Item={
+        'PK': 'METADATA#MAXVALUES',
+        'SK': 'GLOBAL',
+        'max_step': max_step,
+        'edu_credit_combos': sorted(edu_credit_combos),
+        'last_updated': datetime.utcnow().isoformat()
+    })
+    logger.info(f"Updated global metadata: max_step={max_step}, combos={len(edu_credit_combos)}")
 
-    # Get table name from command line or environment variable
-    if len(sys.argv) > 1:
-        table_name = sys.argv[1]
-    else:
-        table_name = os.environ.get('DYNAMODB_TABLE_NAME')
-        if not table_name:
-            print("ERROR: DYNAMODB_TABLE_NAME environment variable not set")
-            print("\nUsage:")
-            print("  python3 normalize_salaries.py <table_name>")
-            print("  OR set environment variable in /backend/.env:")
-            print("    DYNAMODB_TABLE_NAME=<table_name>")
-            sys.exit(1)
-        print(f"Using environment variable from .env: {table_name}\n")
 
-    table = dynamodb.Table(table_name)
+def update_normalization_status(job_id):
+    """Update normalization status to not needed"""
+    table.put_item(Item={
+        'PK': 'METADATA#NORMALIZATION',
+        'SK': 'STATUS',
+        'needs_normalization': False,
+        'last_normalized_at': datetime.utcnow().isoformat(),
+        'last_normalization_job_id': job_id
+    })
+    logger.info("Updated normalization status to not needed")
 
-    print(f"\n{'='*60}")
-    print("SALARY DATA NORMALIZATION")
-    print(f"{'='*60}\n")
 
-    # STEP 1: Get max values
-    max_step, edu_credit_combos = get_max_values(table)
+def complete_normalization_job(job_id, records_created):
+    """Mark normalization job as complete"""
+    # Delete the running job marker
+    table.delete_item(Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'})
 
-    # STEP 2: Get all year/periods
-    year_periods = get_all_year_periods(table)
+    # Create completed job record
+    table.put_item(Item={
+        'PK': f'NORMALIZATION_JOB#{job_id}',
+        'SK': 'METADATA',
+        'job_id': job_id,
+        'status': 'completed',
+        'completed_at': datetime.utcnow().isoformat(),
+        'records_created': records_created
+    })
 
-    # STEP 3: Process each year/period
-    total_calculated = 0
-    all_combos_set = set(edu_credit_combos)  # Track all combos (real + calculated)
+    logger.info(f"Normalization job {job_id} marked as complete")
 
-    for year, period in year_periods:
-        print(f"\nProcessing {year}/{period}...")
 
-        # Get district data
-        district_data = get_district_data_for_year_period(table, year, period)
-
-        # Generate calculated entries
-        all_calculated = []
-        for district_id, real_entries in district_data.items():
-            district_name = real_entries[0]['district_name'] if real_entries else district_id
-            calculated = generate_calculated_entries(
-                district_id, district_name, year, period, real_entries, max_step, edu_credit_combos
-            )
-            all_calculated.extend(calculated)
-
-            # Track combos created
-            for entry in calculated:
-                combo = f"{entry['education']}+{entry['credits']}"
-                all_combos_set.add(combo)
-
-        print(f"  Generated {len(all_calculated)} calculated entries")
-
-        # Write calculated entries
-        if all_calculated:
-            batch_write_items(table, all_calculated, f"{year}/{period}")
-            total_calculated += len(all_calculated)
-
-    print(f"\n{'='*60}")
-    print(f"NORMALIZATION COMPLETE")
-    print(f"Total calculated entries created: {total_calculated}")
-    print(f"{'='*60}\n")
-
-    # STEP 4: Update METADATA#MAXVALUES to include all combos (real + calculated)
-    print(f"Updating METADATA#MAXVALUES with all combos (including calculated)...")
-
+def fail_normalization_job(job_id, error_message):
+    """Mark normalization job as failed"""
+    # Delete the running job marker
     try:
-        table.put_item(
-            Item={
-                'PK': 'METADATA#MAXVALUES',
-                'SK': 'GLOBAL',
-                'max_step': max_step,
-                'edu_credit_combos': sorted(list(all_combos_set)),
-                'last_updated': datetime.utcnow().isoformat()
-            }
-        )
-        print(f"✓ METADATA#MAXVALUES updated:")
-        print(f"  Original combos: {len(edu_credit_combos)}")
-        print(f"  Total combos (including calculated): {len(all_combos_set)}")
-        print(f"{'='*60}\n")
-    except Exception as e:
-        print(f"✗ Error updating METADATA#MAXVALUES: {e}")
-        print(f"{'='*60}\n")
+        table.delete_item(Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'})
+    except Exception:
+        pass
 
-if __name__ == '__main__':
-    main()
+    # Create failed job record
+    table.put_item(Item={
+        'PK': f'NORMALIZATION_JOB#{job_id}',
+        'SK': 'METADATA',
+        'job_id': job_id,
+        'status': 'failed',
+        'failed_at': datetime.utcnow().isoformat(),
+        'error_message': error_message
+    })
+
+    logger.error(f"Normalization job {job_id} marked as failed: {error_message}")

@@ -226,6 +226,17 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
 
                 source_entry = entries_by_step[source_step]
 
+                # Track where this calculated value came from
+                if 'is_calculated_from' in source_entry:
+                    is_calculated_from = source_entry['is_calculated_from']
+                else:
+                    # Construct from source entry's actual values
+                    is_calculated_from = {
+                        'education': source_entry['education'],
+                        'credits': source_entry['credits'],
+                        'step': source_step
+                    }
+
                 # Create calculated entry
                 step_padded = pad_number(target_step, 2)
                 calculated_item = {
@@ -240,6 +251,7 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
                     'step': target_step,
                     'salary': source_entry['salary'],
                     'is_calculated': True,
+                    'is_calculated_from': is_calculated_from,
                     'source_step': source_step,
                     'GSI1PK': f'YEAR#{year}#PERIOD#{period}#EDU#{edu}#CR#{cred_padded}',
                     'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
@@ -321,6 +333,17 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
 
             source_was_calculated = source_entry.get('is_calculated', False)
 
+            # Track where this calculated value came from
+            if 'is_calculated_from' in source_entry:
+                is_calculated_from = source_entry['is_calculated_from']
+            else:
+                # Construct from source entry's actual values
+                is_calculated_from = {
+                    'education': source_entry['education'],
+                    'credits': source_entry['credits'],
+                    'step': source_entry['step']
+                }
+
             calculated_item = {
                 'PK': f'DISTRICT#{district_id}',
                 'SK': f'SCHEDULE#{year}#{period}#EDU#{target_edu}#CR#{target_cred_padded}#STEP#{step_padded}',
@@ -333,6 +356,7 @@ def generate_calculated_entries(district_id, district_name, year, period, real_e
                 'step': step,
                 'salary': source_entry['salary'],
                 'is_calculated': True,
+                'is_calculated_from': is_calculated_from,
                 'source_edu_credit': best_source,
                 'source_step': source_entry.get('source_step') if source_was_calculated else step,
                 'GSI1PK': f'YEAR#{year}#PERIOD#{period}#EDU#{target_edu}#CR#{target_cred_padded}',
