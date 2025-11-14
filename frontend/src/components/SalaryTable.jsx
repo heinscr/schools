@@ -137,7 +137,7 @@ function SalaryTable({ districtId, highlight = null }) {
   const sortedSchedules = [...schedules].sort((a, b) => {
     const ya = extractYear(a?.school_year);
     const yb = extractYear(b?.school_year);
-    if (ya !== yb) return yb - ya; // descending year
+    if (ya !== yb) return ya - yb; // descending year
     const pa = a?.period || '';
     const pb = b?.period || '';
     if (pa === pb) return 0;
