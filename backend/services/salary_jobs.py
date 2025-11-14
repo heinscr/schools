@@ -789,6 +789,49 @@ class SalaryJobsService:
             return None
 
 
+    def start_normalization_job(self, lambda_client, normalizer_arn: str, triggered_by: str) -> str:
+        """
+        Start a global normalization job
+
+        Returns:
+            job_id of the normalization job
+        """
+        # Check if already running
+        response = self.table.get_item(
+            Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'}
+        )
+
+        if 'Item' in response:
+            raise ValueError("Normalization job already running")
+
+        job_id = str(uuid.uuid4())
+
+        # Create normalization job record
+        ttl = int(time.time()) + (30 * 24 * 60 * 60)  # 30 days
+
+        job = {
+            'PK': 'NORMALIZATION_JOB#RUNNING',
+            'SK': 'METADATA',
+            'job_id': job_id,
+            'status': 'running',
+            'started_at': datetime.utcnow().isoformat(),
+            'triggered_by': triggered_by,
+            'ttl': ttl
+        }
+
+        self.table.put_item(Item=job)
+
+        # Invoke normalizer Lambda asynchronously
+        lambda_client.invoke(
+            FunctionName=normalizer_arn,
+            InvocationType='Event',  # Async invocation
+            Payload=json.dumps({'job_id': job_id})
+        )
+
+        logger.info(f"Started normalization job {job_id}")
+        return job_id
+
+
 class LocalSalaryJobsService:
     """A lightweight, file-backed stub of SalaryJobsService for local development.
 
@@ -1053,7 +1096,7 @@ class LocalSalaryJobsService:
         }
 
     # Optional helper used by normalization endpoints
-    def start_normalization_job(self, lambda_client=None, normalizer_arn: str = None, triggered_by: str = None) -> str:
+    def start_normalization_job(self, lambda_client=None, normalizer_arn: Optional[str] = None, triggered_by: Optional[str] = None) -> str:
         # No-op for local; return a deterministic job id
         jid = f"local-normalize-{int(time.time())}"
         logger.info(f"[LocalSalaryJobsService] start_normalization_job -> {jid}")
@@ -1071,87 +1114,3 @@ class LocalSalaryJobsService:
         # No background job in local stub
         return None
 
-    def _set_normalization_status(self, needs_normalization: bool, triggered_by_job_id: str):
-        """Set global normalization status"""
-        self.table.put_item(Item={
-            'PK': 'METADATA#NORMALIZATION',
-            'SK': 'STATUS',
-            'needs_normalization': needs_normalization,
-            'triggered_by_job_id': triggered_by_job_id,
-            'last_checked': datetime.utcnow().isoformat()
-        })
-
-    def get_normalization_status(self) -> Dict:
-        """Get current normalization status"""
-        # If no DynamoDB table is configured (local/dev), return a safe default
-        if not getattr(self, 'table', None):
-            return {
-                'needs_normalization': False,
-                'last_normalized_at': None,
-                'job_running': False
-            }
-
-        response = self.table.get_item(
-            Key={'PK': 'METADATA#NORMALIZATION', 'SK': 'STATUS'}
-        )
-
-        if 'Item' not in response:
-            return {
-                'needs_normalization': False,
-                'last_normalized_at': None
-            }
-
-        return response['Item']
-
-    def start_normalization_job(self, lambda_client, normalizer_arn: str, triggered_by: str) -> str:
-        """
-        Start a global normalization job
-
-        Returns:
-            job_id of the normalization job
-        """
-        # Check if already running
-        response = self.table.get_item(
-            Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'}
-        )
-
-        if 'Item' in response:
-            raise ValueError("Normalization job already running")
-
-        job_id = str(uuid.uuid4())
-
-        # Create normalization job record
-        ttl = int(time.time()) + (30 * 24 * 60 * 60)  # 30 days
-
-        job = {
-            'PK': 'NORMALIZATION_JOB#RUNNING',
-            'SK': 'METADATA',
-            'job_id': job_id,
-            'status': 'running',
-            'started_at': datetime.utcnow().isoformat(),
-            'triggered_by': triggered_by,
-            'ttl': ttl
-        }
-
-        self.table.put_item(Item=job)
-
-        # Invoke normalizer Lambda asynchronously
-        lambda_client.invoke(
-            FunctionName=normalizer_arn,
-            InvocationType='Event',  # Async invocation
-            Payload=json.dumps({'job_id': job_id})
-        )
-
-        logger.info(f"Started normalization job {job_id}")
-        return job_id
-
-    def get_normalization_job(self) -> Optional[Dict]:
-        """Get current running normalization job"""
-        # If no DynamoDB table is configured (local/dev), return None
-        if not getattr(self, 'table', None):
-            return None
-
-        response = self.table.get_item(
-            Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'}
-        )
-        return response.get('Item')
