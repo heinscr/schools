@@ -718,6 +718,38 @@ class SalaryJobsService:
             'last_checked': datetime.now(timezone.utc).isoformat()
         })
 
+    def get_normalization_status(self) -> Dict:
+        """Get current normalization status from the table"""
+        try:
+            response = self.table.get_item(
+                Key={'PK': 'METADATA#NORMALIZATION', 'SK': 'STATUS'}
+            )
+        except Exception as e:
+            logger.error(f"Error fetching normalization status: {e}")
+            return {
+                'needs_normalization': False,
+                'last_normalized_at': None
+            }
+
+        if 'Item' not in response:
+            return {
+                'needs_normalization': False,
+                'last_normalized_at': None
+            }
+
+        return response['Item']
+
+    def get_normalization_job(self) -> Optional[Dict]:
+        """Get current running normalization job"""
+        try:
+            response = self.table.get_item(
+                Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'}
+            )
+            return response.get('Item')
+        except Exception as e:
+            logger.error(f"Error fetching normalization job: {e}")
+            return None
+
 
 class LocalSalaryJobsService:
     """A lightweight, file-backed stub of SalaryJobsService for local development.
@@ -1013,6 +1045,14 @@ class LocalSalaryJobsService:
 
     def get_normalization_status(self) -> Dict:
         """Get current normalization status"""
+        # If no DynamoDB table is configured (local/dev), return a safe default
+        if not getattr(self, 'table', None):
+            return {
+                'needs_normalization': False,
+                'last_normalized_at': None,
+                'job_running': False
+            }
+
         response = self.table.get_item(
             Key={'PK': 'METADATA#NORMALIZATION', 'SK': 'STATUS'}
         )
@@ -1069,6 +1109,10 @@ class LocalSalaryJobsService:
 
     def get_normalization_job(self) -> Optional[Dict]:
         """Get current running normalization job"""
+        # If no DynamoDB table is configured (local/dev), return None
+        if not getattr(self, 'table', None):
+            return None
+
         response = self.table.get_item(
             Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'}
         )
