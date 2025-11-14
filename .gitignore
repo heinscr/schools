@@ -105,3 +105,4 @@ extracted_salaries.json
 backend/backend/local_data/jobs.json
 backend/scripts/add_entity_type_gsi.py
 scripts/extracted_salaries.json
+scripts/extracted_salaries.json

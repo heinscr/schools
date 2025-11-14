@@ -5,7 +5,7 @@ import { logger } from '../utils/logger';
 import './SalaryTable.css';
 import { DataCacheContext } from '../contexts/DataCacheContext';
 
-function SalaryTable({ districtId, highlight = null }) {
+function SalaryTable({ districtId, highlight = null, refreshKey = 0 }) {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -36,7 +36,7 @@ function SalaryTable({ districtId, highlight = null }) {
     };
 
     fetchSalaries();
-  }, [districtId]);
+  }, [districtId, refreshKey]);
 
   // Fetch global salary metadata (max_step) to calculate reserved table height
   useEffect(() => {

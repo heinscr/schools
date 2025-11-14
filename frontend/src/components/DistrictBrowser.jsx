@@ -55,6 +55,7 @@ function DistrictBrowser({ user }) {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all', 'name', 'town'
+  const [salaryRefreshKey, setSalaryRefreshKey] = useState(0);
 
   const cache = useDataCache();
   const getDistrictUrl = cache.getDistrictUrl;
@@ -182,7 +183,9 @@ function DistrictBrowser({ user }) {
         variant: 'success'
       });
     }
-    // Force re-render of salary table by updating selected district
+    // Trigger refetch in SalaryTable by bumping refresh key
+    setSalaryRefreshKey((k) => k + 1);
+    // Optionally refresh selected district details as well
     if (selectedDistrict) {
       handleDistrictClick(selectedDistrict);
     }
@@ -425,7 +428,7 @@ function DistrictBrowser({ user }) {
               )}
             </div>
             <Suspense fallback={<div className="loading">Loading salary table...</div>}>
-              <SalaryTable districtId={selectedDistrict.id} />
+              <SalaryTable districtId={selectedDistrict.id} refreshKey={salaryRefreshKey} />
             </Suspense>
           </div>
         )}
