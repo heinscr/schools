@@ -8,23 +8,74 @@ import { DISTRICT_TYPE_OPTIONS } from '../constants/districtTypes';
 import { formatCurrency } from '../utils/formatters';
 import './SalaryComparison.css';
 
+// Helper functions for URL parameter management
+const getUrlParams = () => {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    education: params.get('education'),
+    credits: params.get('credits'),
+    step: params.get('step'),
+    types: params.get('types')?.split(',').filter(Boolean),
+    districts: params.get('districts')?.split(',').filter(Boolean),
+    towns: params.get('towns')?.split(',').filter(Boolean),
+  };
+};
+
+const updateUrlParams = (searchParams, selectedTypes, selectedDistricts, selectedTowns) => {
+  const params = new URLSearchParams();
+
+  if (searchParams.education) params.set('education', searchParams.education);
+  if (searchParams.credits) params.set('credits', searchParams.credits);
+  if (searchParams.step) params.set('step', searchParams.step);
+
+  // Only add types if not all are selected (default state)
+  const allTypes = DISTRICT_TYPE_OPTIONS.map(opt => opt.value);
+  if (selectedTypes.length > 0 && selectedTypes.length < allTypes.length) {
+    params.set('types', selectedTypes.join(','));
+  }
+
+  if (selectedDistricts.size > 0) {
+    params.set('districts', Array.from(selectedDistricts).join(','));
+  }
+
+  if (selectedTowns.size > 0) {
+    params.set('towns', Array.from(selectedTowns).join(','));
+  }
+
+  const newUrl = `${window.location.pathname}?${params.toString()}`;
+  window.history.replaceState({}, '', newUrl);
+};
+
 function SalaryComparison() {
+  // Read initial values from URL or use defaults
+  const urlParams = getUrlParams();
+
   const [searchParams, setSearchParams] = useState({
-    step: '5',
-    education: 'M',
-    credits: '30'
+    step: urlParams.step || '5',
+    education: urlParams.education || 'M',
+    credits: urlParams.credits || '30'
   });
-  const [selectedTypes, setSelectedTypes] = useState(DISTRICT_TYPE_OPTIONS.map(opt => opt.value));
+  const [selectedTypes, setSelectedTypes] = useState(
+    urlParams.types?.length > 0
+      ? urlParams.types
+      : DISTRICT_TYPE_OPTIONS.map(opt => opt.value)
+  );
   const [cachedResults, setCachedResults] = useState(null); // Full results from API (cached)
   const [filteredResults, setFilteredResults] = useState(null); // Filtered by district type
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showCustomFilter, setShowCustomFilter] = useState(false);
-  const [selectedDistricts, setSelectedDistricts] = useState(new Set());
-  const [selectedTowns, setSelectedTowns] = useState(new Set());
+  const [selectedDistricts, setSelectedDistricts] = useState(
+    urlParams.districts?.length > 0 ? new Set(urlParams.districts) : new Set()
+  );
+  const [selectedTowns, setSelectedTowns] = useState(
+    urlParams.towns?.length > 0 ? new Set(urlParams.towns) : new Set()
+  );
   const [salaryMeta, setSalaryMeta] = useState(null);
   const [salaryMetaError, setSalaryMetaError] = useState(null);
   const [salaryMetaLoading, setSalaryMetaLoading] = useState(false);
+  const [urlLoaded, setUrlLoaded] = useState(false);
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
   const _dataCache = useContext(DataCacheContext);
   const getDistrictUrl = _dataCache?.getDistrictUrl;
   const [modalOpen, setModalOpen] = useState(false);
@@ -87,6 +138,9 @@ function SalaryComparison() {
       if (cachedResults) {
         applyFilters(cachedResults, newTypes);
       }
+
+      // Update URL with new filters
+      updateUrlParams(searchParams, newTypes, selectedDistricts, selectedTowns);
 
       return newTypes;
     });
@@ -272,6 +326,14 @@ function SalaryComparison() {
     // Only run when salaryMeta changes
     }, [salaryMeta]);
 
+    // Auto-load search results if URL parameters exist
+    useEffect(() => {
+      if (!urlLoaded && salaryMeta && urlParams.education && urlParams.credits && urlParams.step) {
+        setUrlLoaded(true);
+        handleSearch();
+      }
+    }, [salaryMeta, urlLoaded]);
+
     // Perform the comparison search against the API and cache results
     const handleSearch = async () => {
       setLoading(true);
@@ -288,6 +350,9 @@ function SalaryComparison() {
         setCachedResults(data);
         // Apply current client-side filters immediately
         applyFilters(data, selectedTypes);
+
+        // Update URL with current search parameters
+        updateUrlParams(searchParams, selectedTypes, selectedDistricts, selectedTowns);
       } catch (err) {
         setError(err?.message || String(err));
         setCachedResults(null);
@@ -305,6 +370,9 @@ function SalaryComparison() {
       if (cachedResults) {
         applyFilters(cachedResults, selectedTypes, districts, towns);
       }
+
+      // Update URL with new custom filters
+      updateUrlParams(searchParams, selectedTypes, districts, towns);
     };
 
     const handleCustomFilterClear = () => {
@@ -313,6 +381,19 @@ function SalaryComparison() {
 
       if (cachedResults) {
         applyFilters(cachedResults, selectedTypes, new Set(), new Set());
+      }
+
+      // Update URL to remove custom filters
+      updateUrlParams(searchParams, selectedTypes, new Set(), new Set());
+    };
+
+    const handleCopyLink = async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setShowCopyNotification(true);
+        setTimeout(() => setShowCopyNotification(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy link:', err);
       }
     };
 
@@ -327,7 +408,7 @@ function SalaryComparison() {
 
         <div className="search-controls-row">
           <div className="form-group">
-            <label htmlFor="education">Education Level</label>
+            <label htmlFor="education">Education</label>
             <select
               id="education"
               value={searchParams.education}
@@ -340,7 +421,7 @@ function SalaryComparison() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="credits">Additional Credits</label>
+            <label htmlFor="credits">Credits</label>
             <select
               id="credits"
               value={searchParams.credits}
@@ -353,7 +434,7 @@ function SalaryComparison() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="step">Experience Step</label>
+            <label htmlFor="step">Step</label>
             <select
               id="step"
               value={searchParams.step}
@@ -365,15 +446,42 @@ function SalaryComparison() {
             </select>
           </div>
 
-          <div className="form-group">
-            <label>&nbsp;</label>
-            <button
-              className="search-button"
-              onClick={handleSearch}
-              disabled={loading}
-            >
-              {loading ? 'Searching...' : 'Search Salaries'}
-            </button>
+          <div className="button-row">
+            <div className="form-group">
+              <label>&nbsp;</label>
+              <button
+                className="search-button"
+                onClick={handleSearch}
+                disabled={loading}
+              >
+                {loading ? 'Searching...' : 'Search Salaries'}
+              </button>
+            </div>
+
+            {filteredResults && (
+              <div className="form-group share-button-group">
+                <label>&nbsp;</label>
+                <button
+                  className="share-icon-button"
+                  onClick={handleCopyLink}
+                  title={showCopyNotification ? 'Copied!' : 'Copy shareable link'}
+                >
+                  {showCopyNotification ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="18" cy="5" r="3"></circle>
+                      <circle cx="6" cy="12" r="3"></circle>
+                      <circle cx="18" cy="19" r="3"></circle>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
