@@ -248,6 +248,9 @@ class SalaryJobsService:
         # Load new salary data
         records_added = self._load_salary_records(district_id, records)
 
+        # Update schedules metadata for year/period combinations
+        self._update_schedules_metadata(records)
+
         # Update availability metadata for year/period combinations
         self._update_availability_metadata(district_id, records)
 
@@ -501,6 +504,9 @@ class SalaryJobsService:
         # Load salary data
         records_added = self._load_salary_records(district_id, records)
 
+        # Update schedules metadata
+        self._update_schedules_metadata(records)
+
         # Update availability metadata
         self._update_availability_metadata(district_id, records)
 
@@ -650,6 +656,38 @@ class SalaryJobsService:
             self.table.put_item(Item=item)
             logger.info(f"Updated availability metadata for {year}/{period} to include district {district_id}")
 
+    def _update_schedules_metadata(self, records: List[Dict]):
+        """
+        Update METADATA#SCHEDULES to track year/period combinations
+        This is used by salary_service.py and normalization scripts to find available schedules
+        """
+        # Collect unique year/period combinations
+        year_periods = set()
+        for record in records:
+            year = record['school_year']
+            period = record['period']
+            year_periods.add((year, period))
+
+        # Create or update METADATA#SCHEDULES items
+        for year, period in year_periods:
+            pk = 'METADATA#SCHEDULES'
+            sk = f'YEAR#{year}#PERIOD#{period}'
+
+            # Check if this schedule metadata already exists
+            response = self.table.get_item(Key={'PK': pk, 'SK': sk})
+
+            if 'Item' not in response:
+                # Create new schedule metadata item
+                item = {
+                    'PK': pk,
+                    'SK': sk,
+                    'school_year': year,
+                    'period': period,
+                    'created_at': datetime.utcnow().isoformat()
+                }
+                self.table.put_item(Item=item)
+                logger.info(f"Created schedule metadata for {year}/{period}")
+
     def _normalize_district(self, district_id: str, records: List[Dict]) -> int:
         """
         Normalize salary data for a specific district
@@ -717,6 +755,38 @@ class SalaryJobsService:
             'triggered_by_job_id': triggered_by_job_id,
             'last_checked': datetime.now(timezone.utc).isoformat()
         })
+
+    def get_normalization_status(self) -> Dict:
+        """Get current normalization status from the table"""
+        try:
+            response = self.table.get_item(
+                Key={'PK': 'METADATA#NORMALIZATION', 'SK': 'STATUS'}
+            )
+        except Exception as e:
+            logger.error(f"Error fetching normalization status: {e}")
+            return {
+                'needs_normalization': False,
+                'last_normalized_at': None
+            }
+
+        if 'Item' not in response:
+            return {
+                'needs_normalization': False,
+                'last_normalized_at': None
+            }
+
+        return response['Item']
+
+    def get_normalization_job(self) -> Optional[Dict]:
+        """Get current running normalization job"""
+        try:
+            response = self.table.get_item(
+                Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'}
+            )
+            return response.get('Item')
+        except Exception as e:
+            logger.error(f"Error fetching normalization job: {e}")
+            return None
 
 
 class LocalSalaryJobsService:
@@ -1013,6 +1083,14 @@ class LocalSalaryJobsService:
 
     def get_normalization_status(self) -> Dict:
         """Get current normalization status"""
+        # If no DynamoDB table is configured (local/dev), return a safe default
+        if not getattr(self, 'table', None):
+            return {
+                'needs_normalization': False,
+                'last_normalized_at': None,
+                'job_running': False
+            }
+
         response = self.table.get_item(
             Key={'PK': 'METADATA#NORMALIZATION', 'SK': 'STATUS'}
         )
@@ -1069,6 +1147,10 @@ class LocalSalaryJobsService:
 
     def get_normalization_job(self) -> Optional[Dict]:
         """Get current running normalization job"""
+        # If no DynamoDB table is configured (local/dev), return None
+        if not getattr(self, 'table', None):
+            return None
+
         response = self.table.get_item(
             Key={'PK': 'NORMALIZATION_JOB#RUNNING', 'SK': 'METADATA'}
         )

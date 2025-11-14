@@ -114,7 +114,21 @@ class HybridContractExtractor:
             year = int(match.group(1))
             return f"{year}-{year + 1}"
 
-        # Strategy 4: Look for any standalone 4-digit year (2000-2099)
+        # Strategy 4: Look for "FY YYYY" or "FY YY" pattern
+        # Matches: "FY26" → "2025-2026", "FY 2026" → "2025-2026"
+        match = re.search(r'FY\s*(\d{2,4})', text, re.IGNORECASE)
+        if match:
+            year_str = match.group(1)
+            if len(year_str) == 2:
+                # FY26 -> 2025-2026
+                year = 2000 + int(year_str)
+                return f"{year - 1}-{year}"
+            else:
+                # FY 2022 -> 2021-2022
+                year = int(year_str)
+                return f"{year - 1}-{year}"
+
+        # Strategy 5: Look for any standalone 4-digit year (2000-2099)
         # Matches: "2023" → "2023-2024"
         years = re.findall(r'\b(20\d{2})\b', text)
         if years:
@@ -122,7 +136,7 @@ class HybridContractExtractor:
             year = int(max(years))
             return f"{year}-{year + 1}"
 
-        # Strategy 5: Look for 2-digit year (e.g., "27" → "2027-2028")
+        # Strategy 6: Look for 2-digit year (e.g., "27" → "2027-2028")
         match = re.search(r'\b(\d{2})\b', text)
         if match:
             year_2digit = int(match.group(1))
@@ -142,11 +156,13 @@ class HybridContractExtractor:
             'BA': ('B', 0), 'B': ('B', 0),
             'BA+15': ('B', 15), 'B+15': ('B', 15),
             'BA+30': ('B', 30), 'B+30': ('B', 30), 'B30/MA': ('M', 0), 'B30': ('M', 0),
+            'BA+60': ('B', 60), 'B+60': ('B', 60), 'B60/MA': ('M', 0), 'B60': ('M', 0),
             'MA': ('M', 0), 'M': ('M', 0), 'MASTERS': ('M', 0),
             'MA+15': ('M', 15), 'M+15': ('M', 15),
             'MA+30': ('M', 30), 'M+30': ('M', 30),
             'MA+45': ('M', 45), 'M+45': ('M', 45), 'MA+45/CAGS': ('M', 45),
-            'CAGS': ('M', 60), 'M+60': ('M', 60), 'CAGS/DOC': ('D', 0),
+            'MA+60': ('M', 60), 'M+60': ('M', 60),
+            'CAGS': ('M', 60), 'CAGS/DOC': ('D', 0),
             'DOC': ('D', 0), 'DOCTORATE': ('D', 0),
         }
 
@@ -158,8 +174,8 @@ class HybridContractExtractor:
         for idx, row in enumerate(table):
             if not row:
                 continue
-            # Normalize row values
-            normalized_row = [str(h).strip().upper().replace(' ', '') for h in row]
+            # Normalize row values, handling None values
+            normalized_row = [str(h).strip().upper().replace(' ', '') if h else 'NONE' for h in row]
             # Check if this looks like a header (has 'STEP' and at least one education column)
             has_step = 'STEP' in normalized_row or 'STEPS' in normalized_row
             has_education = any(col in edu_map for col in normalized_row)
@@ -167,12 +183,14 @@ class HybridContractExtractor:
             if has_step and has_education:
                 header_idx = idx
                 header = normalized_row
+                if header_idx > 0:
+                    logger.debug(f"Skipping {header_idx} non-header row(s) at top of table")
                 logger.debug(f"Found header at row {idx}: {header}")
                 break
 
         # If no header found, try using first row as fallback
         if not header:
-            header = [str(h).strip().upper().replace(' ', '') for h in table[0]]
+            header = [str(h).strip().upper().replace(' ', '') if h else 'NONE' for h in table[0]]
             header_idx = 0
             logger.debug(f"Using first row as header: {header}")
 
@@ -282,7 +300,15 @@ class HybridContractExtractor:
 
                         for table in tables:
                             if table and len(table) > 1:
-                                records = self.parse_salary_table(table, district, year)
+                                # Try to extract year from table itself (first row might have FY26, etc.)
+                                table_year = year  # Default to page-level year
+                                if table[0] and table[0][0]:
+                                    first_cell = str(table[0][0]).strip()
+                                    extracted = self.extract_year_from_text(first_cell)
+                                    if extracted != "unknown":
+                                        table_year = extracted
+
+                                records = self.parse_salary_table(table, district, table_year)
                                 all_records.extend(records)
                                 logger.debug(f"Page {page_num}: extracted {len(records)} records (keyword match)")
                     else:
@@ -291,7 +317,15 @@ class HybridContractExtractor:
 
                         for table in tables:
                             if table and len(table) > 1 and self.is_salary_table(table):
-                                records = self.parse_salary_table(table, district, year)
+                                # Try to extract year from table itself (first row might have FY26, etc.)
+                                table_year = year  # Default to page-level year
+                                if table[0] and table[0][0]:
+                                    first_cell = str(table[0][0]).strip()
+                                    extracted = self.extract_year_from_text(first_cell)
+                                    if extracted != "unknown":
+                                        table_year = extracted
+
+                                records = self.parse_salary_table(table, district, table_year)
                                 if records:  # Only extend if we got records
                                     all_records.extend(records)
                                     logger.debug(f"Page {page_num}: extracted {len(records)} records (structure match)")
@@ -433,7 +467,15 @@ class HybridContractExtractor:
                     for table_obj in tables.tables:
                         table_data = table_obj.extract()
                         if table_data and len(table_data) > 1:
-                            records = self.parse_salary_table(table_data, district, year)
+                            # Try to extract year from table itself (first row might have FY26, etc.)
+                            table_year = year  # Default to page-level year
+                            if table_data[0] and table_data[0][0]:
+                                first_cell = str(table_data[0][0]).strip()
+                                extracted = self.extract_year_from_text(first_cell)
+                                if extracted != "unknown":
+                                    table_year = extracted
+
+                            records = self.parse_salary_table(table_data, district, table_year)
                             all_records.extend(records)
                 else:
                     # Fallback: Parse text as column-oriented table
