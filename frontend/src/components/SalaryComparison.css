@@ -811,47 +811,36 @@
 }
 
 /* Shareable URL feature styles */
-.comparison-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  gap: 20px;
-  flex-wrap: wrap;
+.share-button-group {
+  flex: 0 0 auto;
+  min-width: auto;
 }
 
-.copy-link-button {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
-  border: none;
+.share-icon-button {
+  padding: 12px;
+  background: white;
+  color: #667eea;
+  border: 2px solid #e2e8f0;
   border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
-  box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
 }
 
-.copy-link-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(72, 187, 120, 0.3);
+.share-icon-button:hover {
+  border-color: #667eea;
+  background: #f7fafc;
+  color: #5568d3;
 }
 
-.copy-link-button:active {
-  transform: translateY(0);
+.share-icon-button:active {
+  transform: scale(0.95);
 }
 
-@media (max-width: 768px) {
-  .comparison-actions {
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-  }
-
-  .copy-link-button {
-    width: 100%;
-    text-align: center;
-  }
+.share-icon-button svg {
+  display: block;
 }
