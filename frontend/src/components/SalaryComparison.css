@@ -744,6 +744,61 @@
     width: 30px;
   }
 
+  /* Hide Type and Year columns on mobile */
+  .type-col,
+  .year-col,
+  .type-cell,
+  .year-cell {
+    display: none;
+  }
+
+  /* Adjust table cell padding for tighter mobile layout */
+  .results-table td {
+    padding: 12px 8px;
+  }
+
+  .results-table th {
+    padding: 12px 8px;
+  }
+
+  /* Make rank column narrower on mobile */
+  .rank-col {
+    width: 50px;
+  }
+
+  .rank-cell {
+    padding: 8px 4px;
+  }
+
+  /* Compact rank badge on mobile */
+  .rank-badge {
+    min-width: 28px;
+    padding: 3px 6px;
+    font-size: 13px;
+  }
+
+  /* Adjust link cells to be more compact */
+  .link-cell,
+  .details-cell {
+    padding: 8px 4px;
+  }
+
+  /* District name with better wrapping */
+  .district-cell {
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  /* Salary column adjustments */
+  .salary-col {
+    width: 100px;
+  }
+
+  .salary-cell {
+    font-size: 14px;
+    padding-right: 8px;
+  }
+
   .results-stats {
     flex-direction: column;
     gap: 16px;
