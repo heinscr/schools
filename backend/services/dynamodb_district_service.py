@@ -202,41 +202,69 @@ class DynamoDBDistrictService:
     @staticmethod
     def _get_all_districts(table, limit: int, offset: int) -> Tuple[List[dict], int]:
         """Get all districts using GSI_METADATA index for efficient querying"""
-        districts = []
+        districts: List[dict] = []
         last_evaluated_key = None
 
-        # Query GSI_METADATA to get all district items (SK='METADATA')
-        # This is much faster than scanning because it uses the index
-        while True:
-            query_kwargs = {
-                'IndexName': 'GSI_METADATA',
-                'KeyConditionExpression': Key('SK').eq('METADATA')
-            }
+        # Compute a capped fetch limit to guard against DoS style large offsets
+        fetch_limit = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
 
-            if last_evaluated_key:
-                query_kwargs['ExclusiveStartKey'] = last_evaluated_key
+        # First attempt: query GSI_METADATA (sparse index of district metadata)
+        try:
+            while True:
+                query_kwargs = {
+                    'IndexName': 'GSI_METADATA',
+                    'KeyConditionExpression': Key('SK').eq('METADATA'),
+                    'Limit': fetch_limit
+                }
 
-            response = table.query(**query_kwargs)
+                if last_evaluated_key:
+                    query_kwargs['ExclusiveStartKey'] = last_evaluated_key
 
-            # Add items from this query (already sorted by name_lower in the GSI)
-            districts.extend([
-                DynamoDBDistrictService._item_to_dict(item)
-                for item in response.get('Items', [])
-            ])
+                response = table.query(**query_kwargs)
 
-            # Check if there are more items to query
-            last_evaluated_key = response.get('LastEvaluatedKey')
-            if not last_evaluated_key:
-                break
+                districts.extend([
+                    DynamoDBDistrictService._item_to_dict(item)
+                    for item in response.get('Items', [])
+                ])
 
-        # GSI already sorts by name_lower, but ensure consistency
+                # If we already fetched enough for requested page, we can stop early
+                if len(districts) >= offset + limit or len(districts) >= fetch_limit:
+                    break
+
+                last_evaluated_key = response.get('LastEvaluatedKey')
+                if not last_evaluated_key:
+                    break
+        except Exception:
+            # Fall back to scan if the index doesn't exist yet
+            districts = []
+
+        # Fallback: if index returned no items (e.g., not ACTIVE yet), perform a filtered scan
+        if not districts:
+            last_evaluated_key = None
+            while True:
+                scan_kwargs = {
+                    'FilterExpression': Attr('entity_type').eq('district'),
+                    'Limit': fetch_limit
+                }
+                if last_evaluated_key:
+                    scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
+                response = table.scan(**scan_kwargs)
+                districts.extend([
+                    DynamoDBDistrictService._item_to_dict(item)
+                    for item in response.get('Items', [])
+                ])
+                if len(districts) >= offset + limit or len(districts) >= fetch_limit:
+                    break
+                last_evaluated_key = response.get('LastEvaluatedKey')
+                if not last_evaluated_key:
+                    break
+
+        # Ensure deterministic ordering by name
         districts.sort(key=lambda d: d.get('name', '').lower())
-        
-        # Apply offset and limit to the result set
-        paginated_districts = districts[offset:offset + limit]
+
+        paginated = districts[offset:offset + limit]
         total = len(districts)
-        
-        return paginated_districts, total
+        return paginated, total
 
     @staticmethod
     def update_district(
