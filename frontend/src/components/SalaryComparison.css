@@ -650,6 +650,24 @@
   color: #667eea;
 }
 
+/* Button row for search and share */
+.button-row {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.button-row .form-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.button-row .share-button-group {
+  flex: 0 0 auto;
+  min-width: auto;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   /* Reduce outer padding so the card and content can use more screen width */
@@ -674,15 +692,54 @@
   .search-controls-row {
     flex-direction: column;
     max-width: 100%;
+    gap: 8px;
   }
 
   .form-group {
     min-width: 100%;
     width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .form-group label {
+    margin-bottom: 0;
+    min-width: 80px;
+    text-align: left;
+    font-size: 12px;
+  }
+
+  .form-group select {
+    flex: 1;
+  }
+
+  /* Search button and share icon on same row */
+  .button-row {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .button-row .form-group {
+    flex: 1;
+  }
+
+  .button-row .share-button-group {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: auto;
   }
 
   .search-button {
     width: 100%;
+  }
+
+  .share-icon-button {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
   }
 
   .district-type-toggle {
