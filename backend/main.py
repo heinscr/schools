@@ -319,7 +319,12 @@ NORMALIZER_LAMBDA_ARN = os.getenv('SALARY_NORMALIZER_LAMBDA_ARN')
 
 # Initialize salary jobs service
 salary_jobs_service = None
-if main_table and S3_BUCKET_NAME and SQS_QUEUE_URL:
+if main_table and S3_BUCKET_NAME:
+    # Allow running without SQS queue (manual apply & backups still work).
+    if not SQS_QUEUE_URL:
+        logger.warning("SALARY_PROCESSING_QUEUE_URL not set; PDF upload jobs disabled but manual apply will function.")
+        # Provide a dummy queue url so create_job can fail gracefully if invoked
+        SQS_QUEUE_URL = ""
     salary_jobs_service = SalaryJobsService(
         dynamodb_table=main_table,
         s3_client=s3_client,
@@ -578,6 +583,58 @@ async def apply_salary_schedule(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Apply failed: {str(e)}")
+
+
+@app.post("/api/admin/districts/{district_id}/salary-schedule/manual-apply")
+@limiter.limit(WRITE_RATE_LIMIT)
+async def manual_apply_salary_schedule(
+    request: Request,
+    district_id: str,
+    table = Depends(get_table),
+    user: dict = Depends(require_admin_role)
+):
+    """Apply salary data directly from provided records (admin-only, no job).
+
+    Body JSON: { "records": [ { school_year, period, education, credits, step, salary, (optional) district_name } ] }
+    """
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    # Validate district exists
+    from services.dynamodb_district_service import DynamoDBDistrictService
+    district = DynamoDBDistrictService.get_district(table=table, district_id=district_id)
+    if not district:
+        raise HTTPException(status_code=404, detail="District not found")
+
+    # Parse and validate body
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON body")
+
+    records = body.get('records') if isinstance(body, dict) else None
+    if not records or not isinstance(records, list):
+        raise HTTPException(status_code=400, detail="'records' must be a non-empty list")
+
+    # Ensure district_name present when missing; types will be handled in service
+    district_name = district['name']
+    for r in records:
+        if isinstance(r, dict) and 'district_name' not in r:
+            r['district_name'] = district_name
+
+    logger.info(f"Manual apply invoked for district {district_id} with {len(records)} records; service type={type(salary_jobs_service).__name__}")
+    try:
+        success, metadata = salary_jobs_service.apply_salary_records(district_id, records)
+        return {
+            "success": success,
+            "records_added": metadata['records_added'],
+            "metadata_changed": metadata['metadata_changed'],
+            "needs_global_normalization": metadata['needs_global_normalization']
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Manual apply failed: {str(e)}")
 
 
 @app.delete("/api/admin/districts/{district_id}/salary-schedule/jobs/{job_id}")

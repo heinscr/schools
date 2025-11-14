@@ -239,6 +239,33 @@ class SalaryJobsService:
             ]
             logger.info(f"Applied exclusions: {original_count} -> {len(records)} records (excluded {original_count - len(records)})")
 
+        # Run common apply pipeline
+        return self._apply_records_pipeline(district_id=district_id, records=records, normalization_trigger_id=job_id)
+
+    def apply_salary_records(self, district_id: str, records: List[Dict]) -> Tuple[bool, Dict]:
+        """
+        Apply salary data directly from provided records (no job/exclusions).
+
+        Args:
+            district_id: District ID to apply records to
+            records: List of salary records in extractor format
+
+        Returns:
+            (success, metadata_info) same as apply_salary_data
+        """
+        return self._apply_records_pipeline(district_id=district_id, records=records, normalization_trigger_id="manual-apply")
+
+    def _apply_records_pipeline(self, district_id: str, records: List[Dict], normalization_trigger_id: Optional[str]) -> Tuple[bool, Dict]:
+        """
+        Common pipeline to apply a list of records to a district.
+        Performs: metadata check, delete old, load new, update metadata, normalize, backup.
+        """
+        # Ensure each record includes district identifiers for downstream writes and backup
+        district_name = self._get_district_name(district_id)
+        for r in records:
+            r.setdefault('district_id', district_id)
+            r.setdefault('district_name', district_name)
+
         # Check if metadata will change
         metadata_changed, needs_normalization = self._check_metadata_change(records)
 
@@ -263,7 +290,7 @@ class SalaryJobsService:
             self._update_global_metadata(records)
 
             # Set normalization flag (for other districts that might need it)
-            self._set_normalization_status(needs_normalization, job_id)
+            self._set_normalization_status(needs_normalization, normalization_trigger_id or "manual-apply")
 
         logger.info(f"Applied salary data for district {district_id}: {records_added} records, {normalized_count} calculated")
 
@@ -1113,4 +1140,38 @@ class LocalSalaryJobsService:
     def get_normalization_job(self) -> Optional[Dict]:
         # No background job in local stub
         return None
+
+    def apply_salary_records(self, district_id: str, records: List[Dict]) -> Tuple[bool, Dict]:
+        """Apply manual salary records in local development.
+
+        This does NOT persist to DynamoDB (not available locally by default). It simply
+        validates records and returns a success payload so the frontend flow mirrors
+        production behavior.
+        """
+        if not isinstance(records, list) or len(records) == 0:
+            raise ValueError("'records' must be a non-empty list")
+
+        valid = 0
+        for r in records:
+            if not isinstance(r, dict):
+                continue
+            try:
+                amt = float(r.get('salary', 0))
+            except Exception:
+                continue
+            if amt <= 0:
+                continue
+            required = ['school_year', 'period', 'education', 'credits', 'step']
+            if all(k in r for k in required):
+                valid += 1
+
+        if valid == 0:
+            raise ValueError("No valid records to apply")
+
+        logger.info(f"[LocalSalaryJobsService] apply_salary_records received {len(records)} records, {valid} valid for district {district_id}")
+        return True, {
+            'records_added': valid,
+            'metadata_changed': True,
+            'needs_global_normalization': False
+        }
 

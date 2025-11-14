@@ -19,12 +19,14 @@ function DistrictBrowser({ user }) {
   const [activeTab, setActiveTab] = useState('districts'); // 'districts' or 'salaries'
   const [editingDistrict, setEditingDistrict] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const EditSalaryModal = lazy(() => import('./EditSalaryModal'));
   const [toast, setToast] = useState({ isOpen: false, message: '', variant: 'success' });
   // District type filters
   const [selectedTypes, setSelectedTypes] = useState(DISTRICT_TYPE_OPTIONS.map(opt => opt.value));
 
-  // Check if user is admin
-  const isAdmin = user?.is_admin || false;
+  // Check if user is admin; allow local override via VITE_SHOW_ADMIN_CONTROLS=true
+  const isAdmin = (user?.is_admin || false) || (import.meta.env.VITE_SHOW_ADMIN_CONTROLS === 'true');
 
   // Handle checkbox change
   const handleTypeChange = (type) => {
@@ -413,18 +415,27 @@ function DistrictBrowser({ user }) {
             <div className="salary-section-header">
               <h3>Salary Schedule</h3>
               {isAdmin && (
-                <button
-                  className="upload-salary-button"
-                  onClick={() => setShowUploadModal(true)}
-                  title="Upload PDF salary schedule"
-                >
-                  <svg className="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
-                  Update Salaries
-                </button>
+                <div className="salary-actions" role="group" aria-label="Salary actions">
+                  <button
+                    className="salary-action-button edit-salary-button"
+                    onClick={() => setShowEditModal(true)}
+                    title="Edit salary table data"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    className="salary-action-button upload-salary-button"
+                    onClick={() => setShowUploadModal(true)}
+                    title="Upload PDF salary schedule"
+                  >
+                    <svg className="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    Upload
+                  </button>
+                </div>
               )}
             </div>
             <Suspense fallback={<div className="loading">Loading salary table...</div>}>
@@ -447,6 +458,33 @@ function DistrictBrowser({ user }) {
           onClose={() => setShowUploadModal(false)}
           onSuccess={handleUploadSuccess}
         />
+      )}
+
+      {showEditModal && selectedDistrict && (
+        <Suspense fallback={<div className="loading">Loading editor...</div>}>
+          <EditSalaryModal
+            district={selectedDistrict}
+            onClose={() => setShowEditModal(false)}
+            onSuccess={(result) => {
+              // mirror upload success handling
+              if (result.needs_global_normalization) {
+                setToast({
+                  isOpen: true,
+                  message: `Salary data applied successfully! ${result.records_added} records added.\n\nGlobal metadata has changed. Please run normalization from the user menu.`,
+                  variant: 'warning'
+                });
+              } else {
+                setToast({
+                  isOpen: true,
+                  message: `Salary data applied successfully! ${result.records_added} records added.`,
+                  variant: 'success'
+                });
+              }
+              setSalaryRefreshKey((k) => k + 1);
+              setShowEditModal(false);
+            }}
+          />
+        </Suspense>
       )}
         </>
       ) : (

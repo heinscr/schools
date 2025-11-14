@@ -481,30 +481,57 @@
   font-weight: 700;
 }
 
-.upload-salary-button {
-  display: flex;
+.salary-actions {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #3b82f6;
+  background-color: #3b82f6; /* make the whole group look like one box */
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
+}
+
+.salary-action-button {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
   background-color: #3b82f6;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 0; /* no rounded corners between buttons */
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  flex: 1 1 0; /* make all action buttons equal width within the group */
+  justify-content: center;
+  min-width: 0; /* allow flex items to shrink equally (avoid content-based min width) */
 }
 
-.upload-salary-button:hover {
-  background-color: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+.salary-action-button + .salary-action-button {
+  border-left: 1px solid rgba(255,255,255,0.3);
+}
+
+.salary-action-button:hover {
+  background-color: #2f6fe0;
+  transform: none; /* keep the group silhouette consistent */
+}
+
+.upload-salary-button,
+.edit-salary-button {
+  /* keep class hooks for tests, styling inherited from salary-action-button */
+}
+
+.salary-action-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -4px;
 }
 
 .upload-icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
 }
 
 /* District Detail */

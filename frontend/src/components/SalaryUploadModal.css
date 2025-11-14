@@ -24,6 +24,12 @@
   padding: 24px;
 }
 
+/* Wider layout for EditSalaryModal only */
+.modal-content.edit-salary-modal {
+  max-width: 1600px;
+  width: 98vw;
+}
+
 .salary-upload-modal h3 {
   margin-top: 0;
   margin-bottom: 16px;
@@ -244,6 +250,44 @@
   margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid #e0e0e0;
+}
+
+/* EditSalaryModal input styles and indicators */
+.cell-editor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.salary-input {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 6px 8px;
+  width: 100%;
+  text-align: right;
+}
+
+.salary-input::placeholder {
+  color: #9ca3af;
+}
+
+.calc-badge {
+  font-size: 11px;
+  color: #374151;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 10px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.calc-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280; /* neutral gray */
 }
 
 .btn {

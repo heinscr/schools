@@ -388,6 +388,35 @@ class ApiService {
   }
 
   /**
+   * Admin: Apply manual salary records directly (no job/exclusions)
+   * @param {string} districtId - District ID
+   * @param {Array<Object>} records - Array of records: {school_year, period, education, credits, step, salary}
+   * @returns {Promise<Object>} - Application result with metadata change info
+   */
+  async manualApplySalaryRecords(districtId, records) {
+    const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/manual-apply`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this._getAuthHeaders(),
+      },
+      body: JSON.stringify({ records }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to apply manual salary records: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
    * Admin: Delete a salary processing job
    * @param {string} districtId - District ID
    * @param {string} jobId - Job ID
