@@ -162,6 +162,7 @@ class HybridContractExtractor:
             'MA+30': ('M', 30), 'M+30': ('M', 30),
             'MA+45': ('M', 45), 'M+45': ('M', 45), 'MA+45/CAGS': ('M', 45),
             'MA+60': ('M', 60), 'M+60': ('M', 60),
+            'MA+75': ('M', 75), 'M+75': ('M', 75),
             'CAGS': ('M', 60), 'CAGS/DOC': ('D', 0),
             'DOC': ('D', 0), 'DOCTORATE': ('D', 0),
         }
