@@ -248,6 +248,9 @@ class SalaryJobsService:
         # Load new salary data
         records_added = self._load_salary_records(district_id, records)
 
+        # Update schedules metadata for year/period combinations
+        self._update_schedules_metadata(records)
+
         # Update availability metadata for year/period combinations
         self._update_availability_metadata(district_id, records)
 
@@ -501,6 +504,9 @@ class SalaryJobsService:
         # Load salary data
         records_added = self._load_salary_records(district_id, records)
 
+        # Update schedules metadata
+        self._update_schedules_metadata(records)
+
         # Update availability metadata
         self._update_availability_metadata(district_id, records)
 
@@ -649,6 +655,38 @@ class SalaryJobsService:
             # Save updated metadata
             self.table.put_item(Item=item)
             logger.info(f"Updated availability metadata for {year}/{period} to include district {district_id}")
+
+    def _update_schedules_metadata(self, records: List[Dict]):
+        """
+        Update METADATA#SCHEDULES to track year/period combinations
+        This is used by salary_service.py and normalization scripts to find available schedules
+        """
+        # Collect unique year/period combinations
+        year_periods = set()
+        for record in records:
+            year = record['school_year']
+            period = record['period']
+            year_periods.add((year, period))
+
+        # Create or update METADATA#SCHEDULES items
+        for year, period in year_periods:
+            pk = 'METADATA#SCHEDULES'
+            sk = f'YEAR#{year}#PERIOD#{period}'
+
+            # Check if this schedule metadata already exists
+            response = self.table.get_item(Key={'PK': pk, 'SK': sk})
+
+            if 'Item' not in response:
+                # Create new schedule metadata item
+                item = {
+                    'PK': pk,
+                    'SK': sk,
+                    'school_year': year,
+                    'period': period,
+                    'created_at': datetime.utcnow().isoformat()
+                }
+                self.table.put_item(Item=item)
+                logger.info(f"Created schedule metadata for {year}/{period}")
 
     def _normalize_district(self, district_id: str, records: List[Dict]) -> int:
         """
