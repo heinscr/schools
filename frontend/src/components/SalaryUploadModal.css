@@ -323,6 +323,116 @@
   background-color: #7f8c8d;
 }
 
+/* EditSalaryModal - Sticky header and footer */
+.edit-salary-modal {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  padding: 0;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 100;
+  padding: 4px 24px;
+  border-bottom: 2px solid #e0e0e0;
+  color: #333;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-top h3 {
+  margin: 0;
+  color: #333;
+}
+
+.color-key {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+  padding: 8px 0;
+  color: #333;
+}
+
+.key-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+}
+
+.color-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.color-box.calculated {
+  background-color: #ffedcc; /* Light orange */
+}
+
+.color-box.edited {
+  background-color: #cce5ff; /* Light blue */
+}
+
+.scrollable-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 24px;
+}
+
+.salary-schedule h4 {
+  color: #333;
+}
+
+.sticky-footer {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  z-index: 100;
+  padding: 12px 24px;
+  border-top: 2px solid #e0e0e0;
+  margin-top: 0;
+}
+
+/* Input colors based on state */
+.salary-input.calculated {
+  background-color: #ffedcc; /* Light orange for calculated, not edited */
+}
+
+.salary-input.edited {
+  background-color: #cce5ff; /* Light blue for edited */
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .modal-content {
@@ -345,5 +455,10 @@
 
   .btn {
     width: 100%;
+  }
+
+  .color-key {
+    flex-direction: column;
+    gap: 8px;
   }
 }

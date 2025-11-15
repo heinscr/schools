@@ -162,15 +162,63 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
     }
   };
 
+  // Helper: determine if a cell has been edited (value differs from original)
+  const isCellEdited = (idx, step, education, credits, originalValue) => {
+    const key = `${idx}|${step}|${education}|${credits}`;
+    const currentValue = (inputs[key] ?? '').trim();
+    const origValue = originalValue != null ? String(originalValue).trim() : '';
+
+    if (currentValue === '' && origValue === '') return false;
+    if (currentValue === '' || origValue === '') return currentValue !== origValue;
+
+    // Numeric comparison rounded to 2 decimals
+    const current = Math.round(Number(currentValue) * 100) / 100;
+    const orig = Math.round(Number(origValue) * 100) / 100;
+    return current !== orig;
+  };
+
+  // Count total calculated (not edited) and edited cells across all schedules
+  const counts = useMemo(() => {
+    let calculatedCount = 0;
+    let editedCount = 0;
+
+    schedules.forEach((schedule, idx) => {
+      (schedule.salaries || []).forEach(item => {
+        const isCalculated = Boolean(item.isCalculated || item.is_calculated);
+        const edited = isCellEdited(idx, item.step, item.education, item.credits, item.salary);
+
+        if (edited) {
+          editedCount++;
+        } else if (isCalculated) {
+          calculatedCount++;
+        }
+      });
+    });
+
+    return { calculatedCount, editedCount };
+  }, [schedules, inputs]);
+
   // Render
   return (
     <div className="modal-backdrop">
       <div className="modal-content edit-salary-modal">
-        <div className="modal-header">
-          <h3>Edit Salary Table — {district.name}</h3>
-          <button className="close-button" onClick={onClose} aria-label="Close">×</button>
+        <div className="modal-header sticky-header">
+          <div className="header-top">
+            <h3>Edit Salary Table — {district.name}</h3>
+            <button className="close-button" onClick={onClose} aria-label="Close">×</button>
+          </div>
+          <div className="color-key">
+            <span className="key-item">
+              <span className="color-box calculated"></span>
+              Calculated ({counts.calculatedCount})
+            </span>
+            <span className="key-item">
+              <span className="color-box edited"></span>
+              Edited ({counts.editedCount})
+            </span>
+          </div>
         </div>
-        <div className="modal-body">
+        <div className="modal-body scrollable-body">
           {loading ? (
             <div className="loading">Loading current salaries…</div>
           ) : error ? (
@@ -219,30 +267,31 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                                 const item = salariesByStep[step][c.key];
                                 const valKey = `${idx}|${step}|${c.education}|${c.credits}`;
                                 const isCalculated = Boolean(item?.isCalculated || item?.is_calculated);
+                                const edited = item ? isCellEdited(idx, step, c.education, c.credits, item.salary) : false;
+
+                                // Determine cell class: edited takes priority, then calculated
+                                let cellClass = 'salary-input';
+                                if (edited) {
+                                  cellClass += ' edited';
+                                } else if (isCalculated) {
+                                  cellClass += ' calculated';
+                                }
+
                                 return (
                                   <td key={c.key}>
-                                    <div className="cell-editor">
-                                      <input
-                                        type="text"
-                                        inputMode="decimal"
-                                        pattern="^\\d+(?:\\.\\d{1,2})?$"
-                                        className="salary-input"
-                                        value={inputs[valKey] ?? ''}
-                                        placeholder={item && item.salary != null ? String(item.salary) : ''}
-                                        onChange={(e) => {
-                                          // strip $, commas, spaces as user types
-                                          const cleaned = (e.target.value || '').replace(/[,$]/g, '').replace(/^\$/,'').trim();
-                                          setCell(idx, step, c.education, c.credits, cleaned);
-                                        }}
-                                      />
-                                      {isCalculated && (
-                                        <span className="calc-icon" title="Previously calculated" aria-label="Calculated">
-                                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" role="img" focusable="false">
-                                            <path d="M7 2h10a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3zm0 2a1 1 0 0 0-1 1v3h12V5a1 1 0 0 0-1-1H7zm11 7H6v7a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-7zM8 13h2v2H8v-2zm3 0h2v2h-2v-2zm3 0h2v2h-2v-2zM8 16h2v2H8v-2zm3 0h2v2h-2v-2zm3 0h2v2h-2v-2z"/>
-                                          </svg>
-                                        </span>
-                                      )}
-                                    </div>
+                                    <input
+                                      type="text"
+                                      inputMode="decimal"
+                                      pattern="^\\d+(?:\\.\\d{1,2})?$"
+                                      className={cellClass}
+                                      value={inputs[valKey] ?? ''}
+                                      placeholder={item && item.salary != null ? String(item.salary) : ''}
+                                      onChange={(e) => {
+                                        // strip $, commas, spaces as user types
+                                        const cleaned = (e.target.value || '').replace(/[,$]/g, '').replace(/^\$/,'').trim();
+                                        setCell(idx, step, c.education, c.credits, cleaned);
+                                      }}
+                                    />
                                   </td>
                                 );
                               })}
@@ -257,7 +306,7 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
             </div>
           )}
         </div>
-        <div className="modal-actions">
+        <div className="modal-actions sticky-footer">
           <button className="btn btn-secondary" onClick={onClose} disabled={saving}>Cancel</button>
           <button className="btn btn-primary" onClick={handleApply} disabled={saving || loading}>
             {saving ? 'Applying…' : 'Apply Changes'}
