@@ -339,6 +339,7 @@
   z-index: 100;
   padding: 24px 24px 16px 24px;
   border-bottom: 2px solid #e0e0e0;
+  color: #333;
 }
 
 .header-top {
@@ -350,6 +351,7 @@
 
 .header-top h3 {
   margin: 0;
+  color: #333;
 }
 
 .color-key {
@@ -357,12 +359,14 @@
   gap: 24px;
   font-size: 14px;
   padding: 8px 0;
+  color: #333;
 }
 
 .key-item {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: #333;
 }
 
 .color-box {
