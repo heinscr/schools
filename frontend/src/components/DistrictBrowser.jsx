@@ -56,7 +56,6 @@ function DistrictBrowser({ user }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('all'); // 'all', 'name', 'town'
   const [salaryRefreshKey, setSalaryRefreshKey] = useState(0);
 
   const cache = useDataCache();
@@ -64,18 +63,11 @@ function DistrictBrowser({ user }) {
 
   // Do not auto-load districts on mount
 
-  const loadDistricts = async (query, type) => {
+  const loadDistricts = async (query) => {
     try {
       setLoading(true);
       setError(null);
-      let response;
-      if (type === 'all') {
-        response = await api.searchDistricts(query, { limit: 100 });
-      } else if (type === 'name') {
-        response = await api.getDistricts({ name: query, limit: 100 });
-      } else if (type === 'town') {
-        response = await api.getDistricts({ town: query, limit: 100 });
-      }
+      const response = await api.searchDistricts(query, { limit: 100 });
       setDistricts(response.data);
     } catch (err) {
       setError(err.message);
@@ -91,7 +83,7 @@ function DistrictBrowser({ user }) {
       setDistricts([]); // Clear districts if search is blank
       return;
     }
-    await loadDistricts(searchQuery, filterType);
+    await loadDistricts(searchQuery);
   };
 
   const handleDistrictClick = async (district) => {
@@ -123,7 +115,6 @@ function DistrictBrowser({ user }) {
       setSelectedDistrict(null);
       setClickedTown(townName);
       setSearchQuery(townName);
-      setFilterType('town');
       setLoading(true);
       setError(null);
       try {
@@ -247,69 +238,6 @@ function DistrictBrowser({ user }) {
 
       {activeTab === 'districts' ? (
         <>
-          <div className="search-section">
-        <form onSubmit={handleSearch} className="search-form">
-          <div className="search-controls">
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="filter-select"
-              aria-label="Filter search by type"
-            >
-              <option value="all">Search All</option>
-              <option value="name">District Name</option>
-              <option value="town">Town Name</option>
-            </select>
-
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={
-                filterType === 'name'
-                  ? 'Search by district name...'
-                  : filterType === 'town'
-                  ? 'Search by town name...'
-                  : 'Search districts or towns...'
-              }
-              className="search-input"
-              aria-label="Search districts or towns"
-            />
-
-            <button type="submit" className="btn btn-primary">
-              Search
-            </button>
-
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                className="btn btn-secondary"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-
-          {/* District Type Filters - in same container */}
-          <div className="district-type-filters-row">
-            {DISTRICT_TYPE_OPTIONS.map(opt => (
-              <button
-                key={opt.value}
-                type="button"
-                className={`district-type-toggle${selectedTypes.includes(opt.value) ? ' active' : ''}`}
-                onClick={() => handleTypeChange(opt.value)}
-                aria-pressed={selectedTypes.includes(opt.value)}
-              >
-                <span className="district-type-icon">{opt.icon}</span>
-                <span className="district-type-label">{opt.label}</span>
-                <span className="district-type-count">{typeCounts[opt.value] ?? 0}</span>
-              </button>
-            ))}
-          </div>
-        </form>
-      </div>
-
       {error && (
         <div className="error-message">
           <strong>Error:</strong> {error}
@@ -317,6 +245,56 @@ function DistrictBrowser({ user }) {
       )}
 
       <div className="content-area">
+        {/* Left Sidebar */}
+        <div className="sidebar">
+          {/* Search Section */}
+          <div className="search-section">
+            <form onSubmit={handleSearch} className="search-form">
+              <div className="search-controls">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search districts and towns..."
+                  className="search-input"
+                  aria-label="Search districts and towns"
+                />
+
+                <button type="submit" className="btn btn-primary">
+                  Search
+                </button>
+
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    className="btn btn-secondary"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              {/* District Type Filters */}
+              <div className="district-type-filters-row">
+                {DISTRICT_TYPE_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={`district-type-toggle${selectedTypes.includes(opt.value) ? ' active' : ''}`}
+                    onClick={() => handleTypeChange(opt.value)}
+                    aria-pressed={selectedTypes.includes(opt.value)}
+                  >
+                    <span className="district-type-icon">{opt.icon}</span>
+                    <span className="district-type-label">{opt.label}</span>
+                    <span className="district-type-count">{typeCounts[opt.value] ?? 0}</span>
+                  </button>
+                ))}
+              </div>
+            </form>
+          </div>
+
+          {/* District List */}
         <div className="district-list">
           <h2>
             Districts ({districts.length})
@@ -392,7 +370,10 @@ function DistrictBrowser({ user }) {
             </ul>
           )}
         </div>
+        </div>
 
+        {/* Right Content Area */}
+        <div className="right-content">
         <div className="map-section">
           <ErrorBoundary
             errorTitle="Map Error"
@@ -443,6 +424,7 @@ function DistrictBrowser({ user }) {
             </Suspense>
           </div>
         )}
+        </div>
       </div>
 
       <DistrictEditor
