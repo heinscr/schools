@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>District Browser - Sidebar Layout Mockup</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      padding: 20px 40px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0 0 15px 0;
+      color: #1e3a5f;
+      font-size: 2.5rem;
+      font-weight: 800;
+    }
+
+    .tab-navigation {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .tab-button {
+      padding: 12px 24px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #4a5568;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+    }
+
+    /* Main Content Area */
+    .main-content {
+      display: flex;
+      flex: 1;
+      gap: 20px;
+      padding: 20px 40px;
+      overflow: hidden;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Search Section - Compact */
+    .search-section {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .search-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      background: white;
+      min-width: 100px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #3b82f6;
+      border: 2px solid #3b82f6;
+    }
+
+    /* District Type Filters - Compact */
+    .type-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .type-toggle {
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .type-toggle.active {
+      background: #e3f2fd;
+      border-color: #4a90e2;
+      color: #1565c0;
+    }
+
+    /* District List */
+    .district-list {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .district-list h2 {
+      margin: 0 0 12px 0;
+      font-size: 1.2rem;
+      color: #1e3a5f;
+      font-weight: 700;
+      border-bottom: 3px solid #3b82f6;
+      padding-bottom: 8px;
+    }
+
+    .district-item {
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f8fafc;
+    }
+
+    .district-item:hover {
+      background: white;
+      border-left-color: #3b82f6;
+      transform: translateX(4px);
+    }
+
+    .district-item.active {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      border-left-width: 4px;
+    }
+
+    .district-name {
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+
+    .district-towns {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    /* Right Content Area */
+    .right-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    /* Map Section */
+    .map-section {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      height: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    /* Salary Section */
+    .salary-section {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .salary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 3px solid #3b82f6;
+      padding-bottom: 10px;
+    }
+
+    .salary-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #1e3a5f;
+      font-weight: 700;
+    }
+
+    .salary-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .salary-action-btn {
+      padding: 8px 16px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .salary-table-placeholder {
+      color: #94a3b8;
+      text-align: center;
+      padding: 40px;
+      font-size: 1.1rem;
+    }
+
+    /* Scrollbar Styling */
+    .district-list::-webkit-scrollbar,
+    .salary-section::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .district-list::-webkit-scrollbar-track,
+    .salary-section::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+
+    .district-list::-webkit-scrollbar-thumb,
+    .salary-section::-webkit-scrollbar-thumb {
+      background: #3b82f6;
+      border-radius: 3px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .sidebar {
+        width: 320px;
+      }
+    }
+
+    @media (max-width: 968px) {
+      .main-content {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+
+      .map-section {
+        height: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Massachusetts School Districts</h1>
+      <div class="tab-navigation">
+        <button class="tab-button active">🗺️ District Browser</button>
+        <button class="tab-button">💰 Compare Salaries</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Left Sidebar -->
+      <div class="sidebar">
+        <!-- Search Section -->
+        <div class="search-section">
+          <div class="search-controls">
+            <select class="filter-select">
+              <option>Search All</option>
+              <option>District Name</option>
+              <option>Town Name</option>
+            </select>
+            <input type="text" class="search-input" placeholder="Search districts or towns...">
+            <button class="btn btn-primary">Search</button>
+          </div>
+
+          <!-- District Type Filters -->
+          <div class="type-filters">
+            <button class="type-toggle active">
+              <span>🏫</span>
+              <span>Public</span>
+              <span>(145)</span>
+            </button>
+            <button class="type-toggle active">
+              <span>🤝</span>
+              <span>Regional</span>
+              <span>(62)</span>
+            </button>
+            <button class="type-toggle active">
+              <span>🎓</span>
+              <span>Charter</span>
+              <span>(28)</span>
+            </button>
+            <button class="type-toggle active">
+              <span>⚙️</span>
+              <span>Vocational</span>
+              <span>(15)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- District List -->
+        <div class="district-list">
+          <h2>Districts (250)</h2>
+          <div class="district-item active">
+            <div class="district-name">🏫 Boston Public Schools</div>
+            <div class="district-towns">Boston</div>
+          </div>
+          <div class="district-item">
+            <div class="district-name">🏫 Cambridge Public Schools</div>
+            <div class="district-towns">Cambridge</div>
+          </div>
+          <div class="district-item">
+            <div class="district-name">🤝 Minuteman Regional Vocational Technical</div>
+            <div class="district-towns">Acton, Arlington, Belmont, Bolton, Boxborough, Carlisle, Concord, Dover, Lancaster, Lexington, Lincoln, Needham, Stow, Sudbury, Wayland, Weston</div>
+          </div>
+          <div class="district-item">
+            <div class="district-name">🏫 Somerville Public Schools</div>
+            <div class="district-towns">Somerville</div>
+          </div>
+          <div class="district-item">
+            <div class="district-name">🎓 KIPP Academy Boston Charter</div>
+            <div class="district-towns">Boston</div>
+          </div>
+          <div class="district-item">
+            <div class="district-name">🏫 Brookline Public Schools</div>
+            <div class="district-towns">Brookline</div>
+          </div>
+          <div class="district-item">
+            <div class="district-name">🏫 Newton Public Schools</div>
+            <div class="district-towns">Newton</div>
+          </div>
+          <div class="district-item">
+            <div class="district-name">🏫 Worcester Public Schools</div>
+            <div class="district-towns">Worcester</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Content Area -->
+      <div class="right-content">
+        <!-- Map Section -->
+        <div class="map-section">
+          <div>🗺️ Interactive Map (larger view)</div>
+        </div>
+
+        <!-- Salary Section (visible when district selected) -->
+        <div class="salary-section">
+          <div class="salary-header">
+            <h3>Salary Schedule - Boston Public Schools</h3>
+            <div class="salary-actions">
+              <button class="salary-action-btn">✏️ Edit</button>
+              <button class="salary-action-btn">📤 Upload</button>
+            </div>
+          </div>
+          <div class="salary-table-placeholder">
+            📊 Salary table would display here<br>
+            <small style="color: #cbd5e1; margin-top: 8px; display: block;">
+              Scrollable within this section
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
