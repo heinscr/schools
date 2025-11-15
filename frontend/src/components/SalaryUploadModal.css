@@ -337,7 +337,7 @@
   top: 0;
   background-color: white;
   z-index: 100;
-  padding: 24px 24px 16px 24px;
+  padding: 12px 24px 8px 24px;
   border-bottom: 2px solid #e0e0e0;
   color: #333;
 }
@@ -387,7 +387,11 @@
 .scrollable-body {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 12px 24px;
+}
+
+.salary-schedule h4 {
+  color: #333;
 }
 
 .sticky-footer {
@@ -395,7 +399,7 @@
   bottom: 0;
   background-color: white;
   z-index: 100;
-  padding: 16px 24px 24px 24px;
+  padding: 12px 24px;
   border-top: 2px solid #e0e0e0;
   margin-top: 0;
 }
