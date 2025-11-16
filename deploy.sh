@@ -241,7 +241,7 @@ if [ -n "$SALARY_PROCESSOR_LAMBDA" ]; then
     rm -rf processor-package salary-processor.zip 2>/dev/null || true
 
     # Install dependencies
-    $PIP_BUILD_CMD install boto3 pdfplumber -t processor-package/ --quiet
+    $PIP_BUILD_CMD install boto3 pdfplumber pymupdf pypdfium2 -t processor-package/ --quiet
 
     # Copy Lambda handler
     cp lambdas/processor.py processor-package/
