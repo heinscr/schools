@@ -1519,8 +1519,11 @@ class HybridContractExtractor:
 
         Extraction order:
         1. pdfplumber (fast, works for most text PDFs)
-        2. PyMuPDF (better text extraction, handles encoding issues and column-oriented layouts)
-        3. AWS Textract (for image-based/scanned PDFs)
+        2. pypdfium2 (better for column-oriented layouts)
+        3. PyMuPDF (better text extraction, handles encoding issues and column-oriented layouts)
+        4. AWS Textract (for image-based/scanned PDFs)
+
+        Falls back to next method if records found < 40
 
         Args:
             pdf_bytes: PDF file content
@@ -1532,6 +1535,8 @@ class HybridContractExtractor:
         Returns:
             Tuple of (records, method_used)
         """
+        MIN_RECORDS_THRESHOLD = 40
+
         # Try pdfplumber first for text-based PDFs
         if self.is_text_based_pdf(pdf_bytes):
             logger.info(f"✓ Text-based PDF detected: {filename}")
@@ -1539,7 +1544,11 @@ class HybridContractExtractor:
             if records:
                 # Filter records by year and period
                 records = self.filter_records_by_year_and_period(records)
-                return records, "pdfplumber"
+                if len(records) >= MIN_RECORDS_THRESHOLD:
+                    logger.info(f"pdfplumber extracted {len(records)} records (>= {MIN_RECORDS_THRESHOLD})")
+                    return records, "pdfplumber"
+                else:
+                    logger.warning(f"pdfplumber extracted only {len(records)} records (< {MIN_RECORDS_THRESHOLD}), trying next method")
             else:
                 logger.warning("pdfplumber extraction returned no records")
 
@@ -1548,7 +1557,11 @@ class HybridContractExtractor:
                 records = self.extract_with_pypdfium(pdf_bytes, filename, district_name)
                 if records:
                     records = self.filter_records_by_year_and_period(records)
-                    return records, "pypdfium"
+                    if len(records) >= MIN_RECORDS_THRESHOLD:
+                        logger.info(f"pypdfium2 extracted {len(records)} records (>= {MIN_RECORDS_THRESHOLD})")
+                        return records, "pypdfium"
+                    else:
+                        logger.warning(f"pypdfium2 extracted only {len(records)} records (< {MIN_RECORDS_THRESHOLD}), trying next method")
                 else:
                     logger.warning("pypdfium2 extraction returned no records, falling back to PyMuPDF")
             else:
@@ -1561,7 +1574,11 @@ class HybridContractExtractor:
                 if records:
                     # Filter records by year and period
                     records = self.filter_records_by_year_and_period(records)
-                    return records, "pymupdf"
+                    if len(records) >= MIN_RECORDS_THRESHOLD:
+                        logger.info(f"PyMuPDF extracted {len(records)} records (>= {MIN_RECORDS_THRESHOLD})")
+                        return records, "pymupdf"
+                    else:
+                        logger.warning(f"PyMuPDF extracted only {len(records)} records (< {MIN_RECORDS_THRESHOLD}), falling back to Textract")
                 else:
                     logger.warning("PyMuPDF extraction returned no records, falling back to Textract")
             else:
@@ -1575,6 +1592,7 @@ class HybridContractExtractor:
         if records:
             # Filter records by year and period
             records = self.filter_records_by_year_and_period(records)
+            logger.info(f"Textract extracted {len(records)} records")
             return records, "textract"
 
         return [], "failed"
