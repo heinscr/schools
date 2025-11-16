@@ -137,14 +137,38 @@ EDU_MAP_RAW: Dict[str, Tuple[str, int]] = {
     'PAYSCALE4': ('M', 0),
     'PAYSCALE5': ('M', 15),
     'PAYSCALE6': ('M', 30),
+    # Roman numeral variants (for tables using I, II, III, IV notation)
+    'I': ('B', 0),
+    'II': ('B', 15),
+    'III': ('B', 30),
+    'IV': ('M', 0),
+    'V': ('M', 15),
+    'VI': ('M', 30),
+    'VII': ('M', 45),
+    'VIII': ('M', 60),
+    '(I)': ('B', 0),
+    '(II)': ('B', 15),
+    '(III)': ('B', 30),
+    '(IV)': ('M', 0),
+    '(V)': ('M', 15),
+    '(VI)': ('M', 30),
+    '(VII)': ('M', 45),
+    '(VIII)': ('M', 60),
 }
 
 
 def normalize_lane_key(text: Any) -> str:
+    """
+    Normalize lane/education column keys to standard format.
+    Enhanced to handle Roman numerals and parentheses (e.g., "B.A. (I)", "MA + (15) II").
+    """
     if text is None:
         return 'NONE'
-    raw = str(text).upper()
-    raw = raw.replace('–', '-').replace('—', '-').replace(':', '-')
+
+    raw = str(text).upper().strip()
+
+    # Normalize common variations
+    raw = raw.replace('B.A.', 'BA').replace('M.A.', 'MA')
     replacements = {
         'BACHELOR': 'BA',
         'BACCALAUREATE': 'BA',
@@ -158,18 +182,40 @@ def normalize_lane_key(text: Any) -> str:
     for needle, repl in replacements.items():
         raw = raw.replace(needle, repl)
 
-    raw = raw.replace('-', '+')
-    raw = re.sub(r'\+L(\d)', r'+1\1', raw)
-    raw = re.sub(r'\+I(\d)', r'+1\1', raw)
-    raw = re.sub(r'\b(BA|MA)(\d{1,3})\b', r'\1+\2', raw)
-    raw = re.sub(r'\b(B|M)(\d{1,3})\b', r'\1+\2', raw)
+    # Handle parenthetical Roman numerals: "BA (I)" or "MA+15 (II)"
+    paren_match = re.search(r'\(([IVX]+)\)', raw)
+    if paren_match:
+        roman_num = paren_match.group(1)
+        # Check if this is a standalone Roman numeral with minimal other content
+        cleaned = re.sub(r'\([IVX]+\)', '', raw).strip()
+        cleaned = re.sub(r'[^A-Z0-9+]', '', cleaned)
+        if not cleaned or cleaned in ['BA', 'MA', 'B', 'M']:
+            # Use Roman numeral for mapping
+            return f'({roman_num})'
 
+    # Handle "BA + (10)" -> "BA+10"
+    raw = re.sub(r'\+\s*\((\d+)\)', r'+\1', raw)
+
+    # Normalize dashes/colons to plus
+    raw = raw.replace('–', '+').replace('—', '+').replace('-', '+').replace(':', '+')
+
+    # Normalize plus signs
+    raw = re.sub(r'\s*\+\s*', '+', raw)
+
+    # Normalize BA15 to BA+15, M30 to M+30
+    raw = re.sub(r'\b(BA|MA|B|M)(\d{1,2})\b', r'\1+\2', raw)
+    raw = re.sub(r'\+L(\d)', r'+1\1', raw)  # Handle "+L5" -> "+15"
+    raw = re.sub(r'\+I(\d)', r'+1\1', raw)  # Handle "+I5" -> "+15"
+
+    # Try tokenizing to extract education label
     tokens = tokenize_lane_labels(raw)
     if tokens:
         return tokens[0]
 
-    simplified = re.sub(r'[^A-Z0-9+ ]', '', raw).replace(' ', '')
+    # Clean up for mapping
+    simplified = re.sub(r'[^A-Z0-9+()]', '', raw)
 
+    # Handle explicit lane references
     lane_match = re.match(r'LANE(\d+)', simplified)
     if lane_match:
         return f"LANE{lane_match.group(1)}"
@@ -182,38 +228,54 @@ def normalize_lane_key(text: Any) -> str:
     if level_match:
         return f"LEVEL{level_match.group(1)}"
 
-    roman_match = re.fullmatch(r'[IVXLCDM]+', simplified)
+    # Check for standalone Roman numerals with optional parentheses
+    roman_pattern = r'\(?([IVX]+)\)?'
+    roman_match = re.fullmatch(roman_pattern, simplified)
     if roman_match:
-        roman_value = roman_to_int(roman_match.group(0))
-        if roman_value:
-            return f"LANE{roman_value}"
+        return simplified  # Keep parentheses if present
 
-    if simplified:
-        return simplified
-
-    return 'NONE'
+    return simplified if simplified else 'NONE'
 
 
 def tokenize_lane_labels(text: str) -> List[str]:
+    """
+    Tokenize lane labels from text.
+    Enhanced to handle Roman numerals and parenthetical notation.
+    """
     if not text:
         return []
 
-    normalized = text.upper()
+    normalized = text.upper().strip()
+
+    # Normalize common patterns
     normalized = normalized.replace('B.A.', 'BA').replace('M.A.', 'MA')
     normalized = normalized.replace('BACCALAUREATE', 'BA').replace('BACHELOR', 'BA')
     normalized = normalized.replace('MASTERS', 'MA').replace('MASTER', 'MA')
-    normalized = normalized.replace('/', ' ')
-    normalized = normalized.replace('-', '+')
-    normalized = re.sub(r'\([IVX]+\)', ' ', normalized)
-    normalized = re.sub(r'[^A-Z0-9+ ]', ' ', normalized)
-    normalized = re.sub(r'\s+', ' ', normalized)
-    normalized = normalized.replace(' + ', '+').strip()
-    normalized = re.sub(r'\b(BA|MA)(\d{1,3})\b', r'\1+\2', normalized)
-    normalized = re.sub(r'\b(B|M)(\d{1,3})\b', r'\1+\2', normalized)
 
-    token_pattern = re.compile(r'(?:BA|MA)(?:\+\d+)?|B\+\d+|M\+\d+|CAGS|DOC|DR|EDD', re.I)
+    # Handle "BA + (10)" -> "BA+10"
+    normalized = re.sub(r'\+\s*\((\d+)\)', r'+\1', normalized)
+
+    # Normalize separators
+    normalized = normalized.replace('-', '+').replace('/', ' ')
+
+    # Remove other punctuation except +, spaces, and parentheses (for Roman numerals)
+    normalized = re.sub(r'[^A-Z0-9+ ()]', ' ', normalized)
+    normalized = re.sub(r'\s+', ' ', normalized).strip()
+
+    # Normalize BA15 to BA+15
+    normalized = re.sub(r'\b(BA|MA|B|M)(\d{1,2})\b', r'\1+\2', normalized)
+
+    # Enhanced pattern to match education tokens including Roman numerals
+    token_pattern = re.compile(
+        r'(?:BA|MA|B|M)(?:\+\d+)?|'  # BA, MA, B+15, M+30, etc.
+        r'CAGS|DOC|DR|EDD|PHD|'  # Doctorate variants
+        r'\([IVX]+\)|'  # Parenthetical Roman numerals like (I), (II)
+        r'[IVX]+',  # Standalone Roman numerals
+        re.I
+    )
+
     tokens = token_pattern.findall(normalized)
-    return [token.upper().replace(' ', '') for token in tokens]
+    return [token.upper().strip() for token in tokens if token.strip()]
 
 
 def extract_lane_labels(lines: List[str], header_idx: int, expected_pairs: int) -> List[str]:
@@ -788,6 +850,14 @@ class HybridContractExtractor:
 
         return "unknown"
 
+    @staticmethod
+    def is_valid_step_number(step: int) -> bool:
+        """
+        Check if a step number is valid (not garbage from bad text extraction).
+        Valid step numbers are typically 0-35 (some districts go higher but rarely above 35).
+        """
+        return 0 <= step <= 35
+
     def parse_salary_table(
         self,
         table: Sequence[Sequence[Any]],
@@ -795,7 +865,10 @@ class HybridContractExtractor:
         year: str,
         alias_map: Optional[Dict[str, str]] = None,
     ) -> List[Dict]:
-        """Parse salary table into structured records with alias-aware lane mapping."""
+        """
+        Parse salary table into structured records with alias-aware lane mapping.
+        Enhanced with step number validation and better education column detection.
+        """
         if not table:
             return []
 
@@ -805,6 +878,7 @@ class HybridContractExtractor:
 
         alias_map = alias_map or {}
         records: List[Dict] = []
+        invalid_steps = 0
 
         for sub_table in split_table_on_step_columns(normalized_table):
             if len(sub_table) < 2:
@@ -838,18 +912,22 @@ class HybridContractExtractor:
                 if mapped_key and mapped_key in EDU_MAP:
                     edu_columns.append((col_idx, display_label, EDU_MAP[mapped_key]))
                 else:
-                    logger.warning(
-                        "Unknown education level '%s' (normalized: '%s') in column %s",
-                        display_label,
-                        normalized_cell,
-                        col_idx,
-                    )
+                    # Skip warning for known metadata columns
+                    if normalized_cell.upper() not in ['MULTIPLIER', 'SALARY', 'EMPTY', 'NONE', '']:
+                        logger.warning(
+                            "Unknown education level '%s' (normalized: '%s') in column %s",
+                            display_label,
+                            normalized_cell,
+                            col_idx,
+                        )
 
             if not edu_columns:
+                logger.debug("No valid education columns found in table")
                 continue
 
             logger.debug(
-                "Mapped columns: %s",
+                "Mapped %d columns: %s",
+                len(edu_columns),
                 [(header, edu, cr) for _, header, (edu, cr) in edu_columns],
             )
 
@@ -863,6 +941,11 @@ class HybridContractExtractor:
                     continue
                 step = int(step_match.group(1))
 
+                # Validate step number to filter garbage from bad text extraction
+                if not self.is_valid_step_number(step):
+                    invalid_steps += 1
+                    continue
+
                 for col_idx, _, (education, credits) in edu_columns:
                     if col_idx >= len(row):
                         continue
@@ -871,11 +954,11 @@ class HybridContractExtractor:
                     if not salary_str:
                         continue
 
-                    salary_cleaned = re.sub(r'[$,\s]', '', salary_str)
+                    salary_cleaned = re.sub(r'[$,\s]', '', salary_str).replace('.', '')
                     try:
                         salary = float(Decimal(salary_cleaned))
                     except (ValueError, InvalidOperation):
-                        logger.warning(
+                        logger.debug(
                             "Could not parse salary '%s' at row %s, col %s",
                             salary_str,
                             row_idx,
@@ -883,7 +966,9 @@ class HybridContractExtractor:
                         )
                         continue
 
-                    if salary <= 0:
+                    # Validate salary range
+                    if not (20000 <= salary <= 200000):
+                        logger.debug("Salary %s out of valid range at row %s, col %s", salary, row_idx, col_idx)
                         continue
 
                     records.append({
@@ -896,6 +981,9 @@ class HybridContractExtractor:
                         'step': step,
                         'salary': salary,
                     })
+
+            if invalid_steps > 0:
+                logger.debug("Filtered out %d rows with invalid step numbers (> 35)", invalid_steps)
 
         return records
 
