@@ -1,0 +1,8 @@
+document,pypdfium_records,attempted_pypdfium,pymupdf_records,attempted_pymupdf,pdfplumber_records,attempted_pdfplumber,other_records,total_records
+Abington_contract_1_conf60.pdf,53,True,0,True,0,False,0,53
+Abington_contract_1_conf60_pages_1-1.pdf,53,True,0,True,0,False,0,53
+Amherst_contract_4_conf50_pages_32-34.pdf,0,True,303,True,0,False,0,303
+Arlington_contract_1_conf85.pdf,72,True,288,True,0,False,0,360
+Ashland_contract_1_conf85_pages_23-25.pdf,0,True,285,True,0,False,0,285
+Athol-Royalston_contract_2_conf60_pages_47.pdf,0,True,7,True,0,False,0,7
+Avon_contract_7_conf50_pages_93-100.pdf,832,True,832,True,0,False,0,1664
