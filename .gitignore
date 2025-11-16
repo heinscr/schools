@@ -68,7 +68,6 @@ infrastructure/terraform/placeholder/
 
 #data
 data/sample_contracts/json/*
-data/results_contracts/*
 
 #scripts
 scripts/*

@@ -162,6 +162,7 @@ def normalize_lane_key(text: Any) -> str:
     raw = re.sub(r'\+L(\d)', r'+1\1', raw)
     raw = re.sub(r'\+I(\d)', r'+1\1', raw)
     raw = re.sub(r'\b(BA|MA)(\d{1,3})\b', r'\1+\2', raw)
+    raw = re.sub(r'\b(B|M)(\d{1,3})\b', r'\1+\2', raw)
 
     tokens = tokenize_lane_labels(raw)
     if tokens:
@@ -208,6 +209,7 @@ def tokenize_lane_labels(text: str) -> List[str]:
     normalized = re.sub(r'\s+', ' ', normalized)
     normalized = normalized.replace(' + ', '+').strip()
     normalized = re.sub(r'\b(BA|MA)(\d{1,3})\b', r'\1+\2', normalized)
+    normalized = re.sub(r'\b(B|M)(\d{1,3})\b', r'\1+\2', normalized)
 
     token_pattern = re.compile(r'(?:BA|MA)(?:\+\d+)?|B\+\d+|M\+\d+|CAGS|DOC|DR|EDD', re.I)
     tokens = token_pattern.findall(normalized)
@@ -869,7 +871,7 @@ class HybridContractExtractor:
                     if not salary_str:
                         continue
 
-                    salary_cleaned = re.sub(r'[$,\s]', '', salary_str).replace('.', '')
+                    salary_cleaned = re.sub(r'[$,\s]', '', salary_str)
                     try:
                         salary = float(Decimal(salary_cleaned))
                     except (ValueError, InvalidOperation):

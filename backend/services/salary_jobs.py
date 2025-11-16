@@ -502,26 +502,19 @@ class SalaryJobsService:
             raise ValueError(f"Backup file not found: {backup_filename}")
 
         # Extract data
-        district_id = backup_data.get('district_id')
         district_name = backup_data.get('district_name')
         records = backup_data.get('records', [])
 
-        if not district_id or not records:
-            raise ValueError(f"Invalid backup file: missing district_id or records")
+        if not district_name or not records:
+            raise ValueError(f"Invalid backup file: missing district_name or records")
 
-        logger.info(f"Re-applying backup for {district_name} ({district_id}): {len(records)} records")
-
-        # Verify district still exists
-        district_check = self._get_district_name(district_id)
-        if district_check == district_id:  # Returns district_id if not found
-            # Try to find by name
-            district_id_from_name = self._get_district_id_by_name(district_name)
-            if district_id_from_name:
-                logger.info(f"District ID changed, using current ID: {district_id_from_name}")
-                district_id = district_id_from_name
-            else:
-                raise ValueError(f"District not found: {district_name}")
-
+        district_id = self._get_district_id_by_name(district_name)
+        
+        if district_id: 
+            logger.info(f"Re-applying backup for {district_name} ({district_id}): {len(records)} records")
+        else:
+            raise ValueError(f"District not found: {district_name}")
+        
         # Check if metadata will change
         metadata_changed, needs_normalization = self._check_metadata_change(records)
 
@@ -562,22 +555,31 @@ class SalaryJobsService:
         """
         try:
             # Query using name_lower for case-insensitive matching
-            response = self.table.scan(
-                FilterExpression='#name_lower = :name_lower AND #sk = :sk',
-                ExpressionAttributeNames={
+            scan_kwargs = {
+                'FilterExpression': '#name_lower = :name_lower AND #sk = :sk',
+                'ExpressionAttributeNames': {
                     '#name_lower': 'name_lower',
                     '#sk': 'SK'
                 },
-                ExpressionAttributeValues={
+                'ExpressionAttributeValues': {
                     ':name_lower': district_name.lower(),
                     ':sk': 'METADATA'
                 }
-            )
+            }
 
-            if 'Items' in response and len(response['Items']) > 0:
-                district_id = response['Items'][0].get('district_id')
-                logger.info(f"Found district_id {district_id} for name {district_name}")
-                return district_id
+            while True:
+                response = self.table.scan(**scan_kwargs)
+                items = response.get('Items', [])
+                for item in items:
+                    district_id = item.get('district_id')
+                    if district_id:
+                        logger.info(f"Found district_id {district_id} for name {district_name}")
+                        return district_id
+
+                last_evaluated_key = response.get('LastEvaluatedKey')
+                if not last_evaluated_key:
+                    break
+                scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
 
         except Exception as e:
             logger.error(f"Error looking up district by name: {e}")
@@ -990,12 +992,16 @@ class LocalSalaryJobsService:
             # Attempt to remove local files if present
             try:
                 from pathlib import Path
-                p = Path(job.get('s3_pdf_key'))
-                j = Path(job.get('s3_json_key'))
-                if p.exists():
-                    p.unlink()
-                if j.exists():
-                    j.unlink()
+                pdf_key = job.get('s3_pdf_key')
+                json_key = job.get('s3_json_key')
+                if pdf_key:
+                    p = Path(pdf_key)
+                    if p.exists():
+                        p.unlink()
+                if json_key:
+                    j = Path(json_key)
+                    if j.exists():
+                        j.unlink()
             except Exception:
                 pass
             self._write_jobs(jobs)
