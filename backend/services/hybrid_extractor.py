@@ -858,6 +858,56 @@ class HybridContractExtractor:
         """
         return 0 <= step <= 35
 
+    @staticmethod
+    def deduplicate_records(records: List[Dict]) -> List[Dict]:
+        """
+        Deduplicate salary records based on their DynamoDB primary key.
+
+        The primary key is: (district_id, school_year, period, education, credits, step)
+
+        When duplicates are found (same table extracted via multiple methods),
+        keeps the first occurrence.
+
+        Args:
+            records: List of salary records
+
+        Returns:
+            Deduplicated list of salary records
+        """
+        if not records:
+            return records
+
+        seen_keys = set()
+        unique_records = []
+        duplicates_removed = 0
+
+        for record in records:
+            # Create a key tuple matching DynamoDB primary key
+            key = (
+                record.get('district_id'),
+                record.get('school_year'),
+                record.get('period'),
+                record.get('education'),
+                record.get('credits'),
+                record.get('step'),
+            )
+
+            if key not in seen_keys:
+                seen_keys.add(key)
+                unique_records.append(record)
+            else:
+                duplicates_removed += 1
+
+        if duplicates_removed > 0:
+            logger.debug(
+                "Removed %d duplicate records (original: %d, unique: %d)",
+                duplicates_removed,
+                len(records),
+                len(unique_records)
+            )
+
+        return unique_records
+
     def parse_salary_table(
         self,
         table: Sequence[Sequence[Any]],
@@ -1142,6 +1192,11 @@ class HybridContractExtractor:
                 page.close()
 
             pdf.close()
+
+            # Deduplicate records (same table might be extracted via column + row parsers)
+            if all_records:
+                all_records = self.deduplicate_records(all_records)
+
             return all_records if all_records else None
 
         except Exception as e:  # pragma: no cover - debugging helper
@@ -1237,6 +1292,11 @@ class HybridContractExtractor:
                     all_records.extend(records)
 
             doc.close()
+
+            # Deduplicate records (same table might be extracted via built-in + column + row parsers)
+            if all_records:
+                all_records = self.deduplicate_records(all_records)
+
             return all_records if all_records else None
 
         except Exception as e:
