@@ -143,6 +143,56 @@
   overflow: visible;
 }
 
+.salary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.salary-table thead {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.salary-table th,
+.salary-table td {
+  padding: 10px;
+  text-align: right;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.salary-table th {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.salary-table th > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.salary-table td {
+  color: #000;
+}
+
+.salary-table .step-cell {
+  text-align: left;
+  font-weight: 600;
+  background-color: #f8f9fa;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+}
+
+.salary-table tbody tr:hover {
+  background-color: #f5f7fa;
+}
+
 .preview-table {
   width: 100%;
   border-collapse: collapse;
@@ -167,6 +217,13 @@
   font-weight: 600;
   color: #333;
   white-space: nowrap;
+  text-align: center;
+}
+
+.preview-table th > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .preview-table td {
