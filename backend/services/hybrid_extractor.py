@@ -1604,6 +1604,8 @@ class HybridContractExtractor:
             if records:
                 # Filter records by year and period
                 records = self.filter_records_by_year_and_period(records)
+                # Final deduplication to prevent DynamoDB duplicate key errors
+                records = self.deduplicate_records(records)
                 if len(records) >= MIN_RECORDS_THRESHOLD:
                     logger.info(f"pdfplumber extracted {len(records)} records (>= {MIN_RECORDS_THRESHOLD})")
                     return records, "pdfplumber"
@@ -1617,6 +1619,8 @@ class HybridContractExtractor:
                 records = self.extract_with_pypdfium(pdf_bytes, filename, district_name)
                 if records:
                     records = self.filter_records_by_year_and_period(records)
+                    # Final deduplication to prevent DynamoDB duplicate key errors
+                    records = self.deduplicate_records(records)
                     if len(records) >= MIN_RECORDS_THRESHOLD:
                         logger.info(f"pypdfium2 extracted {len(records)} records (>= {MIN_RECORDS_THRESHOLD})")
                         return records, "pypdfium"
@@ -1634,6 +1638,8 @@ class HybridContractExtractor:
                 if records:
                     # Filter records by year and period
                     records = self.filter_records_by_year_and_period(records)
+                    # Final deduplication to prevent DynamoDB duplicate key errors
+                    records = self.deduplicate_records(records)
                     if len(records) >= MIN_RECORDS_THRESHOLD:
                         logger.info(f"PyMuPDF extracted {len(records)} records (>= {MIN_RECORDS_THRESHOLD})")
                         return records, "pymupdf"
@@ -1652,6 +1658,8 @@ class HybridContractExtractor:
         if records:
             # Filter records by year and period
             records = self.filter_records_by_year_and_period(records)
+            # Final deduplication to prevent DynamoDB duplicate key errors
+            records = self.deduplicate_records(records)
             logger.info(f"Textract extracted {len(records)} records")
             return records, "textract"
 
