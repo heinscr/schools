@@ -1523,7 +1523,7 @@ class HybridContractExtractor:
         3. PyMuPDF (better text extraction, handles encoding issues and column-oriented layouts)
         4. AWS Textract (for image-based/scanned PDFs)
 
-        Falls back to next method if records found < 40
+        Falls back to next method if records found < 200
 
         Args:
             pdf_bytes: PDF file content
@@ -1535,7 +1535,7 @@ class HybridContractExtractor:
         Returns:
             Tuple of (records, method_used)
         """
-        MIN_RECORDS_THRESHOLD = 40
+        MIN_RECORDS_THRESHOLD = 200
 
         # Try pdfplumber first for text-based PDFs
         if self.is_text_based_pdf(pdf_bytes):
