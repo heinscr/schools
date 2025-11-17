@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Query, Request, UploadFile, File
+from fastapi import FastAPI, Depends, HTTPException, Query, Request, UploadFile, File, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from typing import Optional, List
@@ -798,6 +798,157 @@ async def reapply_backups(
         "total_processed": len(results),
         "total_errors": len(errors)
     }
+
+
+@app.post("/api/admin/backup/reapply/start")
+@limiter.limit(WRITE_RATE_LIMIT)
+async def start_backup_reapply_job(
+    request: Request,
+    filenames: List[str],
+    background_tasks: BackgroundTasks,
+    user: dict = Depends(require_admin_role)
+):
+    """
+    Start a background job to re-apply backup files
+    Returns job_id to poll for progress
+    """
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    if not filenames or len(filenames) == 0:
+        raise HTTPException(status_code=400, detail="No files specified")
+
+    try:
+        # Start the job
+        job_id = salary_jobs_service.start_backup_reapply_job(
+            filenames=filenames,
+            triggered_by=user['sub']
+        )
+
+        # Process backups in background
+        background_tasks.add_task(
+            process_backup_reapply_job,
+            job_id=job_id,
+            filenames=filenames
+        )
+
+        return {
+            "job_id": job_id,
+            "status": "started",
+            "total": len(filenames)
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error starting backup reapply job: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/admin/backup/reapply/status")
+@limiter.limit(GENERAL_RATE_LIMIT)
+async def get_backup_reapply_status(
+    request: Request,
+    user: dict = Depends(require_admin_role)
+):
+    """Get status of currently running backup reapply job"""
+    if not salary_jobs_service:
+        raise HTTPException(status_code=503, detail="Salary processing service not configured")
+
+    try:
+        job = salary_jobs_service.get_backup_reapply_job()
+
+        if not job:
+            return {
+                "job_running": False,
+                "job_id": None,
+                "status": None
+            }
+
+        return {
+            "job_running": True,
+            "job_id": job.get('job_id'),
+            "status": job.get('status'),
+            "started_at": job.get('started_at'),
+            "total": job.get('total', 0),
+            "processed": job.get('processed', 0),
+            "succeeded": job.get('succeeded', 0),
+            "failed": job.get('failed', 0),
+            "current_file": job.get('current_file', ''),
+            "results": job.get('results', []),
+            "errors": job.get('errors', [])
+        }
+    except Exception as e:
+        logger.error(f"Error getting backup reapply status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def process_backup_reapply_job(job_id: str, filenames: List[str]):
+    """Background task to process backup reapply job"""
+    import asyncio
+
+    processed = 0
+    succeeded = 0
+    failed = 0
+
+    for filename in filenames:
+        try:
+            # Update current file
+            salary_jobs_service.update_backup_reapply_progress(
+                job_id=job_id,
+                processed=processed,
+                succeeded=succeeded,
+                failed=failed,
+                current_file=filename
+            )
+
+            # Re-apply the backup
+            success, result = salary_jobs_service.re_apply_from_backup(filename)
+
+            processed += 1
+            succeeded += 1
+
+            # Update with success result
+            salary_jobs_service.update_backup_reapply_progress(
+                job_id=job_id,
+                processed=processed,
+                succeeded=succeeded,
+                failed=failed,
+                current_file=filename,
+                result={
+                    "filename": filename,
+                    "district_id": result['district_id'],
+                    "district_name": result['district_name'],
+                    "records_added": result['records_added'],
+                    "calculated_entries": result['calculated_entries']
+                }
+            )
+
+            # Small delay to avoid rate limiting
+            await asyncio.sleep(0.5)
+
+        except Exception as e:
+            logger.error(f"Error processing backup {filename}: {e}")
+            processed += 1
+            failed += 1
+
+            # Update with error
+            salary_jobs_service.update_backup_reapply_progress(
+                job_id=job_id,
+                processed=processed,
+                succeeded=succeeded,
+                failed=failed,
+                current_file=filename,
+                error={
+                    "filename": filename,
+                    "error": str(e)
+                }
+            )
+
+            # Small delay even on error
+            await asyncio.sleep(0.5)
+
+    # Mark job as complete
+    salary_jobs_service.complete_backup_reapply_job(job_id)
 
 
 # Lambda handler (only needed for AWS deployment)

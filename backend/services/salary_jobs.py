@@ -846,6 +846,137 @@ class SalaryJobsService:
         logger.info(f"Started normalization job {job_id}")
         return job_id
 
+    def start_backup_reapply_job(self, filenames: List[str], triggered_by: str) -> str:
+        """
+        Start a backup reapply job
+
+        Args:
+            filenames: List of backup filenames to re-apply
+            triggered_by: Cognito user sub
+
+        Returns:
+            job_id of the backup reapply job
+        """
+        # Check if already running
+        response = self.table.get_item(
+            Key={'PK': 'BACKUP_REAPPLY_JOB#RUNNING', 'SK': 'METADATA'}
+        )
+
+        if 'Item' in response:
+            raise ValueError("Backup reapply job already running")
+
+        job_id = str(uuid.uuid4())
+
+        # Create backup reapply job record
+        ttl = int(time.time()) + (7 * 24 * 60 * 60)  # 7 days
+
+        job = {
+            'PK': 'BACKUP_REAPPLY_JOB#RUNNING',
+            'SK': 'METADATA',
+            'job_id': job_id,
+            'status': 'running',
+            'started_at': datetime.utcnow().isoformat(),
+            'triggered_by': triggered_by,
+            'filenames': filenames,
+            'total': len(filenames),
+            'processed': 0,
+            'succeeded': 0,
+            'failed': 0,
+            'current_file': '',
+            'results': [],
+            'errors': [],
+            'ttl': ttl
+        }
+
+        self.table.put_item(Item=job)
+
+        logger.info(f"Started backup reapply job {job_id} with {len(filenames)} files")
+        return job_id
+
+    def get_backup_reapply_job(self) -> Optional[Dict]:
+        """Get current running backup reapply job"""
+        try:
+            response = self.table.get_item(
+                Key={'PK': 'BACKUP_REAPPLY_JOB#RUNNING', 'SK': 'METADATA'}
+            )
+            return response.get('Item')
+        except Exception as e:
+            logger.error(f"Error fetching backup reapply job: {e}")
+            return None
+
+    def update_backup_reapply_progress(
+        self,
+        job_id: str,
+        processed: int,
+        succeeded: int,
+        failed: int,
+        current_file: str,
+        result: Optional[Dict] = None,
+        error: Optional[Dict] = None
+    ) -> None:
+        """Update progress of backup reapply job"""
+        try:
+            update_expr = "SET processed = :proc, succeeded = :succ, failed = :fail, current_file = :curr, updated_at = :updated"
+            expr_values = {
+                ':proc': processed,
+                ':succ': succeeded,
+                ':fail': failed,
+                ':curr': current_file,
+                ':updated': datetime.utcnow().isoformat()
+            }
+
+            # Add result or error to lists
+            if result:
+                update_expr += ", results = list_append(if_not_exists(results, :empty_list), :result)"
+                expr_values[':result'] = [result]
+                if ':empty_list' not in expr_values:
+                    expr_values[':empty_list'] = []
+
+            if error:
+                update_expr += ", errors = list_append(if_not_exists(errors, :empty_list2), :error)"
+                expr_values[':error'] = [error]
+                expr_values[':empty_list2'] = []
+
+            expr_values[':jid'] = job_id
+
+            self.table.update_item(
+                Key={'PK': 'BACKUP_REAPPLY_JOB#RUNNING', 'SK': 'METADATA'},
+                UpdateExpression=update_expr,
+                ExpressionAttributeValues=expr_values,
+                ConditionExpression='attribute_exists(PK) AND job_id = :jid'
+            )
+        except Exception as e:
+            logger.error(f"Error updating backup reapply progress: {e}")
+
+    def complete_backup_reapply_job(self, job_id: str) -> None:
+        """Mark backup reapply job as complete and remove from RUNNING"""
+        try:
+            # Get the job
+            response = self.table.get_item(
+                Key={'PK': 'BACKUP_REAPPLY_JOB#RUNNING', 'SK': 'METADATA'}
+            )
+
+            if 'Item' not in response or response['Item'].get('job_id') != job_id:
+                logger.warning(f"Job {job_id} not found or mismatch when completing")
+                return
+
+            job = response['Item']
+            job['status'] = 'completed'
+            job['completed_at'] = datetime.utcnow().isoformat()
+
+            # Archive the completed job
+            job['PK'] = f'BACKUP_REAPPLY_JOB#{job_id}'
+            self.table.put_item(Item=job)
+
+            # Delete from RUNNING
+            self.table.delete_item(
+                Key={'PK': 'BACKUP_REAPPLY_JOB#RUNNING', 'SK': 'METADATA'}
+            )
+
+            logger.info(f"Completed backup reapply job {job_id}")
+        except Exception as e:
+            logger.error(f"Error completing backup reapply job: {e}")
+
 
 class LocalSalaryJobsService:
     """A lightweight, file-backed stub of SalaryJobsService for local development.

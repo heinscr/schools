@@ -68,72 +68,56 @@ function BackupManager({ onClose, onSuccess }) {
       setResults(null);
 
       const filenames = Array.from(selectedBackups);
-      const total = filenames.length;
 
-      // Track results from each backup
-      const successfulResults = [];
-      const failedResults = [];
-      let totalProcessed = 0;
-      let totalErrors = 0;
+      // Start the job
+      const jobResponse = await api.startBackupReapplyJob(filenames);
+      const jobId = jobResponse.job_id;
 
-      // Helper to delay between requests (to avoid rate limiting)
-      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+      setProgress({
+        current: 0,
+        total: filenames.length,
+        currentFile: 'Starting...'
+      });
 
-      // Process backups one at a time with rate limiting
-      for (let i = 0; i < filenames.length; i++) {
-        const filename = filenames[i];
-        const backupInfo = backups.find(b => b.filename === filename);
-        const displayName = backupInfo?.district_name || filename;
+      // Poll for status
+      const pollInterval = 2000; // Poll every 2 seconds
+      let jobComplete = false;
 
-        setProgress({
-          current: i + 1,
-          total: total,
-          currentFile: displayName
-        });
+      while (!jobComplete) {
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
 
-        try {
-          // Re-apply single backup
-          const response = await api.reapplyBackups([filename]);
+        const status = await api.getBackupReapplyStatus();
 
-          if (response.results && response.results.length > 0) {
-            successfulResults.push(...response.results);
-            totalProcessed += response.total_processed || 0;
+        if (!status.job_running || status.job_id !== jobId) {
+          // Job completed or not found
+          jobComplete = true;
+
+          // Final results
+          const finalResults = {
+            success: status.failed === 0,
+            total_processed: status.succeeded || 0,
+            total_errors: status.failed || 0,
+            results: status.results || [],
+            errors: status.errors || []
+          };
+
+          setResults(finalResults);
+          setSelectedBackups(new Set());
+
+          if (finalResults.success && onSuccess) {
+            onSuccess(finalResults);
           }
+        } else {
+          // Update progress
+          const backupInfo = backups.find(b => b.filename === status.current_file);
+          const displayName = backupInfo?.district_name || status.current_file;
 
-          if (response.errors && response.errors.length > 0) {
-            failedResults.push(...response.errors);
-            totalErrors += response.total_errors || 0;
-          }
-        } catch (err) {
-          // Track individual failures
-          failedResults.push({
-            filename: filename,
-            error: err.message
+          setProgress({
+            current: status.processed || 0,
+            total: status.total || filenames.length,
+            currentFile: displayName
           });
-          totalErrors++;
         }
-
-        // Add delay between requests to avoid rate limiting
-        // Wait 3.5 seconds between requests (allows ~17 requests per minute, safely under the 20/min limit)
-        if (i < filenames.length - 1) {
-          await delay(3500);
-        }
-      }
-
-      // Compile final results
-      const finalResults = {
-        success: totalErrors === 0,
-        total_processed: totalProcessed,
-        total_errors: totalErrors,
-        results: successfulResults,
-        errors: failedResults
-      };
-
-      setResults(finalResults);
-      setSelectedBackups(new Set());
-
-      if (finalResults.success && onSuccess) {
-        onSuccess(finalResults);
       }
     } catch (err) {
       setError(err.message);
