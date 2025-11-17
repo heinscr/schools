@@ -141,6 +141,42 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
     });
   };
 
+  // Re-label a column (change education level and/or credits)
+  const handleRelabelColumn = (scheduleIdx, oldEducation, oldCredits, newEducation, newCredits) => {
+    setSchedules(prev => {
+      const updated = [...prev];
+      const schedule = { ...updated[scheduleIdx] };
+      const salaries = (schedule.salaries || []).map(s => {
+        if (s.education === oldEducation && s.credits === oldCredits) {
+          return { ...s, education: newEducation, credits: newCredits };
+        }
+        return s;
+      });
+      schedule.salaries = salaries;
+      updated[scheduleIdx] = schedule;
+      return updated;
+    });
+
+    // Update inputs map with new keys
+    setInputs(prev => {
+      const updated = { ...prev };
+      const steps = Array.from(new Set(
+        (schedules[scheduleIdx]?.salaries || []).map(s => s.step)
+      ));
+
+      steps.forEach(step => {
+        const oldKey = `${scheduleIdx}|${step}|${oldEducation}|${oldCredits}`;
+        const newKey = `${scheduleIdx}|${step}|${newEducation}|${newCredits}`;
+        if (updated[oldKey] !== undefined) {
+          updated[newKey] = updated[oldKey];
+          delete updated[oldKey];
+        }
+      });
+
+      return updated;
+    });
+  };
+
   // Delete a step (row) from a specific schedule
   const handleDeleteStep = (scheduleIdx, stepNumber) => {
     setSchedules(prev => {
@@ -833,19 +869,13 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                             <tr>
                               <th>Step</th>
                               {columns.map(c => (
-                                <th key={c.key}>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                    <span>{c.key}</span>
-                                    <button
-                                      className="remove-btn"
-                                      onClick={() => handleDeleteColumn(idx, c.education, c.credits)}
-                                      title={`Delete column ${c.key}`}
-                                      style={{ width: '18px', height: '18px', fontSize: '14px' }}
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
-                                </th>
+                                <ColumnHeader
+                                  key={c.key}
+                                  scheduleIdx={idx}
+                                  column={c}
+                                  onDelete={handleDeleteColumn}
+                                  onRelabel={(newEducation, newCredits) => handleRelabelColumn(idx, c.education, c.credits, newEducation, newCredits)}
+                                />
                               ))}
                             </tr>
                           </thead>
@@ -1081,5 +1111,125 @@ function AddStepControl({ scheduleIdx, existingSteps, onAddStep }) {
         Cancel
       </button>
     </div>
+  );
+}
+
+// Component for column header with edit capability
+function ColumnHeader({ scheduleIdx, column, onDelete, onRelabel }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [education, setEducation] = useState(column.education);
+  const [credits, setCredits] = useState(column.credits);
+
+  const handleSave = () => {
+    onRelabel(education, Number(credits));
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEducation(column.education);
+    setCredits(column.credits);
+    setIsEditing(false);
+  };
+
+  if (!isEditing) {
+    return (
+      <th key={column.key}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <span
+            onClick={() => setIsEditing(true)}
+            style={{ cursor: 'pointer' }}
+            title="Click to edit column label"
+          >
+            {column.key}
+          </span>
+          <button
+            className="remove-btn"
+            onClick={() => onDelete(scheduleIdx, column.education, column.credits)}
+            title={`Delete column ${column.key}`}
+            style={{ width: '18px', height: '18px', fontSize: '14px' }}
+          >
+            ×
+          </button>
+        </div>
+      </th>
+    );
+  }
+
+  return (
+    <th key={column.key}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '8px', minWidth: '180px' }}>
+        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+          <select
+            value={education}
+            onChange={(e) => setEducation(e.target.value)}
+            style={{
+              padding: '4px 6px',
+              border: '1px solid #cbd5e1',
+              borderRadius: '4px',
+              fontSize: '12px',
+              backgroundColor: '#ffffff',
+              color: '#000',
+              flex: 1
+            }}
+          >
+            <option value="B">B</option>
+            <option value="M">M</option>
+            <option value="D">D</option>
+          </select>
+          <select
+            value={credits}
+            onChange={(e) => setCredits(e.target.value)}
+            style={{
+              padding: '4px 6px',
+              border: '1px solid #cbd5e1',
+              borderRadius: '4px',
+              fontSize: '12px',
+              backgroundColor: '#ffffff',
+              color: '#000',
+              flex: 1
+            }}
+          >
+            <option value="0">0</option>
+            <option value="15">+15</option>
+            <option value="30">+30</option>
+            <option value="45">+45</option>
+            <option value="60">+60</option>
+            <option value="75">+75</option>
+          </select>
+        </div>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          <button
+            onClick={handleSave}
+            style={{
+              padding: '4px 8px',
+              fontSize: '11px',
+              backgroundColor: '#10b981',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              flex: 1
+            }}
+          >
+            ✓
+          </button>
+          <button
+            onClick={handleCancel}
+            style={{
+              padding: '4px 8px',
+              fontSize: '11px',
+              backgroundColor: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              flex: 1
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    </th>
   );
 }
