@@ -550,36 +550,22 @@ class SalaryJobsService:
 
     def _get_district_id_by_name(self, district_name: str) -> Optional[str]:
         """
-        Look up district_id by district name
-        Uses scan with filter - not ideal for large datasets but works for this use case
+        Look up district_id by district name using GSI_METADATA index
+        Queries on SK='METADATA' and name_lower for efficient lookup
         """
         try:
-            # Query using name_lower for case-insensitive matching
-            scan_kwargs = {
-                'FilterExpression': '#name_lower = :name_lower AND #sk = :sk',
-                'ExpressionAttributeNames': {
-                    '#name_lower': 'name_lower',
-                    '#sk': 'SK'
-                },
-                'ExpressionAttributeValues': {
-                    ':name_lower': district_name.lower(),
-                    ':sk': 'METADATA'
-                }
-            }
+            # Query GSI_METADATA using SK (hash key) and name_lower (range key)
+            response = self.table.query(
+                IndexName='GSI_METADATA',
+                KeyConditionExpression=Key('SK').eq('METADATA') & Key('name_lower').eq(district_name.lower())
+            )
 
-            while True:
-                response = self.table.scan(**scan_kwargs)
-                items = response.get('Items', [])
-                for item in items:
-                    district_id = item.get('district_id')
-                    if district_id:
-                        logger.info(f"Found district_id {district_id} for name {district_name}")
-                        return district_id
-
-                last_evaluated_key = response.get('LastEvaluatedKey')
-                if not last_evaluated_key:
-                    break
-                scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
+            items = response.get('Items', [])
+            if items:
+                district_id = items[0].get('district_id')
+                if district_id:
+                    logger.info(f"Found district_id {district_id} for name {district_name}")
+                    return district_id
 
         except Exception as e:
             logger.error(f"Error looking up district by name: {e}")
