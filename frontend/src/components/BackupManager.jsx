@@ -76,7 +76,10 @@ function BackupManager({ onClose, onSuccess }) {
       let totalProcessed = 0;
       let totalErrors = 0;
 
-      // Process backups one at a time
+      // Helper to delay between requests (to avoid rate limiting)
+      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+      // Process backups one at a time with rate limiting
       for (let i = 0; i < filenames.length; i++) {
         const filename = filenames[i];
         const backupInfo = backups.find(b => b.filename === filename);
@@ -108,6 +111,12 @@ function BackupManager({ onClose, onSuccess }) {
             error: err.message
           });
           totalErrors++;
+        }
+
+        // Add delay between requests to avoid rate limiting
+        // Wait 3.5 seconds between requests (allows ~17 requests per minute, safely under the 20/min limit)
+        if (i < filenames.length - 1) {
+          await delay(3500);
         }
       }
 
