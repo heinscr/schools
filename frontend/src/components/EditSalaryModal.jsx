@@ -14,9 +14,14 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
   const [schedules, setSchedules] = useState([]);
 
   // State for adding new items
-  const [newYearInput, setNewYearInput] = useState('');
-  const [newPeriodInput, setNewPeriodInput] = useState('regular');
+  const [newYearInput, setNewYearInput] = useState('2025-2026');
   const [showAddYear, setShowAddYear] = useState(false);
+
+  // Generate year options from 2025-2026 to 2030-2031
+  const yearOptions = [];
+  for (let startYear = 2025; startYear <= 2030; startYear++) {
+    yearOptions.push(`${startYear}-${startYear + 1}`);
+  }
 
   useEffect(() => {
     let mounted = true;
@@ -60,32 +65,25 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
 
   // Add a new year/period schedule
   const handleAddYear = () => {
-    const yearPattern = /^\d{4}-\d{4}$/;
-    if (!yearPattern.test(newYearInput.trim())) {
-      setError('Year must be in YYYY-YYYY format (e.g., 2024-2025)');
-      return;
-    }
-
-    // Check if this year/period combination already exists
+    // Check if this year already exists (with Full Year period)
     const exists = schedules.some(s =>
-      s.school_year === newYearInput.trim() &&
-      (s.period || 'regular') === newPeriodInput
+      s.school_year === newYearInput &&
+      (s.period || 'Full Year') === 'Full Year'
     );
 
     if (exists) {
-      setError(`Schedule for ${newYearInput.trim()} (${newPeriodInput}) already exists`);
+      setError(`Schedule for ${newYearInput} already exists`);
       return;
     }
 
-    // Add new empty schedule
+    // Add new empty schedule with "Full Year" period
     setSchedules(prev => [...prev, {
-      school_year: newYearInput.trim(),
-      period: newPeriodInput,
+      school_year: newYearInput,
+      period: 'Full Year',
       salaries: []
     }]);
 
-    setNewYearInput('');
-    setNewPeriodInput('regular');
+    setNewYearInput('2025-2026');
     setShowAddYear(false);
     setError(null);
   };
@@ -212,6 +210,346 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
       });
       return updated;
     });
+  };
+
+  // Parse clipboard data and populate the schedule
+  const handlePasteData = async (scheduleIdx) => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const parsed = parseClipboardData(text);
+
+      if (!parsed.success) {
+        setError(parsed.error || 'Failed to parse clipboard data');
+        return;
+      }
+
+      // Update the schedule with parsed data
+      setSchedules(prev => {
+        const updated = [...prev];
+        const schedule = { ...updated[scheduleIdx] };
+        const salaries = [];
+
+        // Create all cells from parsed data
+        parsed.steps.forEach(step => {
+          parsed.columns.forEach(col => {
+            const salary = parsed.data[step]?.[col.key];
+            if (salary != null) {
+              salaries.push({
+                step,
+                education: col.education,
+                credits: col.credits,
+                salary,
+                isCalculated: false
+              });
+            }
+          });
+        });
+
+        schedule.salaries = salaries;
+        updated[scheduleIdx] = schedule;
+        return updated;
+      });
+
+      setError(null);
+    } catch (e) {
+      setError('Failed to read clipboard. Please ensure you have granted clipboard permissions.');
+    }
+  };
+
+  // Intelligent parser for clipboard data
+  const parseClipboardData = (text) => {
+    const lines = text.trim().split('\n').filter(line => line.trim());
+    if (lines.length < 2) {
+      return { success: false, error: 'Clipboard data must have at least a header row and one data row' };
+    }
+
+    // Enhanced education mapping
+    const eduMap = {
+      'B': 'B', 'BA': 'B', 'BACHELOR': 'B', "BACHELOR'S": 'B',
+      'M': 'M', 'MA': 'M', 'MASTER': 'M', "MASTER'S": 'M', '2M': 'M', 'CAGS': 'M',
+      'D': 'D', 'DOC': 'D', 'DOCTOR': 'D', "DOCTOR'S": 'D', 'DOCTORATE': 'D'
+    };
+
+    const headerTokens = [];
+    let dataStartIdx = 0;
+
+    // Collect all header tokens until we hit a line starting with a number
+    for (let i = 0; i < lines.length; i++) {
+      const parts = lines[i].split(/\s+/).filter(p => p.trim());
+      const firstPart = parts[0];
+
+      // If first part is a number, this is where data starts
+      if (/^\d+$/.test(firstPart)) {
+        dataStartIdx = i;
+        break;
+      }
+
+      // Collect all non-"Step" tokens from header lines
+      for (const part of parts) {
+        const normalized = part.replace(/['']/g, "'").toUpperCase();
+        if (!normalized.match(/^(STEP|TEP)$/i)) {
+          headerTokens.push(part);
+        }
+      }
+    }
+
+    if (dataStartIdx === 0 || headerTokens.length === 0) {
+      return { success: false, error: 'Could not find header and data rows' };
+    }
+
+    // Find the first data row with actual values to determine column count
+    let numDataCols = 0;
+    for (let i = dataStartIdx; i < Math.min(dataStartIdx + 10, lines.length); i++) {
+      const parts = lines[i].split(/\s+/);
+      if (parts.length > 1 && /^\d+$/.test(parts[0])) {
+        // This line starts with a step number and has values
+        const valueCols = parts.slice(1).filter(p => {
+          const cleaned = p.replace(/[$,]/g, '').trim();
+          return !isNaN(parseFloat(cleaned));
+        }).length;
+        if (valueCols > numDataCols) {
+          numDataCols = valueCols;
+        }
+      }
+    }
+
+    if (numDataCols === 0) {
+      // Fallback to header token count
+      numDataCols = headerTokens.length;
+    }
+
+    // Helper function to parse a column header token or phrase
+    const parseColumnHeader = (tokens) => {
+      const combined = tokens.join(' ').replace(/['']/g, "'").toUpperCase();
+
+      // Try patterns like "BACHELOR'S DEGREE", "MASTER'S DEGREE +30", etc.
+      let eduLevel = null;
+      let credits = 0;
+
+      // Look for education level keywords
+      for (const [key, value] of Object.entries(eduMap)) {
+        if (combined.includes(key)) {
+          eduLevel = value;
+          break;
+        }
+      }
+
+      // Look for credit amounts like "+30", "+45", "DEGREE +30"
+      const creditMatch = combined.match(/\+\s*(\d+)/);
+      if (creditMatch) {
+        credits = parseInt(creditMatch[1]);
+      }
+
+      if (eduLevel) {
+        const key = credits > 0 ? `${eduLevel}+${credits}` : eduLevel;
+        return { education: eduLevel, credits, key };
+      }
+
+      return null;
+    };
+
+    // Try to match header tokens to columns
+    const columns = [];
+
+    // First, try to parse all tokens as simple single-token headers
+    const parsedTokens = headerTokens.map(token => {
+      const normalized = token.replace(/['']/g, "'").toUpperCase();
+
+      // Try simple patterns first (e.g., "BA+15", "MA", "DOC", "B", "M+30")
+      const simpleMatch = normalized.match(/^([A-Z]+)(\+(\d+))?$/);
+      if (simpleMatch) {
+        const eduRaw = simpleMatch[1];
+        const education = eduMap[eduRaw] || eduRaw.charAt(0);
+        const credits = simpleMatch[3] ? parseInt(simpleMatch[3]) : 0;
+        const key = credits > 0 ? `${education}+${credits}` : education;
+        return { education, credits, key, original: token, parsed: true };
+      }
+      return { original: token, parsed: false };
+    });
+
+    // Count how many tokens successfully parsed as simple headers
+    const simpleParsedCount = parsedTokens.filter(t => t.parsed).length;
+
+    if (simpleParsedCount === numDataCols || simpleParsedCount >= numDataCols) {
+      // Use parsed tokens, handling potential duplicates by adding suffixes
+      const seenKeys = new Map(); // maps key -> count
+      for (const token of parsedTokens) {
+        if (token.parsed && columns.length < numDataCols) {
+          let finalKey = token.key;
+          const count = seenKeys.get(token.key) || 0;
+          if (count > 0) {
+            // Duplicate key - add suffix
+            finalKey = `${token.key}_${count}`;
+          }
+          seenKeys.set(token.key, count + 1);
+
+          columns.push({
+            education: token.education,
+            credits: token.credits,
+            key: finalKey,
+            original: token.original
+          });
+        }
+      }
+    } else if (headerTokens.length === numDataCols) {
+      // Same number of tokens as columns, but not all parsed simply
+      // Try complex parsing for unparsed tokens
+      for (const token of parsedTokens) {
+        if (token.parsed) {
+          columns.push(token);
+        } else {
+          const parsed = parseColumnHeader([token.original]);
+          if (parsed) {
+            columns.push({ ...parsed, original: token.original });
+          } else {
+            columns.push({ education: 'B', credits: 0, key: `Col${columns.length + 1}`, original: token.original });
+          }
+        }
+      }
+    } else {
+      // Complex case: tokens may represent multi-word headers
+      // Try to group tokens into column headers based on known patterns
+      let i = 0;
+      while (i < headerTokens.length && columns.length < numDataCols) {
+        // First try single token if it parsed successfully
+        if (parsedTokens[i]?.parsed) {
+          columns.push(parsedTokens[i]);
+          i++;
+        } else {
+          // Try consuming 2-4 tokens as a potential multi-word column header
+          let found = false;
+          for (let len = 4; len >= 2; len--) {
+            if (i + len > headerTokens.length) continue;
+            const phrase = headerTokens.slice(i, i + len);
+            const parsed = parseColumnHeader(phrase);
+            if (parsed) {
+              columns.push({ ...parsed, original: phrase.join(' ') });
+              i += len;
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            // Couldn't parse, use placeholder
+            columns.push({ education: 'B', credits: 0, key: `Col${columns.length + 1}`, original: headerTokens[i] });
+            i++;
+          }
+        }
+      }
+
+      // Fill in missing columns with defaults
+      while (columns.length < numDataCols) {
+        columns.push({ education: 'B', credits: 0, key: `Col${columns.length + 1}`, original: `Col${columns.length + 1}` });
+      }
+    }
+
+    if (columns.length === 0) {
+      return { success: false, error: 'Could not identify any education columns' };
+    }
+
+    // Parse data rows - enhanced to handle multi-line data and sparse rows
+    const steps = [];
+    const data = {};
+    let currentStep = null;
+    let pendingValues = []; // Values waiting to be assigned to a step
+
+    for (let i = dataStartIdx; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      const parts = line.split(/\s+/);
+      if (parts.length === 0) continue;
+
+      // Check if first part is a step number
+      const firstToken = parts[0];
+      const stepNum = parseInt(firstToken);
+
+      if (!isNaN(stepNum) && stepNum >= 1) {
+        // This line starts with a step number
+
+        // First, process any pending values for previous step
+        if (currentStep !== null && pendingValues.length > 0) {
+          if (!data[currentStep]) {
+            data[currentStep] = {};
+          }
+          // Right-align: if fewer values than columns, fill from the right
+          const startCol = Math.max(0, columns.length - pendingValues.length);
+          pendingValues.forEach((val, idx) => {
+            const colIdx = startCol + idx;
+            if (colIdx < columns.length) {
+              const col = columns[colIdx];
+              data[currentStep][col.key] = val;
+            }
+          });
+          pendingValues = [];
+        }
+
+        // Start new step
+        currentStep = stepNum;
+        if (!steps.includes(stepNum)) {
+          steps.push(stepNum);
+        }
+        if (!data[stepNum]) {
+          data[stepNum] = {};
+        }
+
+        // Parse values from this line (after the step number)
+        for (let j = 1; j < parts.length; j++) {
+          const valueStr = parts[j].replace(/[$,]/g, '').trim();
+          // Try to clean up OCR errors like "41.124.59" -> "41124.59"
+          const cleaned = valueStr.replace(/\.(\d{3})\./g, '$1.');
+          const value = parseFloat(cleaned);
+          if (!isNaN(value) && value > 0) {
+            pendingValues.push(value);
+          }
+        }
+      } else {
+        // This line doesn't start with a step number
+        // Could be continuation of previous step's data, or noise
+
+        // Try to extract salary values from this line
+        const values = [];
+        for (const part of parts) {
+          // Skip obvious non-salary text
+          if (/^[A-Za-z]+$/.test(part) && !part.match(/^\$?\d/)) continue;
+
+          const valueStr = part.replace(/[$,]/g, '').trim();
+          // Try to clean up OCR errors
+          const cleaned = valueStr.replace(/\.(\d{3})\./g, '$1.');
+          const value = parseFloat(cleaned);
+          if (!isNaN(value) && value > 0) {
+            values.push(value);
+          }
+        }
+
+        // If we found values and have a current step, add them as pending
+        if (values.length > 0 && currentStep !== null) {
+          pendingValues.push(...values);
+        }
+      }
+    }
+
+    // Process any remaining pending values
+    if (currentStep !== null && pendingValues.length > 0) {
+      if (!data[currentStep]) {
+        data[currentStep] = {};
+      }
+      // Right-align: if fewer values than columns, fill from the right
+      const startCol = Math.max(0, columns.length - pendingValues.length);
+      pendingValues.forEach((val, idx) => {
+        const colIdx = startCol + idx;
+        if (colIdx < columns.length) {
+          const col = columns[colIdx];
+          data[currentStep][col.key] = val;
+        }
+      });
+    }
+
+    if (steps.length === 0) {
+      return { success: false, error: 'No valid data rows found' };
+    }
+
+    return { success: true, columns, steps, data };
   };
 
   const validateAndBuildRecords = () => {
@@ -398,9 +736,8 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                   </button>
                 ) : (
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '4px', flex: 1 }}>
-                    <input
-                      type="text"
-                      placeholder="YYYY-YYYY (e.g., 2024-2025)"
+                    <label style={{ fontSize: '14px', fontWeight: '500', color: '#000' }}>School Year:</label>
+                    <select
                       value={newYearInput}
                       onChange={(e) => setNewYearInput(e.target.value)}
                       style={{
@@ -408,28 +745,16 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                         border: '1px solid #cbd5e1',
                         borderRadius: '4px',
                         fontSize: '14px',
-                        width: '200px',
                         backgroundColor: '#ffffff',
-                        color: '#000'
-                      }}
-                    />
-                    <select
-                      value={newPeriodInput}
-                      onChange={(e) => setNewPeriodInput(e.target.value)}
-                      style={{
-                        padding: '8px 12px',
-                        border: '1px solid #cbd5e1',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        backgroundColor: '#ffffff',
-                        color: '#000'
+                        color: '#000',
+                        width: '150px'
                       }}
                     >
-                      <option value="regular">Regular</option>
-                      <option value="summer">Summer</option>
-                      <option value="extended">Extended</option>
-                      <option value="other">Other</option>
+                      {yearOptions.map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
                     </select>
+                    <span style={{ fontSize: '14px', color: '#666' }}>(Full Year)</span>
                     <button
                       className="btn btn-primary"
                       onClick={handleAddYear}
@@ -441,8 +766,7 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                       className="btn btn-secondary"
                       onClick={() => {
                         setShowAddYear(false);
-                        setNewYearInput('');
-                        setNewPeriodInput('regular');
+                        setNewYearInput('2025-2026');
                         setError(null);
                       }}
                       style={{ fontSize: '14px', padding: '8px 16px' }}
@@ -493,6 +817,14 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                       <div style={{ marginBottom: '12px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                         <AddColumnControl scheduleIdx={idx} onAddColumn={handleAddColumn} />
                         <AddStepControl scheduleIdx={idx} existingSteps={steps} onAddStep={handleAddStep} />
+                        <button
+                          className="btn btn-secondary"
+                          onClick={() => handlePasteData(idx)}
+                          style={{ fontSize: '13px', padding: '6px 12px' }}
+                          title="Paste salary table from clipboard"
+                        >
+                          📋 Paste from Clipboard
+                        </button>
                       </div>
 
                       <div className="salary-table-wrapper">
