@@ -12,6 +12,7 @@ function BackupManager({ onClose, onSuccess }) {
   const [reapplying, setReapplying] = useState(false);
   const [results, setResults] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [progress, setProgress] = useState({ current: 0, total: 0, currentFile: '' });
 
   // Load backups on mount
   useEffect(() => {
@@ -67,18 +68,69 @@ function BackupManager({ onClose, onSuccess }) {
       setResults(null);
 
       const filenames = Array.from(selectedBackups);
-      const response = await api.reapplyBackups(filenames);
+      const total = filenames.length;
 
-      setResults(response);
+      // Track results from each backup
+      const successfulResults = [];
+      const failedResults = [];
+      let totalProcessed = 0;
+      let totalErrors = 0;
+
+      // Process backups one at a time
+      for (let i = 0; i < filenames.length; i++) {
+        const filename = filenames[i];
+        const backupInfo = backups.find(b => b.filename === filename);
+        const displayName = backupInfo?.district_name || filename;
+
+        setProgress({
+          current: i + 1,
+          total: total,
+          currentFile: displayName
+        });
+
+        try {
+          // Re-apply single backup
+          const response = await api.reapplyBackups([filename]);
+
+          if (response.results && response.results.length > 0) {
+            successfulResults.push(...response.results);
+            totalProcessed += response.total_processed || 0;
+          }
+
+          if (response.errors && response.errors.length > 0) {
+            failedResults.push(...response.errors);
+            totalErrors += response.total_errors || 0;
+          }
+        } catch (err) {
+          // Track individual failures
+          failedResults.push({
+            filename: filename,
+            error: err.message
+          });
+          totalErrors++;
+        }
+      }
+
+      // Compile final results
+      const finalResults = {
+        success: totalErrors === 0,
+        total_processed: totalProcessed,
+        total_errors: totalErrors,
+        results: successfulResults,
+        errors: failedResults
+      };
+
+      setResults(finalResults);
       setSelectedBackups(new Set());
 
-      if (response.success && onSuccess) {
-        onSuccess(response);
+      if (finalResults.success && onSuccess) {
+        onSuccess(finalResults);
       }
     } catch (err) {
       setError(err.message);
     } finally {
       setReapplying(false);
+      setProgress({ current: 0, total: 0, currentFile: '' });
     }
   };
 
@@ -97,7 +149,11 @@ function BackupManager({ onClose, onSuccess }) {
     <>
       <LoadingOverlay
         isOpen={reapplying}
-        message={`Re-applying ${selectedBackups.size} backup(s)...\nThis may take a moment.`}
+        message={
+          progress.total > 0
+            ? `Re-applying backups (${progress.current}/${progress.total})...\n${progress.currentFile}`
+            : `Re-applying ${selectedBackups.size} backup(s)...\nThis may take a moment.`
+        }
       />
 
       <ConfirmDialog
