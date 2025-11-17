@@ -121,6 +121,10 @@ def import_districts(json_filepath: str, dry_run: bool = False):
         'skipped': 0
     }
 
+    # Cache for tracking districts we've already processed in this run
+    # This prevents duplicates within the import file itself
+    processed_districts_map = {}
+
     # Process each category of districts
     categories = [
         ('regional_academic', 'Regional Academic', 'regional_academic'),
@@ -178,13 +182,37 @@ def import_districts(json_filepath: str, dry_run: bool = False):
                 stats['success'] += 1
             else:
                 try:
-                    # Check if district exists by name (case-insensitive)
-                    existing, _ = DynamoDBDistrictService.get_districts(
-                        table, name=name, limit=1, offset=0
-                    )
+                    name_lower = name.lower()
+
+                    # First check if we've already processed this district in this run
+                    if name_lower in processed_districts_map:
+                        district_id = processed_districts_map[name_lower]['id']
+                        print(f"  ⚠️  Skipping duplicate: {name} (already processed in this run)")
+                        stats['skipped'] += 1
+                        continue
+
+                    # Check if district exists in database using GSI
+                    from boto3.dynamodb.conditions import Key
+                    existing = None
+                    try:
+                        response = table.query(
+                            IndexName='GSI_METADATA',
+                            KeyConditionExpression=Key('SK').eq('METADATA') & Key('name_lower').eq(name_lower),
+                            Limit=1
+                        )
+                        if response.get('Items'):
+                            item = response['Items'][0]
+                            existing = {
+                                'id': item.get('district_id'),
+                                'name': item.get('name')
+                            }
+                    except Exception as query_error:
+                        # If GSI query fails, fall back to checking processed map only
+                        print(f"  ⚠️  Warning: Could not query GSI for {name}: {query_error}")
+
                     if existing:
                         # Update existing
-                        district_id = existing[0]['id']
+                        district_id = existing['id']
                         from schemas import DistrictUpdate
                         update_data = DistrictUpdate(
                             name=name,
@@ -195,10 +223,20 @@ def import_districts(json_filepath: str, dry_run: bool = False):
                         )
                         DynamoDBDistrictService.update_district(table, district_id, update_data)
                         print(f"  ✓ Updated: {name} (ID: {district_id})")
+                        # Track this district in our processed map
+                        processed_districts_map[name_lower] = {
+                            'id': district_id,
+                            'name': name
+                        }
                     else:
                         # Create new
                         result = DynamoDBDistrictService.create_district(table, district_create)
                         print(f"  ✓ Imported: {name} (ID: {result['id']})")
+                        # Track this district in our processed map
+                        processed_districts_map[name_lower] = {
+                            'id': result['id'],
+                            'name': name
+                        }
                     stats['success'] += 1
                 except Exception as e:
                     print(f"  ✗ Failed to import/update {name}: {str(e)}")
