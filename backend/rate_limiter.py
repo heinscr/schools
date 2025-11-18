@@ -5,6 +5,7 @@ Implements rate limiting to prevent abuse and DoS attacks.
 Uses slowapi for FastAPI-compatible rate limiting.
 """
 import os
+from typing import Callable, Any
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -29,7 +30,7 @@ limiter = Limiter(
 )
 
 
-def get_rate_limit_handler():
+def get_rate_limit_handler() -> Callable[[Any, Any], Any]:
     """
     Get the rate limit exceeded handler
 

@@ -12,6 +12,7 @@ from database import get_table
 from cognito_auth import require_admin_role
 from rate_limiter import limiter, GENERAL_RATE_LIMIT, WRITE_RATE_LIMIT
 from services.salary_jobs import SalaryJobsService, LocalSalaryJobsService
+from validation import validate_district_id
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -63,6 +64,9 @@ async def upload_salary_schedule(
     user: dict = Depends(require_admin_role)
 ):
     """Upload a PDF contract for processing"""
+    # Validate district_id format
+    district_id = validate_district_id(district_id)
+
     if not salary_jobs_service:
         raise HTTPException(status_code=503, detail="Salary processing service not configured")
 
@@ -159,6 +163,9 @@ async def apply_salary_schedule(
     user: dict = Depends(require_admin_role)
 ):
     """Apply extracted salary data to district"""
+    # Validate inputs
+    district_id = validate_district_id(district_id)
+
     if not salary_jobs_service:
         raise HTTPException(status_code=503, detail="Salary processing service not configured")
 
@@ -203,6 +210,9 @@ async def manual_apply_salary_schedule(
 
     Body JSON: { "records": [ { school_year, period, education, credits, step, salary, (optional) district_name } ] }
     """
+    # Validate district_id
+    district_id = validate_district_id(district_id)
+
     if not salary_jobs_service:
         raise HTTPException(status_code=503, detail="Salary processing service not configured")
 
@@ -252,6 +262,9 @@ async def reject_salary_schedule(
     user: dict = Depends(require_admin_role)
 ):
     """Reject and delete a processing job"""
+    # Validate district_id
+    district_id = validate_district_id(district_id)
+
     if not salary_jobs_service:
         raise HTTPException(status_code=503, detail="Salary processing service not configured")
 

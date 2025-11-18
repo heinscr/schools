@@ -10,7 +10,7 @@ from pathlib import Path
 from collections import defaultdict
 from decimal import Decimal
 from boto3.dynamodb.conditions import Attr
-from datetime import datetime
+from datetime import datetime, UTC
 
 # Initialize DynamoDB
 dynamodb = boto3.resource('dynamodb')
@@ -201,7 +201,7 @@ def create_items(salary_records, district_map, table_name):
             'SK': f'YEAR#{school_year}#PERIOD#{period}',
             'school_year': school_year,
             'period': period,
-            'created_at': datetime.utcnow().isoformat()
+            'created_at': datetime.now(UTC).isoformat()
         }
         metadata_items.append(metadata_item)
 
@@ -224,7 +224,7 @@ def create_items(salary_records, district_map, table_name):
             'school_year': school_year,
             'period': period,
             'districts': districts_availability,
-            'created_at': datetime.utcnow().isoformat()
+            'created_at': datetime.now(UTC).isoformat()
         }
         availability_items.append(availability_item)
 
@@ -236,7 +236,7 @@ def create_items(salary_records, district_map, table_name):
         'SK': 'GLOBAL',
         'max_step': global_max_step,
         'edu_credit_combos': sorted(list(global_edu_credit_combos)),  # Only combos that exist in data
-        'last_updated': datetime.utcnow().isoformat()
+        'last_updated': datetime.now(UTC).isoformat()
     }
 
     print(f"  ✓ Created max values metadata:")

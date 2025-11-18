@@ -5,13 +5,14 @@ Handles PDF upload, job tracking, and data replacement
 import uuid
 import time
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from decimal import Decimal
 from typing import Dict, List, Optional, Tuple
 import boto3
 from boto3.dynamodb.conditions import Key
 import logging
 from utils.normalization import generate_calculated_entries, pad_number
+from config import JOB_TTL_SECONDS
 
 logger = logging.getLogger(__name__)
 
@@ -69,8 +70,8 @@ class SalaryJobsService:
         logger.info(f"Successfully uploaded PDF to S3: {pdf_key}")
 
         # Create job record
-        now = datetime.utcnow().isoformat()
-        ttl = int(time.time()) + (30 * 24 * 60 * 60)  # 30 days
+        now = datetime.now(UTC).isoformat()
+        ttl = int(time.time()) + JOB_TTL_SECONDS
 
         job = {
             'PK': f'JOB#{job_id}',
@@ -125,7 +126,7 @@ class SalaryJobsService:
         expr_attr_names = {'#status': 'status'}
         expr_attr_values = {
             ':status': status,
-            ':updated_at': datetime.utcnow().isoformat()
+            ':updated_at': datetime.now(UTC).isoformat()
         }
 
         if extracted_records_count is not None:
@@ -438,7 +439,7 @@ class SalaryJobsService:
             'SK': 'GLOBAL',
             'max_step': final_max_step,
             'edu_credit_combos': sorted(list(final_combos)),
-            'last_updated': datetime.utcnow().isoformat()
+            'last_updated': datetime.now(UTC).isoformat()
         })
 
     def list_backups(self) -> List[Dict]:
@@ -653,7 +654,7 @@ class SalaryJobsService:
                 districts[district_id] = {combo: True for combo in edu_credits}
 
                 item['districts'] = districts
-                item['last_updated'] = datetime.utcnow().isoformat()
+                item['last_updated'] = datetime.now(UTC).isoformat()
             else:
                 # Create new availability metadata
                 item = {
@@ -664,7 +665,7 @@ class SalaryJobsService:
                     'districts': {
                         district_id: {combo: True for combo in edu_credits}
                     },
-                    'created_at': datetime.utcnow().isoformat()
+                    'created_at': datetime.now(UTC).isoformat()
                 }
 
             # Save updated metadata
@@ -698,7 +699,7 @@ class SalaryJobsService:
                     'SK': sk,
                     'school_year': year,
                     'period': period,
-                    'created_at': datetime.utcnow().isoformat()
+                    'created_at': datetime.now(UTC).isoformat()
                 }
                 self.table.put_item(Item=item)
                 logger.info(f"Created schedule metadata for {year}/{period}")
@@ -822,14 +823,14 @@ class SalaryJobsService:
         job_id = str(uuid.uuid4())
 
         # Create normalization job record
-        ttl = int(time.time()) + (30 * 24 * 60 * 60)  # 30 days
+        ttl = int(time.time()) + JOB_TTL_SECONDS
 
         job = {
             'PK': 'NORMALIZATION_JOB#RUNNING',
             'SK': 'METADATA',
             'job_id': job_id,
             'status': 'running',
-            'started_at': datetime.utcnow().isoformat(),
+            'started_at': datetime.now(UTC).isoformat(),
             'triggered_by': triggered_by,
             'ttl': ttl
         }
@@ -875,7 +876,7 @@ class SalaryJobsService:
             'SK': 'METADATA',
             'job_id': job_id,
             'status': 'running',
-            'started_at': datetime.utcnow().isoformat(),
+            'started_at': datetime.now(UTC).isoformat(),
             'triggered_by': triggered_by,
             'filenames': filenames,
             'total': len(filenames),
@@ -923,7 +924,7 @@ class SalaryJobsService:
                 ':succ': succeeded,
                 ':fail': failed,
                 ':curr': current_file,
-                ':updated': datetime.utcnow().isoformat()
+                ':updated': datetime.now(UTC).isoformat()
             }
             expr_names = {
                 '#proc': 'processed',
@@ -970,7 +971,7 @@ class SalaryJobsService:
 
             job = response['Item']
             job['status'] = 'completed'
-            job['completed_at'] = datetime.utcnow().isoformat()
+            job['completed_at'] = datetime.now(UTC).isoformat()
 
             # Archive the completed job
             archive_pk = f'BACKUP_REAPPLY_JOB#{job_id}'
@@ -1004,7 +1005,7 @@ class SalaryJobsService:
             job = response['Item']
             job['status'] = 'failed'
             job['error_message'] = error_message
-            job['failed_at'] = datetime.utcnow().isoformat()
+            job['failed_at'] = datetime.now(UTC).isoformat()
 
             # Archive the failed job
             job['PK'] = f'BACKUP_REAPPLY_JOB#{job_id}'
@@ -1112,8 +1113,8 @@ class LocalSalaryJobsService:
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(sample_records, f)
 
-        now = datetime.utcnow().isoformat()
-        ttl = int(time.time()) + (30 * 24 * 60 * 60)
+        now = datetime.now(UTC).isoformat()
+        ttl = int(time.time()) + JOB_TTL_SECONDS
 
         job = {
             'PK': f'JOB#{job_id}',

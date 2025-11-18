@@ -34,3 +34,11 @@ VALID_DISTRICT_TYPES = {
 
 # Pagination
 DEFAULT_OFFSET = 0
+
+# Job and Record TTL Configuration (in seconds)
+JOB_TTL_DAYS = 30  # Jobs expire after 30 days
+JOB_TTL_SECONDS = JOB_TTL_DAYS * 24 * 60 * 60
+
+# Rate Limiting Delays (in seconds)
+BACKUP_PROCESSING_DELAY = 0.5  # Delay between processing backup files
+TEXTRACT_RETRY_DELAY = 2.0  # Delay before retrying Textract operations

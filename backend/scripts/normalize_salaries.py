@@ -10,7 +10,7 @@ Usage:
 import os
 import sys
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 from decimal import Decimal
 from pathlib import Path
 
@@ -109,7 +109,7 @@ def update_global_metadata(max_step, combos):
         'SK': 'GLOBAL',
         'max_step': max_step,
         'edu_credit_combos': sorted(combos),
-        'last_updated': datetime.utcnow().isoformat()
+        'last_updated': datetime.now(UTC).isoformat()
     })
 
 
@@ -119,7 +119,7 @@ def update_normalization_status(job_id):
         'PK': 'METADATA#NORMALIZATION',
         'SK': 'STATUS',
         'needs_normalization': False,
-        'last_normalized_at': datetime.utcnow().isoformat(),
+        'last_normalized_at': datetime.now(UTC).isoformat(),
         'last_normalization_job_id': job_id
     })
 

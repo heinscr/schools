@@ -1,6 +1,7 @@
 import os
 import boto3
 import logging
+from typing import Any
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
@@ -17,8 +18,12 @@ if not TABLE_NAME:
     raise ValueError("DYNAMODB_TABLE_NAME environment variable must be set")
 
 # Create DynamoDB client
-def get_dynamodb_client():
-    """Get DynamoDB client"""
+def get_dynamodb_client() -> Any:
+    """Get DynamoDB client
+
+    Returns:
+        boto3 DynamoDB client configured for local or production use
+    """
     if DYNAMODB_ENDPOINT:
         # Local development with DynamoDB Local
         return boto3.client(
@@ -31,8 +36,12 @@ def get_dynamodb_client():
         return boto3.client('dynamodb', region_name=AWS_REGION)
 
 
-def get_dynamodb_resource():
-    """Get DynamoDB resource (higher-level interface)"""
+def get_dynamodb_resource() -> Any:
+    """Get DynamoDB resource (higher-level interface)
+
+    Returns:
+        boto3 DynamoDB resource configured for local or production use
+    """
     if DYNAMODB_ENDPOINT:
         # Local development
         return boto3.resource(
@@ -51,7 +60,7 @@ dynamodb_resource = get_dynamodb_resource()
 table = dynamodb_resource.Table(TABLE_NAME)
 
 
-def init_db():
+def init_db() -> None:
     """
     Initialize DynamoDB table (for local development only)
     In production, table is created by Terraform
@@ -136,6 +145,10 @@ def init_db():
         logger.info(f"Table {TABLE_NAME} created successfully")
 
 
-def get_table():
-    """Dependency function to get DynamoDB table"""
+def get_table() -> Any:
+    """Dependency function to get DynamoDB table
+
+    Returns:
+        DynamoDB table resource for dependency injection
+    """
     return table

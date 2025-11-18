@@ -146,13 +146,13 @@ def update_job_status(
     error_message: str = None
 ):
     """Update job status in DynamoDB"""
-    from datetime import datetime
+    from datetime import datetime, UTC
 
     update_expr = "SET #status = :status, updated_at = :updated_at"
     expr_attr_names = {'#status': 'status'}
     expr_attr_values = {
         ':status': status,
-        ':updated_at': datetime.utcnow().isoformat()
+        ':updated_at': datetime.now(UTC).isoformat()
     }
 
     if extracted_records_count is not None:

@@ -26,10 +26,13 @@ def get_cognito_config() -> Dict[str, str]:
 
 
 @lru_cache()
-def get_cognito_keys():
+def get_cognito_keys() -> Dict:
     """
     Fetch and cache Cognito public keys for JWT verification
     Keys are cached to avoid repeated requests
+
+    Returns:
+        Dictionary containing JWK keys from Cognito, or empty dict if unavailable
     """
     config = get_cognito_config()
     user_pool_id = config["user_pool_id"]

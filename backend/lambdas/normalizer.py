@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 import boto3
-from datetime import datetime
+from datetime import datetime, UTC
 from decimal import Decimal
 from collections import defaultdict
 
@@ -221,7 +221,7 @@ def update_global_metadata(max_step, edu_credit_combos):
         'SK': 'GLOBAL',
         'max_step': max_step,
         'edu_credit_combos': sorted(edu_credit_combos),
-        'last_updated': datetime.utcnow().isoformat()
+        'last_updated': datetime.now(UTC).isoformat()
     })
     logger.info(f"Updated global metadata: max_step={max_step}, combos={len(edu_credit_combos)}")
 
@@ -232,7 +232,7 @@ def update_normalization_status(job_id):
         'PK': 'METADATA#NORMALIZATION',
         'SK': 'STATUS',
         'needs_normalization': False,
-        'last_normalized_at': datetime.utcnow().isoformat(),
+        'last_normalized_at': datetime.now(UTC).isoformat(),
         'last_normalization_job_id': job_id
     })
     logger.info("Updated normalization status to not needed")
@@ -249,7 +249,7 @@ def complete_normalization_job(job_id, records_created):
         'SK': 'METADATA',
         'job_id': job_id,
         'status': 'completed',
-        'completed_at': datetime.utcnow().isoformat(),
+        'completed_at': datetime.now(UTC).isoformat(),
         'records_created': records_created
     })
 
@@ -270,7 +270,7 @@ def fail_normalization_job(job_id, error_message):
         'SK': 'METADATA',
         'job_id': job_id,
         'status': 'failed',
-        'failed_at': datetime.utcnow().isoformat(),
+        'failed_at': datetime.now(UTC).isoformat(),
         'error_message': error_message
     })
 

@@ -1,10 +1,11 @@
 """
 Serialization utilities for converting Python objects to JSON-compatible formats
 """
+from typing import Any
 from decimal import Decimal
 
 
-def decimal_to_float(obj):
+def decimal_to_float(obj: Any) -> float:
     """
     Convert Decimal objects to float for JSON serialization
 
