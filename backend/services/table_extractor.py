@@ -8,6 +8,13 @@ from typing import Dict, List, Optional, Tuple
 from decimal import Decimal
 from dataclasses import dataclass
 
+from .extraction_common import (
+    parse_salary_value,
+    extract_step_number,
+    has_salary_table_signal,
+    looks_like_step_header,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -86,10 +93,7 @@ class TableDetector:
 
     def _is_salary_table_page(self, text: str) -> bool:
         """Check if page contains a salary table"""
-        for pattern in self.SALARY_TABLE_PATTERNS:
-            if re.search(pattern, text, re.IGNORECASE):
-                return True
-        return False
+        return has_salary_table_signal(text)
 
     def _extract_school_year(self, text: str) -> Optional[str]:
         """
@@ -331,18 +335,7 @@ class TableParser:
         Returns:
             Step number or None
         """
-        if not cell:
-            return None
-
-        # Look for any number in the cell
-        match = re.search(r'\b(\d+)\b', str(cell))
-        if match:
-            step = int(match.group(1))
-            # Validate step is in reasonable range
-            if 1 <= step <= 20:
-                return step
-
-        return None
+        return extract_step_number(cell, min_step=1, max_step=20)
 
     def _parse_salary(self, cell: str) -> Optional[Decimal]:
         """
@@ -354,24 +347,7 @@ class TableParser:
         Returns:
             Decimal salary value or None
         """
-        if not cell or not str(cell).strip():
-            return None
-
-        # Remove currency symbols, commas, whitespace, dollar signs
-        cleaned = re.sub(r'[$,\s]', '', str(cell))
-
-        # Try to convert to decimal
-        try:
-            value = Decimal(cleaned)
-            # Validate salary is in reasonable range (e.g., $20k - $200k)
-            if 20000 <= value <= 200000:
-                return value
-            else:
-                logger.debug(f"Salary out of range: {value}")
-                return None
-        except:
-            logger.debug(f"Could not parse salary: '{cell}'")
-            return None
+        return parse_salary_value(cell, min_val=20000, max_val=200000, return_decimal=True)
 
     def normalize_to_json_format(self, table: SalaryTable) -> List[Dict]:
         """

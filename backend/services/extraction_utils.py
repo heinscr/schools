@@ -13,6 +13,16 @@ from decimal import Decimal, InvalidOperation
 import boto3
 import pdfplumber
 
+# Import common extraction utilities
+from .extraction_common import (
+    parse_salary_value,
+    is_salary_value,
+    extract_step_number as common_extract_step_number,
+    is_step_marker,
+    has_salary_table_signal as common_has_salary_table_signal,
+    looks_like_step_header as common_looks_like_step_header,
+)
+
 fitz = None  # type: ignore
 pdfium = None  # type: ignore
 
@@ -409,34 +419,21 @@ LANE_HEADER_TOKEN_PATTERN = re.compile(r'^(?=.*[A-Z])[A-Z0-9+/.-]+$', re.I)
 
 
 def looks_like_step_header(text: str) -> bool:
-    if not text:
-        return False
-    normalized = text.strip().upper()
-    if not normalized:
-        return False
-    if normalized.startswith('STEP'):
-        return True
-    simplified = re.sub(r'[^A-Z]', '', normalized)
-    return simplified in STEP_HEADER_NORMALIZED
+    """Check if text looks like a step header - delegates to common implementation"""
+    return common_looks_like_step_header(text)
 
 
 STEP_MARKER_PATTERN = re.compile(r'^\d{1,2}(?:[-/]\d{1,2})?$')
 
 
 def is_column_step_marker(text: str) -> bool:
-    if not text:
-        return False
-    token = text.strip().replace('–', '-').replace('—', '-')
-    return bool(STEP_MARKER_PATTERN.match(token))
+    """Check if text is a step marker - delegates to common implementation"""
+    return is_step_marker(text)
 
 
 def is_column_salary_value(text: str) -> bool:
-    if not text:
-        return False
-    token = text.strip()
-    token = token.replace('$', '').replace(',', '').replace(' ', '')
-    token = token.replace('.', '')
-    return token.isdigit()
+    """Check if text is a salary value - delegates to common implementation"""
+    return is_salary_value(text)
 
 
 def looks_like_lane_header_token(token: str) -> bool:
@@ -453,12 +450,8 @@ TRIGGER_PATTERN = re.compile(r'(SALARY|COMPENSATION|TEACHERS?|SCHEDULE|STEP)', r
 
 
 def text_has_salary_signal(text: str) -> bool:
-    if not text:
-        return False
-    if TRIGGER_PATTERN.search(text):
-        return True
-    upper = text.upper()
-    return any(token in upper for token in STEP_HEADER_NORMALIZED)
+    """Check if text has salary table signals - delegates to common implementation"""
+    return common_has_salary_table_signal(text)
 
 
 def collect_lane_aliases(text: str) -> Dict[str, str]:
