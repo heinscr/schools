@@ -81,16 +81,30 @@ function BackupManager({ onClose, onSuccess }) {
 
       // Poll for status
       const pollInterval = 2000; // Poll every 2 seconds
+      const maxPolls = 450; // 15 minutes max (450 * 2 seconds)
       let jobComplete = false;
+      let pollCount = 0;
 
-      while (!jobComplete) {
+      while (!jobComplete && pollCount < maxPolls) {
         await new Promise(resolve => setTimeout(resolve, pollInterval));
+        pollCount++;
 
-        const status = await api.getBackupReapplyStatus();
+        const status = await api.getBackupReapplyStatus(jobId);
 
+        // Check if job has stopped running (completed, failed, or not found)
         if (!status.job_running || status.job_id !== jobId) {
-          // Job completed or not found
           jobComplete = true;
+
+          // Check for fatal errors
+          if (status.error_message) {
+            throw new Error(`Job failed: ${status.error_message}`);
+          }
+
+          // Check if this was an error scenario
+          if (!status.job_running && status.job_id === null) {
+            // Job disappeared - might have crashed
+            throw new Error('Job stopped unexpectedly. Check CloudWatch logs for details.');
+          }
 
           // Final results
           const finalResults = {
@@ -118,6 +132,11 @@ function BackupManager({ onClose, onSuccess }) {
             currentFile: displayName
           });
         }
+      }
+
+      // Timeout check
+      if (pollCount >= maxPolls) {
+        throw new Error('Job timeout: Processing took longer than 15 minutes');
       }
     } catch (err) {
       setError(err.message);

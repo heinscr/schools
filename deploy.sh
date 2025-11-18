@@ -140,6 +140,7 @@ SALARY_API_ENDPOINT=$(terraform output -raw api_endpoint)
 # Salary processing Lambda functions (optional - may not exist in older deployments)
 SALARY_PROCESSOR_LAMBDA=$(terraform output -raw salary_processor_lambda_name 2>/dev/null || echo "")
 SALARY_NORMALIZER_LAMBDA=$(terraform output -raw salary_normalizer_lambda_name 2>/dev/null || echo "")
+BACKUP_REAPPLY_WORKER_LAMBDA=$(terraform output -raw backup_reapply_worker_lambda_name 2>/dev/null || echo "")
 
 echo -e "${GREEN}✓ Configuration loaded${NC}"
 echo "  S3 Bucket: $S3_BUCKET"
@@ -154,6 +155,9 @@ if [ -n "$SALARY_PROCESSOR_LAMBDA" ]; then
 fi
 if [ -n "$SALARY_NORMALIZER_LAMBDA" ]; then
     echo "  Salary Normalizer Lambda: $SALARY_NORMALIZER_LAMBDA"
+fi
+if [ -n "$BACKUP_REAPPLY_WORKER_LAMBDA" ]; then
+    echo "  Backup Reapply Worker Lambda: $BACKUP_REAPPLY_WORKER_LAMBDA"
 fi
 echo ""
 
@@ -338,6 +342,63 @@ if [ -n "$SALARY_NORMALIZER_LAMBDA" ]; then
         echo -e "${GREEN}✓ Salary Normalizer Lambda function deployed${NC}"
     else
         echo -e "${YELLOW}⚠ Salary Normalizer Lambda function does not exist (should be created by Terraform)${NC}"
+    fi
+
+    cd ..
+fi
+
+if [ -n "$BACKUP_REAPPLY_WORKER_LAMBDA" ]; then
+    echo -e "\n${YELLOW}=== Deploying Backup Reapply Worker Lambda ===${NC}"
+
+    echo "Creating Backup Reapply Worker Lambda deployment package..."
+    cd backend
+    rm -rf backup-worker-package backup-reapply-worker.zip 2>/dev/null || true
+
+    # Install dependencies (boto3 is included by AWS Lambda runtime, but include for completeness)
+    $PIP_BUILD_CMD install boto3 -t backup-worker-package/ --quiet
+
+    # Copy Lambda handler and shared services/utilities
+    cp lambdas/backup_reapply_worker.py backup-worker-package/
+    mkdir -p backup-worker-package/services
+    cp services/salary_jobs.py backup-worker-package/services/
+    [ -f "services/__init__.py" ] && cp services/__init__.py backup-worker-package/services/
+
+    # Copy utils directory (needed by salary_jobs.py)
+    [ -d "utils" ] && cp -r utils backup-worker-package/
+
+    # Create zip
+    cd backup-worker-package
+    zip -r ../backup-reapply-worker.zip . -q
+    cd ..
+
+    echo -e "${GREEN}✓ Backup Reapply Worker Lambda package created${NC}"
+
+    # Upload to S3
+    echo "Uploading Backup Reapply Worker Lambda package to S3..."
+    aws s3 cp backup-reapply-worker.zip s3://$S3_BUCKET/backend/backup-reapply-worker.zip --region $AWS_REGION
+    echo -e "${GREEN}✓ Backup Reapply Worker Lambda package uploaded${NC}"
+
+    # Update Lambda function
+    if aws lambda get-function --function-name $BACKUP_REAPPLY_WORKER_LAMBDA --region $AWS_REGION > /dev/null 2>&1; then
+        echo "Updating Backup Reapply Worker Lambda function code..."
+
+        # Wait for any pending updates
+        aws lambda wait function-updated --function-name $BACKUP_REAPPLY_WORKER_LAMBDA --region $AWS_REGION 2>/dev/null || true
+
+        # Update function code
+        aws lambda update-function-code \
+            --function-name $BACKUP_REAPPLY_WORKER_LAMBDA \
+            --s3-bucket $S3_BUCKET \
+            --s3-key backend/backup-reapply-worker.zip \
+            --region $AWS_REGION \
+            --output json > /dev/null
+
+        echo "Waiting for code update to complete..."
+        aws lambda wait function-updated --function-name $BACKUP_REAPPLY_WORKER_LAMBDA --region $AWS_REGION 2>/dev/null || true
+
+        echo -e "${GREEN}✓ Backup Reapply Worker Lambda function deployed${NC}"
+    else
+        echo -e "${YELLOW}⚠ Backup Reapply Worker Lambda function does not exist (should be created by Terraform)${NC}"
     fi
 
     cd ..

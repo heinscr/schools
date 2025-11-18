@@ -311,6 +311,12 @@ resource "aws_dynamodb_table" "main" {
     type = "S"
   }
 
+  # GSI4: GSI_METADATA - For district metadata queries by name
+  attribute {
+    name = "name_lower"
+    type = "S"
+  }
+
   # GSI1: Exact match query for salary comparisons
   global_secondary_index {
     name            = "ExactMatchIndex"
@@ -332,6 +338,14 @@ resource "aws_dynamodb_table" "main" {
     name            = "GSI_TOWN"
     hash_key        = "GSI_TOWN_PK"
     range_key       = "GSI_TOWN_SK"
+    projection_type = "ALL"
+  }
+
+  # GSI4: District metadata queries by name
+  global_secondary_index {
+    name            = "GSI_METADATA"
+    hash_key        = "SK"
+    range_key       = "name_lower"
     projection_type = "ALL"
   }
 
@@ -479,6 +493,7 @@ resource "aws_lambda_function" "api" {
       local.enable_salary_processing ? {
         SALARY_PROCESSING_QUEUE_URL = aws_sqs_queue.salary_processing.url
         SALARY_NORMALIZER_LAMBDA_ARN = aws_lambda_function.salary_normalizer.arn
+        BACKUP_REAPPLY_WORKER_ARN = aws_lambda_function.backup_reapply_worker.arn
       } : {}
     )
   }

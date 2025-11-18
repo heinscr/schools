@@ -71,6 +71,39 @@ resource "aws_s3_object" "salary_normalizer_placeholder" {
   }
 }
 
+# Placeholder for backup reapply worker Lambda
+data "archive_file" "placeholder_backup_reapply_worker" {
+  type        = "zip"
+  output_path = "${path.module}/placeholder/backup-reapply-worker-placeholder.zip"
+
+  source {
+    content  = <<-EOT
+def handler(event, context):
+    return {
+        'statusCode': 503,
+        'body': 'Backup reapply worker not deployed yet. Please run deploy.sh'
+    }
+EOT
+    filename = "backup_reapply_worker.py"
+  }
+}
+
+# Upload placeholder to S3
+resource "aws_s3_object" "backup_reapply_worker_placeholder" {
+  bucket = aws_s3_bucket.main.id
+  key    = "backend/backup-reapply-worker.zip"
+  source = data.archive_file.placeholder_backup_reapply_worker.output_path
+  etag   = data.archive_file.placeholder_backup_reapply_worker.output_md5
+
+  # This will be replaced when deploy.sh runs
+  lifecycle {
+    ignore_changes = [
+      etag,
+      source
+    ]
+  }
+}
+
 # =============================================================================
 # SQS Queue for PDF Processing
 # =============================================================================
@@ -355,6 +388,122 @@ resource "aws_lambda_function" "salary_normalizer" {
 }
 
 # =============================================================================
+# Lambda Function: Backup Reapply Worker
+# =============================================================================
+
+# IAM role for backup reapply worker Lambda
+resource "aws_iam_role" "backup_reapply_worker_lambda" {
+  name = "${var.project_name}-backup-reapply-worker-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.project_name}-backup-reapply-worker-role"
+    }
+  )
+}
+
+# Attach basic Lambda execution policy
+resource "aws_iam_role_policy_attachment" "backup_reapply_worker_basic" {
+  role       = aws_iam_role.backup_reapply_worker_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# Policy for DynamoDB and S3 access
+resource "aws_iam_role_policy" "backup_reapply_worker_access" {
+  name = "${var.project_name}-backup-reapply-worker-access"
+  role = aws_iam_role.backup_reapply_worker_lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:BatchWriteItem"
+        ]
+        Resource = [
+          aws_dynamodb_table.main.arn,
+          "${aws_dynamodb_table.main.arn}/index/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "${aws_s3_bucket.main.arn}/contracts/backups/*",
+          "${aws_s3_bucket.main.arn}/contracts/applied_data/*",
+          aws_s3_bucket.main.arn
+        ]
+      }
+    ]
+  })
+}
+
+# Lambda function for backup reapply worker
+resource "aws_lambda_function" "backup_reapply_worker" {
+  function_name = "${var.project_name}-backup-reapply-worker"
+  role          = aws_iam_role.backup_reapply_worker_lambda.arn
+  handler       = "backup_reapply_worker.handler"
+  runtime       = var.lambda_runtime
+  timeout       = 900  # 15 minutes max
+  memory_size   = 512  # 512MB
+
+  # Code must be uploaded via S3 by deployment script
+  s3_bucket = aws_s3_bucket.main.id
+  s3_key    = "backend/backup-reapply-worker.zip"
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.main.name
+      S3_BUCKET_NAME      = aws_s3_bucket.main.id
+    }
+  }
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.project_name}-backup-reapply-worker"
+    }
+  )
+
+  depends_on = [
+    aws_iam_role_policy_attachment.backup_reapply_worker_basic,
+    aws_iam_role_policy.backup_reapply_worker_access,
+    aws_s3_object.backup_reapply_worker_placeholder
+  ]
+
+  # Ignore changes to source code hash since deploy.sh will update the code
+  lifecycle {
+    ignore_changes = [
+      source_code_hash
+    ]
+  }
+}
+
+# =============================================================================
 # IAM Policies for Main API Lambda
 # =============================================================================
 
@@ -420,6 +569,25 @@ resource "aws_iam_role_policy" "api_lambda_invoke_normalizer" {
   })
 }
 
+# Add Lambda invoke permission for backup reapply worker
+resource "aws_iam_role_policy" "api_lambda_invoke_backup_worker" {
+  name = "${var.project_name}-api-lambda-invoke-backup-worker"
+  role = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Resource = aws_lambda_function.backup_reapply_worker.arn
+      }
+    ]
+  })
+}
+
 # =============================================================================
 # Outputs
 # =============================================================================
@@ -447,4 +615,14 @@ output "salary_normalizer_lambda_name" {
 output "salary_normalizer_lambda_arn" {
   description = "ARN of the salary normalizer Lambda function"
   value       = aws_lambda_function.salary_normalizer.arn
+}
+
+output "backup_reapply_worker_lambda_name" {
+  description = "Name of the backup reapply worker Lambda function"
+  value       = aws_lambda_function.backup_reapply_worker.function_name
+}
+
+output "backup_reapply_worker_lambda_arn" {
+  description = "ARN of the backup reapply worker Lambda function"
+  value       = aws_lambda_function.backup_reapply_worker.arn
 }

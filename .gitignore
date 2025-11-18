@@ -73,6 +73,9 @@ data/results_contracts/*
 #scripts
 scripts/*
 
+#baekdne
+backend/backup-worker-package/*
+
 # Deployment artifacts
 *.zip
 data/ma_municipalities.geojson

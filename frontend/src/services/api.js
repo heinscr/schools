@@ -578,8 +578,10 @@ class ApiService {
    * Admin: Get backup reapply job status
    * @returns {Promise<Object>} - Job status
    */
-  async getBackupReapplyStatus() {
-    const url = `${API_BASE_URL}/api/admin/backup/reapply/status`;
+  async getBackupReapplyStatus(jobId = null) {
+    const url = jobId
+      ? `${API_BASE_URL}/api/admin/backup/reapply/status?job_id=${jobId}`
+      : `${API_BASE_URL}/api/admin/backup/reapply/status`;
 
     const response = await fetch(url, {
       headers: {

@@ -916,13 +916,19 @@ class SalaryJobsService:
     ) -> None:
         """Update progress of backup reapply job"""
         try:
-            update_expr = "SET processed = :proc, succeeded = :succ, failed = :fail, current_file = :curr, updated_at = :updated"
+            # Use ExpressionAttributeNames for reserved keywords
+            update_expr = "SET #proc = :proc, #succ = :succ, #fail = :fail, current_file = :curr, updated_at = :updated"
             expr_values = {
                 ':proc': processed,
                 ':succ': succeeded,
                 ':fail': failed,
                 ':curr': current_file,
                 ':updated': datetime.utcnow().isoformat()
+            }
+            expr_names = {
+                '#proc': 'processed',
+                '#succ': 'succeeded',
+                '#fail': 'failed'
             }
 
             # Add result or error to lists
@@ -942,6 +948,7 @@ class SalaryJobsService:
             self.table.update_item(
                 Key={'PK': 'BACKUP_REAPPLY_JOB#RUNNING', 'SK': 'METADATA'},
                 UpdateExpression=update_expr,
+                ExpressionAttributeNames=expr_names,
                 ExpressionAttributeValues=expr_values,
                 ConditionExpression='attribute_exists(PK) AND job_id = :jid'
             )
@@ -951,6 +958,7 @@ class SalaryJobsService:
     def complete_backup_reapply_job(self, job_id: str) -> None:
         """Mark backup reapply job as complete and remove from RUNNING"""
         try:
+            logger.info(f"Completing backup reapply job: {job_id}")
             # Get the job
             response = self.table.get_item(
                 Key={'PK': 'BACKUP_REAPPLY_JOB#RUNNING', 'SK': 'METADATA'}
@@ -965,6 +973,40 @@ class SalaryJobsService:
             job['completed_at'] = datetime.utcnow().isoformat()
 
             # Archive the completed job
+            archive_pk = f'BACKUP_REAPPLY_JOB#{job_id}'
+            job['PK'] = archive_pk
+            logger.info(f"Archiving job {job_id} to PK={archive_pk}, SK={job.get('SK')}")
+            logger.info(f"Job has job_id field: {job.get('job_id')}")
+            self.table.put_item(Item=job)
+            logger.info(f"Job {job_id} archived successfully")
+
+            # Delete from RUNNING
+            self.table.delete_item(
+                Key={'PK': 'BACKUP_REAPPLY_JOB#RUNNING', 'SK': 'METADATA'}
+            )
+            logger.info(f"Job {job_id} removed from RUNNING")
+
+        except Exception as e:
+            logger.error(f"Error completing backup reapply job: {e}")
+
+    def fail_backup_reapply_job(self, job_id: str, error_message: str) -> None:
+        """Mark backup reapply job as failed and remove from RUNNING"""
+        try:
+            # Get the job
+            response = self.table.get_item(
+                Key={'PK': 'BACKUP_REAPPLY_JOB#RUNNING', 'SK': 'METADATA'}
+            )
+
+            if 'Item' not in response or response['Item'].get('job_id') != job_id:
+                logger.warning(f"Job {job_id} not found or mismatch when failing")
+                return
+
+            job = response['Item']
+            job['status'] = 'failed'
+            job['error_message'] = error_message
+            job['failed_at'] = datetime.utcnow().isoformat()
+
+            # Archive the failed job
             job['PK'] = f'BACKUP_REAPPLY_JOB#{job_id}'
             self.table.put_item(Item=job)
 
