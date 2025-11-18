@@ -317,7 +317,7 @@ def compare_salaries_across_districts(
 
     logger.info(f"Retrieved {len(all_results)} total salary results")
 
-    # STEP 5: Deduplicate by district - keep most recent year/period per district
+    # STEP 5: Deduplicate by district - keep oldest year/period per district
     district_best_match = {}
     for item in all_results:
         district_id = item.get('district_id')
@@ -331,8 +331,8 @@ def compare_salaries_across_districts(
             existing_year = existing.get('school_year')
             existing_period = existing.get('period')
 
-            # Keep the more recent
-            if (year, period) > (existing_year, existing_period):
+            # Keep the older
+            if (year, period) < (existing_year, existing_period):
                 district_best_match[district_id] = item
 
     all_results = list(district_best_match.values())
