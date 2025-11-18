@@ -183,6 +183,7 @@ $PIP_BUILD_CMD install -r requirements.txt -t package/ --quiet
 cp -r *.py package/
 [ -d "services" ] && cp -r services package/
 [ -d "utils" ] && cp -r utils package/
+[ -d "routers" ] && cp -r routers package/
 
 # Create zip
 cd package

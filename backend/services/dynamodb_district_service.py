@@ -406,12 +406,21 @@ class DynamoDBDistrictService:
                     seen_ids.add(district_id)
 
             # Add districts from town search
-            # GSI_TOWN has projection_type=ALL, so items already contain full district data
+            # Note: GSI_TOWN items only contain town reference data, not full district data
+            # We need to fetch the full METADATA items for these districts
+            town_district_ids = []
             for item in town_results.get('Items', []):
                 if 'district_id' in item and item['district_id'] not in seen_ids:
-                    # Item from GSI already has all district attributes - no need to fetch
-                    districts_map[item['district_id']] = DynamoDBDistrictService._item_to_dict(item)
+                    town_district_ids.append(item['district_id'])
                     seen_ids.add(item['district_id'])
+
+            # Fetch town-based districts
+            # TODO: Optimize with batch_get_item for better performance in production
+            if town_district_ids:
+                for district_id in town_district_ids:
+                    district = DynamoDBDistrictService.get_district(table, district_id)
+                    if district:
+                        districts_map[district_id] = district
 
             # Sort by insertion order and apply pagination
             all_district_ids = list(districts_map.keys())
