@@ -22,6 +22,10 @@ from fastapi import HTTPException
 # Import routers
 from routers import districts, auth, salary_public, salary_admin
 
+# Re-export commonly used items for backward compatibility with tests
+from services.dynamodb_district_service import DynamoDBDistrictService
+from cognito_auth import require_admin_role, get_current_user_optional
+
 # Load environment from .env for local development
 load_dotenv()
 
