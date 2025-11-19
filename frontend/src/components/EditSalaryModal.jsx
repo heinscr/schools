@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
 import './SalaryUploadModal.css';
@@ -44,6 +45,10 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
   }, [district.id]);
 
   const [inputs, setInputs] = useState({});
+
+  // State for raw clipboard input per schedule
+  const [rawInputs, setRawInputs] = useState({});
+  const [showRawInputs, setShowRawInputs] = useState({});
 
   // Build an index for inputs: key `${idx}|${step}|${edu}|${credits}` -> string value
   useEffect(() => {
@@ -252,44 +257,73 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
   const handlePasteData = async (scheduleIdx) => {
     try {
       const text = await navigator.clipboard.readText();
-      const parsed = parseClipboardData(text);
 
-      if (!parsed.success) {
-        setError(parsed.error || 'Failed to parse clipboard data');
-        return;
-      }
+      // Store the raw text and show the raw input area
+      setRawInputs(prev => ({ ...prev, [scheduleIdx]: text }));
+      setShowRawInputs(prev => ({ ...prev, [scheduleIdx]: true }));
 
-      // Update the schedule with parsed data
-      setSchedules(prev => {
-        const updated = [...prev];
-        const schedule = { ...updated[scheduleIdx] };
-        const salaries = [];
-
-        // Create all cells from parsed data
-        parsed.steps.forEach(step => {
-          parsed.columns.forEach(col => {
-            const salary = parsed.data[step]?.[col.key];
-            if (salary != null) {
-              salaries.push({
-                step,
-                education: col.education,
-                credits: col.credits,
-                salary,
-                isCalculated: false
-              });
-            }
-          });
-        });
-
-        schedule.salaries = salaries;
-        updated[scheduleIdx] = schedule;
-        return updated;
-      });
+      // Parse and populate the table
+      parseAndPopulateSchedule(scheduleIdx, text);
 
       setError(null);
     } catch (e) {
       setError('Failed to read clipboard. Please ensure you have granted clipboard permissions.');
     }
+  };
+
+  // Parse raw text and populate the schedule (used by paste and when editing raw input)
+  const parseAndPopulateSchedule = (scheduleIdx, text) => {
+    const parsed = parseClipboardData(text);
+
+    if (!parsed.success) {
+      setError(parsed.error || 'Failed to parse clipboard data');
+      return;
+    }
+
+    // Update the schedule with parsed data
+    setSchedules(prev => {
+      const updated = [...prev];
+      const schedule = { ...updated[scheduleIdx] };
+      const salaries = [];
+
+      // Create all cells from parsed data
+      parsed.steps.forEach(step => {
+        parsed.columns.forEach(col => {
+          const salary = parsed.data[step]?.[col.key];
+          if (salary != null) {
+            salaries.push({
+              step,
+              education: col.education,
+              credits: col.credits,
+              salary,
+              isCalculated: false
+            });
+          }
+        });
+      });
+
+      schedule.salaries = salaries;
+      updated[scheduleIdx] = schedule;
+      return updated;
+    });
+
+    setError(null);
+  };
+
+  // Handle raw input changes and re-parse
+  const handleRawInputChange = (scheduleIdx, newText) => {
+    // Update the raw input state
+    setRawInputs(prev => ({ ...prev, [scheduleIdx]: newText }));
+
+    // Try to parse and update the table
+    if (newText.trim()) {
+      parseAndPopulateSchedule(scheduleIdx, newText);
+    }
+  };
+
+  // Toggle raw input visibility
+  const toggleRawInput = (scheduleIdx) => {
+    setShowRawInputs(prev => ({ ...prev, [scheduleIdx]: !prev[scheduleIdx] }));
   };
 
   // Intelligent parser for clipboard data
@@ -861,7 +895,57 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                         >
                           📋 Paste from Clipboard
                         </button>
+                        {rawInputs[idx] && (
+                          <button
+                            className="btn btn-secondary"
+                            onClick={() => toggleRawInput(idx)}
+                            style={{ fontSize: '13px', padding: '6px 12px' }}
+                            title={showRawInputs[idx] ? "Hide raw input" : "Show raw input"}
+                          >
+                            {showRawInputs[idx] ? '👁️ Hide Raw Input' : '👁️ Show Raw Input'}
+                          </button>
+                        )}
                       </div>
+
+                      {/* Raw Input Editor */}
+                      {showRawInputs[idx] && (
+                        <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #cbd5e1' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <label style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>
+                              Raw Input (Edit to update table)
+                            </label>
+                            <button
+                              className="btn btn-secondary"
+                              onClick={() => setRawInputs(prev => {
+                                const updated = { ...prev };
+                                delete updated[idx];
+                                return updated;
+                              })}
+                              style={{ fontSize: '12px', padding: '4px 8px' }}
+                              title="Clear raw input"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                          <textarea
+                            value={rawInputs[idx] || ''}
+                            onChange={(e) => handleRawInputChange(idx, e.target.value)}
+                            style={{
+                              width: '100%',
+                              minHeight: '150px',
+                              padding: '8px',
+                              border: '1px solid #cbd5e1',
+                              borderRadius: '4px',
+                              fontSize: '13px',
+                              fontFamily: 'monospace',
+                              backgroundColor: '#ffffff',
+                              color: '#000',
+                              resize: 'vertical'
+                            }}
+                            placeholder="Paste or edit salary data here..."
+                          />
+                        </div>
+                      )}
 
                       <div className="salary-table-wrapper">
                         <table className="salary-table">
