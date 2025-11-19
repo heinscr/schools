@@ -169,6 +169,9 @@ echo -e "${YELLOW}=== Deploying Backend ===${NC}"
 # 1. Package Python Lambda (districts API)
 echo "Creating Python Lambda deployment package..."
 
+# Save current directory (project root)
+PROJECT_ROOT="$(pwd)"
+
 # Create build directory structure
 BUILD_DIR="build/backend/api"
 rm -rf "$BUILD_DIR" 2>/dev/null || true
@@ -191,7 +194,7 @@ cp backend/*.py "$BUILD_DIR/package/"
 # Create zip
 cd "$BUILD_DIR/package"
 zip -r ../lambda-deployment.zip . -q
-cd ../../..
+cd "$PROJECT_ROOT"
 
 echo -e "${GREEN}✓ Python Lambda package created at $BUILD_DIR/lambda-deployment.zip${NC}"
 
@@ -202,7 +205,7 @@ echo -e "${GREEN}✓ Python Lambda package created at $BUILD_DIR/lambda-deployme
 
 # Upload backend lambda-deployment.zip to S3
 echo "Uploading backend Lambda package to S3..."
-aws s3 cp "$BUILD_DIR/lambda-deployment.zip" s3://$S3_BUCKET/backend/lambda-deployment.zip --region $AWS_REGION
+aws s3 cp "$PROJECT_ROOT/$BUILD_DIR/lambda-deployment.zip" s3://$S3_BUCKET/backend/lambda-deployment.zip --region $AWS_REGION
 
 echo -e "${GREEN}✓ Lambda package uploaded${NC}"
 
@@ -263,13 +266,13 @@ if [ -n "$SALARY_PROCESSOR_LAMBDA" ]; then
     # Create zip
     cd "$PROCESSOR_BUILD_DIR/package"
     zip -r ../salary-processor.zip . -q
-    cd ../../..
+    cd "$PROJECT_ROOT"
 
     echo -e "${GREEN}✓ Salary Processor Lambda package created at $PROCESSOR_BUILD_DIR/salary-processor.zip${NC}"
 
     # Upload to S3
     echo "Uploading Salary Processor Lambda package to S3..."
-    aws s3 cp "$PROCESSOR_BUILD_DIR/salary-processor.zip" s3://$S3_BUCKET/backend/salary-processor.zip --region $AWS_REGION
+    aws s3 cp "$PROJECT_ROOT/$PROCESSOR_BUILD_DIR/salary-processor.zip" s3://$S3_BUCKET/backend/salary-processor.zip --region $AWS_REGION
     echo -e "${GREEN}✓ Salary Processor Lambda package uploaded${NC}"
 
     # Update Lambda function
@@ -316,13 +319,13 @@ if [ -n "$SALARY_NORMALIZER_LAMBDA" ]; then
     # Create zip
     cd "$NORMALIZER_BUILD_DIR/package"
     zip -r ../salary-normalizer.zip . -q
-    cd ../../..
+    cd "$PROJECT_ROOT"
 
     echo -e "${GREEN}✓ Salary Normalizer Lambda package created at $NORMALIZER_BUILD_DIR/salary-normalizer.zip${NC}"
 
     # Upload to S3
     echo "Uploading Salary Normalizer Lambda package to S3..."
-    aws s3 cp "$NORMALIZER_BUILD_DIR/salary-normalizer.zip" s3://$S3_BUCKET/backend/salary-normalizer.zip --region $AWS_REGION
+    aws s3 cp "$PROJECT_ROOT/$NORMALIZER_BUILD_DIR/salary-normalizer.zip" s3://$S3_BUCKET/backend/salary-normalizer.zip --region $AWS_REGION
     echo -e "${GREEN}✓ Salary Normalizer Lambda package uploaded${NC}"
 
     # Update Lambda function
@@ -374,13 +377,13 @@ if [ -n "$BACKUP_REAPPLY_WORKER_LAMBDA" ]; then
     # Create zip
     cd "$BACKUP_WORKER_BUILD_DIR/package"
     zip -r ../backup-reapply-worker.zip . -q
-    cd ../../..
+    cd "$PROJECT_ROOT"
 
     echo -e "${GREEN}✓ Backup Reapply Worker Lambda package created at $BACKUP_WORKER_BUILD_DIR/backup-reapply-worker.zip${NC}"
 
     # Upload to S3
     echo "Uploading Backup Reapply Worker Lambda package to S3..."
-    aws s3 cp "$BACKUP_WORKER_BUILD_DIR/backup-reapply-worker.zip" s3://$S3_BUCKET/backend/backup-reapply-worker.zip --region $AWS_REGION
+    aws s3 cp "$PROJECT_ROOT/$BACKUP_WORKER_BUILD_DIR/backup-reapply-worker.zip" s3://$S3_BUCKET/backend/backup-reapply-worker.zip --region $AWS_REGION
     echo -e "${GREEN}✓ Backup Reapply Worker Lambda package uploaded${NC}"
 
     # Update Lambda function
