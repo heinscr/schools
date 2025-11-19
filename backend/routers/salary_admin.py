@@ -12,6 +12,7 @@ from database import get_table
 from cognito_auth import require_admin_role
 from rate_limiter import limiter, GENERAL_RATE_LIMIT, WRITE_RATE_LIMIT
 from services.salary_jobs import SalaryJobsService, LocalSalaryJobsService
+from services.salary_service import invalidate_salary_cache
 from validation import validate_district_id
 
 # Configure logging
@@ -185,6 +186,10 @@ async def apply_salary_schedule(
     try:
         success, metadata = salary_jobs_service.apply_salary_data(job_id, district_id, exclusions)
 
+        # OPTIMIZATION: Invalidate salary cache for this district after applying new data
+        invalidate_salary_cache(district_id)
+        logger.info(f"Invalidated salary cache for district {district_id} after applying job {job_id}")
+
         return {
             "success": success,
             "records_added": metadata['records_added'],
@@ -241,6 +246,11 @@ async def manual_apply_salary_schedule(
     logger.info(f"Manual apply invoked for district {district_id} with {len(records)} records; service type={type(salary_jobs_service).__name__}")
     try:
         success, metadata = salary_jobs_service.apply_salary_records(district_id, records)
+
+        # OPTIMIZATION: Invalidate salary cache for this district after manual apply
+        invalidate_salary_cache(district_id)
+        logger.info(f"Invalidated salary cache for district {district_id} after manual apply")
+
         return {
             "success": success,
             "records_added": metadata['records_added'],
@@ -316,7 +326,11 @@ async def start_normalization(
     request: Request,
     user: dict = Depends(require_admin_role)
 ):
-    """Start global normalization job"""
+    """Start global normalization job
+
+    Note: Cache is cleared when normalization starts. Frontend should avoid
+    cached queries until normalization completes.
+    """
     if not salary_jobs_service:
         raise HTTPException(status_code=503, detail="Salary processing service not configured")
 
@@ -330,10 +344,15 @@ async def start_normalization(
             triggered_by=user['sub']
         )
 
+        # OPTIMIZATION: Clear entire cache when normalization starts
+        # Normalization updates calculated salaries across ALL districts
+        invalidate_salary_cache()  # Clear all
+        logger.info("Cleared entire salary cache due to global normalization start")
+
         return {
             "success": True,
             "job_id": job_id,
-            "message": "Normalization job started"
+            "message": "Normalization job started, salary cache cleared"
         }
 
     except ValueError as e:
