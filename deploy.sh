@@ -168,8 +168,11 @@ echo -e "${YELLOW}=== Deploying Backend ===${NC}"
 
 # 1. Package Python Lambda (districts API)
 echo "Creating Python Lambda deployment package..."
-cd backend
-rm -rf package lambda-deployment.zip 2>/dev/null || true
+
+# Create build directory structure
+BUILD_DIR="build/backend/api"
+rm -rf "$BUILD_DIR" 2>/dev/null || true
+mkdir -p "$BUILD_DIR/package"
 
 # Install dependencies (use python -m pip to avoid PEP 668 issues)
 if command -v python3 >/dev/null 2>&1; then
@@ -177,22 +180,20 @@ if command -v python3 >/dev/null 2>&1; then
 else
     PIP_BUILD_CMD="pip"
 fi
-$PIP_BUILD_CMD install -r requirements.txt -t package/ --quiet
+$PIP_BUILD_CMD install -r backend/requirements.txt -t "$BUILD_DIR/package/" --quiet
 
 # Copy application code
-cp -r *.py package/
-[ -d "services" ] && cp -r services package/
-[ -d "utils" ] && cp -r utils package/
-[ -d "routers" ] && cp -r routers package/
+cp backend/*.py "$BUILD_DIR/package/"
+[ -d "backend/services" ] && cp -r backend/services "$BUILD_DIR/package/"
+[ -d "backend/utils" ] && cp -r backend/utils "$BUILD_DIR/package/"
+[ -d "backend/routers" ] && cp -r backend/routers "$BUILD_DIR/package/"
 
 # Create zip
-cd package
+cd "$BUILD_DIR/package"
 zip -r ../lambda-deployment.zip . -q
-cd ..
+cd ../../..
 
-echo -e "${GREEN}✓ Python Lambda package created${NC}"
-
-cd ..
+echo -e "${GREEN}✓ Python Lambda package created at $BUILD_DIR/lambda-deployment.zip${NC}"
 
 # Note: Salary endpoints are now served by the main API Lambda. The separate
 # `salaries.zip` package is no longer built or uploaded. Terraform has been
@@ -201,9 +202,7 @@ cd ..
 
 # Upload backend lambda-deployment.zip to S3
 echo "Uploading backend Lambda package to S3..."
-cd backend
-aws s3 cp lambda-deployment.zip s3://$S3_BUCKET/backend/lambda-deployment.zip --region $AWS_REGION
-cd ..
+aws s3 cp "$BUILD_DIR/lambda-deployment.zip" s3://$S3_BUCKET/backend/lambda-deployment.zip --region $AWS_REGION
 
 echo -e "${GREEN}✓ Lambda package uploaded${NC}"
 
@@ -242,32 +241,35 @@ if [ -n "$SALARY_PROCESSOR_LAMBDA" ]; then
     echo -e "\n${YELLOW}=== Deploying Salary Processor Lambda ===${NC}"
 
     echo "Creating Salary Processor Lambda deployment package..."
-    cd backend
-    rm -rf processor-package salary-processor.zip 2>/dev/null || true
+
+    # Create build directory
+    PROCESSOR_BUILD_DIR="build/backend/processor"
+    rm -rf "$PROCESSOR_BUILD_DIR" 2>/dev/null || true
+    mkdir -p "$PROCESSOR_BUILD_DIR/package"
 
     # Install dependencies
-    $PIP_BUILD_CMD install boto3 pdfplumber pymupdf pypdfium2 -t processor-package/ --quiet
+    $PIP_BUILD_CMD install boto3 pdfplumber pymupdf pypdfium2 -t "$PROCESSOR_BUILD_DIR/package/" --quiet
 
     # Copy Lambda handler
-    cp lambdas/processor.py processor-package/
+    cp backend/lambdas/processor.py "$PROCESSOR_BUILD_DIR/package/"
 
     # Copy required services (HybridContractExtractor and dependencies)
-    mkdir -p processor-package/services
-    cp services/hybrid_extractor.py processor-package/services/
-    cp services/contract_processor.py processor-package/services/
-    cp services/table_extractor.py processor-package/services/
-    [ -f "services/__init__.py" ] && cp services/__init__.py processor-package/services/
+    mkdir -p "$PROCESSOR_BUILD_DIR/package/services"
+    cp backend/services/hybrid_extractor.py "$PROCESSOR_BUILD_DIR/package/services/"
+    cp backend/services/contract_processor.py "$PROCESSOR_BUILD_DIR/package/services/"
+    cp backend/services/table_extractor.py "$PROCESSOR_BUILD_DIR/package/services/"
+    [ -f "backend/services/__init__.py" ] && cp backend/services/__init__.py "$PROCESSOR_BUILD_DIR/package/services/"
 
     # Create zip
-    cd processor-package
+    cd "$PROCESSOR_BUILD_DIR/package"
     zip -r ../salary-processor.zip . -q
-    cd ..
+    cd ../../..
 
-    echo -e "${GREEN}✓ Salary Processor Lambda package created${NC}"
+    echo -e "${GREEN}✓ Salary Processor Lambda package created at $PROCESSOR_BUILD_DIR/salary-processor.zip${NC}"
 
     # Upload to S3
     echo "Uploading Salary Processor Lambda package to S3..."
-    aws s3 cp salary-processor.zip s3://$S3_BUCKET/backend/salary-processor.zip --region $AWS_REGION
+    aws s3 cp "$PROCESSOR_BUILD_DIR/salary-processor.zip" s3://$S3_BUCKET/backend/salary-processor.zip --region $AWS_REGION
     echo -e "${GREEN}✓ Salary Processor Lambda package uploaded${NC}"
 
     # Update Lambda function
@@ -292,34 +294,35 @@ if [ -n "$SALARY_PROCESSOR_LAMBDA" ]; then
     else
         echo -e "${YELLOW}⚠ Salary Processor Lambda function does not exist (should be created by Terraform)${NC}"
     fi
-
-    cd ..
 fi
 
 if [ -n "$SALARY_NORMALIZER_LAMBDA" ]; then
     echo -e "\n${YELLOW}=== Deploying Salary Normalizer Lambda ===${NC}"
 
     echo "Creating Salary Normalizer Lambda deployment package..."
-    cd backend
-    rm -rf normalizer-package salary-normalizer.zip 2>/dev/null || true
+
+    # Create build directory
+    NORMALIZER_BUILD_DIR="build/backend/normalizer"
+    rm -rf "$NORMALIZER_BUILD_DIR" 2>/dev/null || true
+    mkdir -p "$NORMALIZER_BUILD_DIR/package"
 
     # Install dependencies (boto3 is included by AWS Lambda runtime, but include for completeness)
-    $PIP_BUILD_CMD install boto3 -t normalizer-package/ --quiet
+    $PIP_BUILD_CMD install boto3 -t "$NORMALIZER_BUILD_DIR/package/" --quiet
 
     # Copy Lambda handler and shared utilities
-    cp lambdas/normalizer.py normalizer-package/
-    cp -r utils normalizer-package/
+    cp backend/lambdas/normalizer.py "$NORMALIZER_BUILD_DIR/package/"
+    cp -r backend/utils "$NORMALIZER_BUILD_DIR/package/"
 
     # Create zip
-    cd normalizer-package
+    cd "$NORMALIZER_BUILD_DIR/package"
     zip -r ../salary-normalizer.zip . -q
-    cd ..
+    cd ../../..
 
-    echo -e "${GREEN}✓ Salary Normalizer Lambda package created${NC}"
+    echo -e "${GREEN}✓ Salary Normalizer Lambda package created at $NORMALIZER_BUILD_DIR/salary-normalizer.zip${NC}"
 
     # Upload to S3
     echo "Uploading Salary Normalizer Lambda package to S3..."
-    aws s3 cp salary-normalizer.zip s3://$S3_BUCKET/backend/salary-normalizer.zip --region $AWS_REGION
+    aws s3 cp "$NORMALIZER_BUILD_DIR/salary-normalizer.zip" s3://$S3_BUCKET/backend/salary-normalizer.zip --region $AWS_REGION
     echo -e "${GREEN}✓ Salary Normalizer Lambda package uploaded${NC}"
 
     # Update Lambda function
@@ -344,39 +347,40 @@ if [ -n "$SALARY_NORMALIZER_LAMBDA" ]; then
     else
         echo -e "${YELLOW}⚠ Salary Normalizer Lambda function does not exist (should be created by Terraform)${NC}"
     fi
-
-    cd ..
 fi
 
 if [ -n "$BACKUP_REAPPLY_WORKER_LAMBDA" ]; then
     echo -e "\n${YELLOW}=== Deploying Backup Reapply Worker Lambda ===${NC}"
 
     echo "Creating Backup Reapply Worker Lambda deployment package..."
-    cd backend
-    rm -rf backup-worker-package backup-reapply-worker.zip 2>/dev/null || true
+
+    # Create build directory
+    BACKUP_WORKER_BUILD_DIR="build/backend/backup-worker"
+    rm -rf "$BACKUP_WORKER_BUILD_DIR" 2>/dev/null || true
+    mkdir -p "$BACKUP_WORKER_BUILD_DIR/package"
 
     # Install dependencies (boto3 is included by AWS Lambda runtime, but include for completeness)
-    $PIP_BUILD_CMD install boto3 -t backup-worker-package/ --quiet
+    $PIP_BUILD_CMD install boto3 -t "$BACKUP_WORKER_BUILD_DIR/package/" --quiet
 
     # Copy Lambda handler and shared services/utilities
-    cp lambdas/backup_reapply_worker.py backup-worker-package/
-    mkdir -p backup-worker-package/services
-    cp services/salary_jobs.py backup-worker-package/services/
-    [ -f "services/__init__.py" ] && cp services/__init__.py backup-worker-package/services/
+    cp backend/lambdas/backup_reapply_worker.py "$BACKUP_WORKER_BUILD_DIR/package/"
+    mkdir -p "$BACKUP_WORKER_BUILD_DIR/package/services"
+    cp backend/services/salary_jobs.py "$BACKUP_WORKER_BUILD_DIR/package/services/"
+    [ -f "backend/services/__init__.py" ] && cp backend/services/__init__.py "$BACKUP_WORKER_BUILD_DIR/package/services/"
 
     # Copy utils directory (needed by salary_jobs.py)
-    [ -d "utils" ] && cp -r utils backup-worker-package/
+    [ -d "backend/utils" ] && cp -r backend/utils "$BACKUP_WORKER_BUILD_DIR/package/"
 
     # Create zip
-    cd backup-worker-package
+    cd "$BACKUP_WORKER_BUILD_DIR/package"
     zip -r ../backup-reapply-worker.zip . -q
-    cd ..
+    cd ../../..
 
-    echo -e "${GREEN}✓ Backup Reapply Worker Lambda package created${NC}"
+    echo -e "${GREEN}✓ Backup Reapply Worker Lambda package created at $BACKUP_WORKER_BUILD_DIR/backup-reapply-worker.zip${NC}"
 
     # Upload to S3
     echo "Uploading Backup Reapply Worker Lambda package to S3..."
-    aws s3 cp backup-reapply-worker.zip s3://$S3_BUCKET/backend/backup-reapply-worker.zip --region $AWS_REGION
+    aws s3 cp "$BACKUP_WORKER_BUILD_DIR/backup-reapply-worker.zip" s3://$S3_BUCKET/backend/backup-reapply-worker.zip --region $AWS_REGION
     echo -e "${GREEN}✓ Backup Reapply Worker Lambda package uploaded${NC}"
 
     # Update Lambda function
@@ -401,8 +405,6 @@ if [ -n "$BACKUP_REAPPLY_WORKER_LAMBDA" ]; then
     else
         echo -e "${YELLOW}⚠ Backup Reapply Worker Lambda function does not exist (should be created by Terraform)${NC}"
     fi
-
-    cd ..
 fi
 
 # Deploy Frontend

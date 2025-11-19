@@ -19,15 +19,16 @@ yarn-error.log*
 # Build outputs
 dist/
 build/
+frontend/dist/
 
-
-# Lambda deployment
+# Legacy build artifacts (should now be in build/ directory)
 backend/package/
 backend/lambda-deployment.zip
 backend/*.zip
-backend/normalizer-package/*
-backend/processor-package/*
-backend/backend/*
+backend/normalizer-package/
+backend/processor-package/
+backend/backup-worker-package/
+backend/backend/
 
 
 # Environment files
@@ -73,8 +74,6 @@ data/results_contracts/*
 #scripts
 scripts/*
 
-#baekdne
-backend/backup-worker-package/*
 
 # Deployment artifacts
 *.zip
@@ -110,3 +109,5 @@ backend/backend/local_data/jobs.json
 backend/scripts/add_entity_type_gsi.py
 scripts/extracted_salaries.json
 scripts/extracted_salaries.json
+data/districts.csv
+data/downloads.csv
