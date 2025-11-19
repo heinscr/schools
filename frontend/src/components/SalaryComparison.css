@@ -231,14 +231,6 @@
   box-shadow: none; /* avoid blue box-shadow from district-type-toggle.active */
 }
 
-/* Keep the custom-filter-button the same fixed width as district-type-toggle when inactive */
-.district-type-toggle.custom-filter-button {
-  width: 160px;
-  flex: 0 0 160px; /* prevent flex from shrinking/expanding */
-  box-sizing: border-box;
-  justify-content: center;
-}
-
 .custom-filter-button:hover:not(:disabled) {
   background: #eeeeee;
   border-color: #bdbdbd;
@@ -252,15 +244,6 @@
 .custom-filter-button:focus {
   outline: none;
   border-color: #ff9800;
-}
-
-.custom-filter-icon {
-  margin-right: 6px;
-  font-size: 1.1em;
-}
-
-.custom-filter-label {
-  font-weight: 500;
 }
 
 .custom-filter-indicator {
@@ -782,15 +765,6 @@
     margin-right: 0;
     padding: 8px 10px;
     flex-direction: column;
-  }
-
-  .custom-filter-label {
-    display: none;
-  }
-
-  .custom-filter-icon {
-    margin-right: 0 !important;
-    font-size: 1.2em;
   }
 
   .custom-filter-indicator {

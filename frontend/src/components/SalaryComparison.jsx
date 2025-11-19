@@ -517,8 +517,8 @@ function SalaryComparison() {
             disabled={!cachedResults}
             title="Filter by Districts and Towns"
           >
-            <span className="custom-filter-icon">🎯</span>
-            <span className="custom-filter-label">Custom</span>
+            <span className="district-type-icon">🎯</span>
+            <span className="district-type-label">Custom</span>
             {hasActiveCustomFilters && (
               <span className="custom-filter-indicator">{getCustomIndicatorCount()}</span>
             )}
