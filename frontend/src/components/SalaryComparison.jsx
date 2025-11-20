@@ -231,10 +231,21 @@ function SalaryComparison() {
 
     // Input change helper
     const handleInputChange = (field, value) => {
-      setSearchParams(prev => ({
-        ...prev,
-        [field]: value
-      }));
+      setSearchParams(prev => {
+        const next = { ...prev, [field]: value };
+
+        // When education changes, validate and adjust credits if needed
+        if (field === 'education' && eduCreditMap) {
+          const validCredits = eduCreditMap.get(value);
+          if (validCredits && !validCredits.has(parseInt(prev.credits, 10))) {
+            // Current credits not valid for new education, select first valid one
+            const sortedCredits = Array.from(validCredits).sort((a, b) => a - b);
+            next.credits = String(sortedCredits[0] || 0);
+          }
+        }
+
+        return next;
+      });
     };
 
     // Fetch global salary metadata (edu_credit_combos, max_step) on mount
@@ -269,41 +280,71 @@ function SalaryComparison() {
     ];
     const DEFAULT_CREDITS = [0, 15, 30, 45, 60];
 
-    const parsedEduOptions = (() => {
-      if (!salaryMeta || !Array.isArray(salaryMeta.edu_credit_combos)) return DEFAULT_EDU_OPTIONS;
-      const eduSet = new Set();
+    // Parse edu_credit_combos into a map for easy lookup
+    const eduCreditMap = (() => {
+      if (!salaryMeta || !Array.isArray(salaryMeta.edu_credit_combos)) return null;
+
+      const map = new Map(); // Map<education, Set<credits>>
+
       for (const combo of salaryMeta.edu_credit_combos) {
         if (!combo) continue;
         const parts = String(combo).split('+');
         const edu = parts[0];
-        if (edu) eduSet.add(edu);
+        const cred = parts.length > 1 ? parseInt(parts[1], 10) : 0;
+
+        if (edu && !Number.isNaN(cred)) {
+          if (!map.has(edu)) {
+            map.set(edu, new Set());
+          }
+          map.get(edu).add(cred);
+        }
       }
-      // Preserve conventional order if present
+
+      return map.size > 0 ? map : null;
+    })();
+
+    // Get all unique education levels from metadata
+    const parsedEduOptions = (() => {
+      if (!eduCreditMap) return DEFAULT_EDU_OPTIONS;
+
       const order = ['B', 'M', 'D'];
+      const eduSet = new Set(eduCreditMap.keys());
       const found = order.filter(o => eduSet.has(o));
       const rest = Array.from(eduSet).filter(e => !order.includes(e));
-      const final = [...found, ...rest].map(e => ({ value: e, label: e === 'B' ? "Bachelor's" : e === 'M' ? "Master's" : e === 'D' ? 'Doctorate' : e }));
+      const final = [...found, ...rest].map(e => ({
+        value: e,
+        label: e === 'B' ? "Bachelor's" : e === 'M' ? "Master's" : e === 'D' ? 'Doctorate' : e
+      }));
+
       return final.length > 0 ? final : DEFAULT_EDU_OPTIONS;
     })();
 
-    const parsedCredits = (() => {
-      if (!salaryMeta || !Array.isArray(salaryMeta.edu_credit_combos)) return DEFAULT_CREDITS;
-      const creditsSet = new Set();
-      for (const combo of salaryMeta.edu_credit_combos) {
-        if (!combo) continue;
-        const parts = String(combo).split('+');
-        const cred = parts.length > 1 ? parseInt(parts[1], 10) : 0;
-        if (!Number.isNaN(cred)) creditsSet.add(cred);
+    // Get valid credits for the currently selected education level
+    const validCreditsForEducation = (() => {
+      if (!eduCreditMap) return DEFAULT_CREDITS;
+
+      const currentEdu = searchParams.education;
+      const creditsSet = eduCreditMap.get(currentEdu);
+
+      if (!creditsSet || creditsSet.size === 0) {
+        // Fallback: return all credits from all education levels
+        const allCredits = new Set();
+        for (const credits of eduCreditMap.values()) {
+          for (const c of credits) {
+            allCredits.add(c);
+          }
+        }
+        return Array.from(allCredits).sort((a, b) => a - b);
       }
-      const arr = Array.from(creditsSet).sort((a, b) => a - b);
-      return arr.length > 0 ? arr : DEFAULT_CREDITS;
+
+      return Array.from(creditsSet).sort((a, b) => a - b);
     })();
 
     const maxStep = (salaryMeta && Number.isFinite(Number(salaryMeta.max_step))) ? Number(salaryMeta.max_step) : DEFAULT_MAX_STEP;
 
     // Ensure current searchParams values are present in options; if not, adjust them
     useEffect(() => {
-      if (!salaryMeta) return;
+      if (!salaryMeta || !eduCreditMap) return;
       setSearchParams(prev => {
         let changed = false;
         const next = { ...prev };
@@ -312,11 +353,16 @@ function SalaryComparison() {
           next.education = eduVals[0] || next.education;
           changed = true;
         }
-        const creditVals = parsedCredits.map(c => String(c));
-        if (!creditVals.includes(String(next.credits))) {
-          next.credits = creditVals[0] || next.credits;
+
+        // Check if current credits are valid for current education
+        const validCredits = eduCreditMap.get(next.education);
+        if (validCredits && !validCredits.has(parseInt(next.credits, 10))) {
+          // Select first valid credit for this education level
+          const sortedCredits = Array.from(validCredits).sort((a, b) => a - b);
+          next.credits = String(sortedCredits[0] || 0);
           changed = true;
         }
+
         if (Number(next.step) < 1 || Number(next.step) > maxStep) {
           next.step = String(Math.max(1, Math.min(Number(next.step) || 1, maxStep)));
           changed = true;
@@ -324,7 +370,7 @@ function SalaryComparison() {
         return changed ? next : prev;
       });
     // Only run when salaryMeta changes
-    }, [salaryMeta]);
+    }, [salaryMeta, eduCreditMap]);
 
     // Auto-load search results if URL parameters exist
     useEffect(() => {
@@ -427,7 +473,7 @@ function SalaryComparison() {
               value={searchParams.credits}
               onChange={(e) => handleInputChange('credits', e.target.value)}
             >
-              {parsedCredits.map(c => (
+              {validCreditsForEducation.map(c => (
                 <option key={String(c)} value={String(c)}>{String(c)}</option>
               ))}
             </select>
