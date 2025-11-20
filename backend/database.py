@@ -69,6 +69,7 @@ def init_db() -> None:
     - ExactMatchIndex: For salary comparisons across districts
     - FallbackQueryIndex: For fallback matching logic
     - GSI_TOWN: For town-based district searches
+    - ComparisonIndex: Fast single-query salary comparisons (Option 2 optimization)
     """
     if not DYNAMODB_ENDPOINT:
         logger.info("Skipping table creation - using AWS DynamoDB (table managed by Terraform)")
@@ -95,7 +96,9 @@ def init_db() -> None:
                 {'AttributeName': 'GSI2PK', 'AttributeType': 'S'},
                 {'AttributeName': 'GSI2SK', 'AttributeType': 'S'},
                 {'AttributeName': 'GSI_TOWN_PK', 'AttributeType': 'S'},
-                {'AttributeName': 'GSI_TOWN_SK', 'AttributeType': 'S'}
+                {'AttributeName': 'GSI_TOWN_SK', 'AttributeType': 'S'},
+                {'AttributeName': 'GSI_COMP_PK', 'AttributeType': 'S'},
+                {'AttributeName': 'GSI_COMP_SK', 'AttributeType': 'S'}
             ],
             GlobalSecondaryIndexes=[
                 {
@@ -127,6 +130,18 @@ def init_db() -> None:
                     'KeySchema': [
                         {'AttributeName': 'GSI_TOWN_PK', 'KeyType': 'HASH'},
                         {'AttributeName': 'GSI_TOWN_SK', 'KeyType': 'RANGE'}
+                    ],
+                    'Projection': {'ProjectionType': 'ALL'},
+                    'ProvisionedThroughput': {
+                        'ReadCapacityUnits': 5,
+                        'WriteCapacityUnits': 5
+                    }
+                },
+                {
+                    'IndexName': 'ComparisonIndex',
+                    'KeySchema': [
+                        {'AttributeName': 'GSI_COMP_PK', 'KeyType': 'HASH'},
+                        {'AttributeName': 'GSI_COMP_SK', 'KeyType': 'RANGE'}
                     ],
                     'Projection': {'ProjectionType': 'ALL'},
                     'ProvisionedThroughput': {

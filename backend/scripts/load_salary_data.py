@@ -95,6 +95,24 @@ def pad_number(num, width):
     """Pad a number with leading zeros"""
     return str(num).zfill(width)
 
+def pad_salary(salary):
+    """
+    Pad salary for lexicographic sorting in DynamoDB GSI
+    Converts to integer cents and pads to 10 digits (supports up to $9,999,999.99)
+    Inverted for descending sort (higher salaries first)
+    """
+    # Convert to cents as integer
+    if isinstance(salary, Decimal):
+        cents = int(salary * 100)
+    else:
+        cents = int(float(salary) * 100)
+
+    # Invert for descending sort: subtract from max value
+    # Max value: 9999999999 (10 digits, ~$100M)
+    inverted = 9999999999 - cents
+
+    return str(inverted).zfill(10)
+
 def create_items(salary_records, district_map, table_name):
     """
     Create DynamoDB items for the new single-table design
@@ -138,6 +156,7 @@ def create_items(salary_records, district_map, table_name):
         # Pad numbers for proper sorting
         credits_padded = pad_number(credits, 3)
         step_padded = pad_number(step, 2)
+        salary_padded = pad_salary(salary)
 
         # Track this year/period combination
         year_periods.add((school_year, period))
@@ -173,6 +192,12 @@ def create_items(salary_records, district_map, table_name):
             # SK: EDU#<edu>#CR#<credits>#STEP#<step>
             'GSI2PK': f'YEAR#{school_year}#PERIOD#{period}#DISTRICT#{district_id}',
             'GSI2SK': f'EDU#{education}#CR#{credits_padded}#STEP#{step_padded}',
+
+            # GSI5: Fast comparison queries - single query for all districts (Option 2 optimization)
+            # PK: EDU#<edu>#CR#<credits>#STEP#<step>
+            # SK: SALARY#<salary_padded>#YEAR#<yyyy>#DISTRICT#<districtId>
+            'GSI_COMP_PK': f'EDU#{education}#CR#{credits_padded}#STEP#{step_padded}',
+            'GSI_COMP_SK': f'SALARY#{salary_padded}#YEAR#{school_year}#DISTRICT#{district_id}',
         }
 
         items.append(item)
