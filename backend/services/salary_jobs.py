@@ -11,7 +11,7 @@ from typing import Dict, List, Optional, Tuple
 import boto3
 from boto3.dynamodb.conditions import Key
 import logging
-from utils.normalization import generate_calculated_entries, pad_number
+from utils.normalization import generate_calculated_entries, pad_number, pad_salary
 from config import JOB_TTL_SECONDS
 
 logger = logging.getLogger(__name__)
@@ -384,6 +384,7 @@ class SalaryJobsService:
             # Pad numbers for proper sorting
             credits_padded = pad_number(credits, 3)
             step_padded = pad_number(step, 2)
+            salary_padded = pad_salary(salary)
 
             item = {
                 'PK': f'DISTRICT#{district_id}',
@@ -400,6 +401,8 @@ class SalaryJobsService:
                 'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
                 'GSI2PK': f'YEAR#{school_year}#PERIOD#{period}#DISTRICT#{district_id}',
                 'GSI2SK': f'EDU#{education}#CR#{credits_padded}#STEP#{step_padded}',
+                'GSI_COMP_PK': f'EDU#{education}#CR#{credits_padded}#STEP#{step_padded}',
+                'GSI_COMP_SK': f'SALARY#{salary_padded}#YEAR#{school_year}#DISTRICT#{district_id}',
             }
             items.append(item)
 
@@ -1340,4 +1343,3 @@ class LocalSalaryJobsService:
             'metadata_changed': True,
             'needs_global_normalization': False
         }
-

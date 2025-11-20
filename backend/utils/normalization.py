@@ -12,6 +12,25 @@ def pad_number(num: int, width: int) -> str:
     return str(num).zfill(width)
 
 
+def pad_salary(salary) -> str:
+    """
+    Pad salary for lexicographic sorting in DynamoDB GSI
+    Converts to integer cents and pads to 10 digits (supports up to $9,999,999.99)
+    Inverted for descending sort (higher salaries first)
+    """
+    # Convert to cents as integer
+    if isinstance(salary, Decimal):
+        cents = int(salary * 100)
+    else:
+        cents = int(float(salary) * 100)
+
+    # Invert for descending sort: subtract from max value
+    # Max value: 9999999999 (10 digits, ~$100M)
+    inverted = 9999999999 - cents
+
+    return str(inverted).zfill(10)
+
+
 def generate_calculated_entries(
     district_id: str,
     district_name: str,
@@ -98,6 +117,9 @@ def generate_calculated_entries(
                 if not isinstance(salary, Decimal):
                     salary = Decimal(str(salary))
 
+                # Add GSI5 keys for fast comparison queries
+                salary_padded = pad_salary(salary)
+
                 calculated_item = {
                     'PK': f'DISTRICT#{district_id}',
                     'SK': f'SCHEDULE#{year}#{period}#EDU#{edu}#CR#{cred_padded}#STEP#{step_padded}',
@@ -116,6 +138,8 @@ def generate_calculated_entries(
                     'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
                     'GSI2PK': f'YEAR#{year}#PERIOD#{period}#DISTRICT#{district_id}',
                     'GSI2SK': f'EDU#{edu}#CR#{cred_padded}#STEP#{step_padded}',
+                    'GSI_COMP_PK': f'EDU#{edu}#CR#{cred_padded}#STEP#{step_padded}',
+                    'GSI_COMP_SK': f'SALARY#{salary_padded}#YEAR#{year}#DISTRICT#{district_id}',
                 }
                 calculated_items.append(calculated_item)
                 matrix[edu_cred_key][target_step] = calculated_item
@@ -202,6 +226,9 @@ def generate_calculated_entries(
             if not isinstance(salary, Decimal):
                 salary = Decimal(str(salary))
 
+            # Add GSI5 keys for fast comparison queries
+            salary_padded = pad_salary(salary)
+
             calculated_item = {
                 'PK': f'DISTRICT#{district_id}',
                 'SK': f'SCHEDULE#{year}#{period}#EDU#{target_edu}#CR#{target_cred_padded}#STEP#{step_padded}',
@@ -221,6 +248,8 @@ def generate_calculated_entries(
                 'GSI1SK': f'STEP#{step_padded}#DISTRICT#{district_id}',
                 'GSI2PK': f'YEAR#{year}#PERIOD#{period}#DISTRICT#{district_id}',
                 'GSI2SK': f'EDU#{target_edu}#CR#{target_cred_padded}#STEP#{step_padded}',
+                'GSI_COMP_PK': f'EDU#{target_edu}#CR#{target_cred_padded}#STEP#{step_padded}',
+                'GSI_COMP_SK': f'SALARY#{salary_padded}#YEAR#{year}#DISTRICT#{district_id}',
             }
             calculated_items.append(calculated_item)
             matrix[missing_combo][step] = calculated_item  # Add to matrix so it can be used as source

@@ -371,28 +371,42 @@ def compare_salaries_across_districts(
         logger.error(f"Exact match required but {target_key} not in global combos")
         raise ValueError(f'No data available for {education}+{credits} (fallback disabled)')
 
-    logger.info(f"Querying for {query_edu}+{query_cred} step {step} across {len(year_periods)} year/periods")
+    logger.info(f"Querying for {query_edu}+{query_cred} step {step} using ComparisonIndex (single query)")
 
-    # STEP 4: Query GSI1 for each year/period combination
-    all_results = []
+    # STEP 4: Query ComparisonIndex (GSI5) - ONE query for all districts across all years
+    # This eliminates the year/period fan-out and is much faster
     query_cred_padded = pad_number(query_cred, 3)
     step_padded = pad_number(step, 2)
 
-    for year, period in year_periods:
-        # Query GSI1 for this specific combination
-        response = table.query(
-            IndexName='ExactMatchIndex',
-            KeyConditionExpression=Key('GSI1PK').eq(
-                f'YEAR#{year}#PERIOD#{period}#EDU#{query_edu}#CR#{query_cred_padded}'
-            ) & Key('GSI1SK').begins_with(f'STEP#{step_padded}#')
+    # Single query to get ALL matching districts across ALL years
+    # Results are already sorted by salary (descending) due to inverted salary padding
+    response = table.query(
+        IndexName='ComparisonIndex',
+        KeyConditionExpression=Key('GSI_COMP_PK').eq(
+            f'EDU#{query_edu}#CR#{query_cred_padded}#STEP#{step_padded}'
         )
+    )
 
-        # Add all results, marking if exact match
+    all_results = []
+    # Mark if exact match and add to results
+    for item in response.get('Items', []):
+        item['is_exact_match'] = is_exact_match
+        all_results.append(item)
+
+    # Handle pagination if needed (results > 1MB)
+    while 'LastEvaluatedKey' in response:
+        response = table.query(
+            IndexName='ComparisonIndex',
+            KeyConditionExpression=Key('GSI_COMP_PK').eq(
+                f'EDU#{query_edu}#CR#{query_cred_padded}#STEP#{step_padded}'
+            ),
+            ExclusiveStartKey=response['LastEvaluatedKey']
+        )
         for item in response.get('Items', []):
             item['is_exact_match'] = is_exact_match
             all_results.append(item)
 
-    logger.info(f"Retrieved {len(all_results)} total salary results")
+    logger.info(f"Retrieved {len(all_results)} total salary results (single query)")
 
     # STEP 5: Deduplicate by district - keep oldest year/period per district
     district_best_match = {}
@@ -415,7 +429,8 @@ def compare_salaries_across_districts(
     all_results = list(district_best_match.values())
     logger.info(f"After deduplication: {len(all_results)} districts")
 
-    # Sort by salary (descending)
+    # Sort by salary (descending) - results from ComparisonIndex are already mostly sorted,
+    # but deduplication may have changed order, so we re-sort
     all_results.sort(key=lambda x: float(x.get('salary', 0)), reverse=True)
 
     # STEP 6: Fetch towns and district types for all result districts

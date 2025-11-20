@@ -374,6 +374,9 @@ if [ -n "$BACKUP_REAPPLY_WORKER_LAMBDA" ]; then
     # Copy utils directory (needed by salary_jobs.py)
     [ -d "backend/utils" ] && cp -r backend/utils "$BACKUP_WORKER_BUILD_DIR/package/"
 
+    # Copy config.py (needed by salary_jobs.py)
+    cp backend/config.py "$BACKUP_WORKER_BUILD_DIR/package/"
+
     # Create zip
     cd "$BACKUP_WORKER_BUILD_DIR/package"
     zip -r ../backup-reapply-worker.zip . -q

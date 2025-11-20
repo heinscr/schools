@@ -260,6 +260,10 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 # GSI3 - GSI_TOWN (District search by town):
 # - PK: TOWN#{townName}
 # - SK: DISTRICT#{districtName}
+#
+# GSI5 - ComparisonIndex (Fast single-query salary comparisons - Option 2 optimization):
+# - PK: EDU#{edu}#CR#{credits}#STEP#{step}
+# - SK: SALARY#{salary_padded}#YEAR#{yyyy}#DISTRICT#{districtId}
 
 resource "aws_dynamodb_table" "main" {
   name           = "${var.project_name}-data"
@@ -317,6 +321,17 @@ resource "aws_dynamodb_table" "main" {
     type = "S"
   }
 
+  # GSI5: ComparisonIndex - Fast single-query salary comparisons (Option 2 optimization)
+  attribute {
+    name = "GSI_COMP_PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "GSI_COMP_SK"
+    type = "S"
+  }
+
   # GSI1: Exact match query for salary comparisons
   global_secondary_index {
     name            = "ExactMatchIndex"
@@ -346,6 +361,16 @@ resource "aws_dynamodb_table" "main" {
     name            = "GSI_METADATA"
     hash_key        = "SK"
     range_key       = "name_lower"
+    projection_type = "ALL"
+  }
+
+  # GSI5: Fast single-query salary comparisons across all districts (Option 2 optimization)
+  # Eliminates year/period fan-out by allowing one query to get all matching districts
+  # Results naturally sorted by salary (descending) for efficient ranking
+  global_secondary_index {
+    name            = "ComparisonIndex"
+    hash_key        = "GSI_COMP_PK"
+    range_key       = "GSI_COMP_SK"
     projection_type = "ALL"
   }
 
