@@ -295,6 +295,15 @@ class SalaryJobsService:
 
         logger.info(f"Applied salary data for district {district_id}: {records_added} records, {normalized_count} calculated")
 
+        # Invalidate caches after data update
+        try:
+            from services.salary_service import invalidate_salary_cache, invalidate_comparison_cache
+            invalidate_salary_cache(district_id)  # Invalidate specific district cache
+            invalidate_comparison_cache()  # Invalidate all comparison query caches
+            logger.info(f"Invalidated caches for district {district_id}")
+        except Exception as e:
+            logger.warning(f"Error invalidating caches: {e}")
+
         # Save backup to S3
         try:
             self._save_applied_backup(district_id, records)
@@ -541,6 +550,15 @@ class SalaryJobsService:
         if metadata_changed:
             self._update_global_metadata(records)
             self._set_normalization_status(needs_normalization, f"backup-reapply-{backup_filename}")
+
+        # Invalidate caches after data update
+        try:
+            from services.salary_service import invalidate_salary_cache, invalidate_comparison_cache
+            invalidate_salary_cache(district_id)  # Invalidate specific district cache
+            invalidate_comparison_cache()  # Invalidate all comparison query caches
+            logger.info(f"Invalidated caches for district {district_id}")
+        except Exception as e:
+            logger.warning(f"Error invalidating caches: {e}")
 
         logger.info(f"Re-applied backup for {district_name}: {records_added} records, {normalized_count} calculated")
 

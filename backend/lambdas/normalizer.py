@@ -94,6 +94,17 @@ def handler(event, context):
         # Update normalization status
         update_normalization_status(job_id)
 
+        # Invalidate all caches after normalization
+        try:
+            # Import at function level to avoid circular dependencies
+            sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            from services.salary_service import invalidate_salary_cache, invalidate_comparison_cache
+            invalidate_salary_cache()  # Invalidate all district caches
+            invalidate_comparison_cache()  # Invalidate all comparison query caches
+            logger.info("Invalidated all caches after normalization")
+        except Exception as e:
+            logger.warning(f"Error invalidating caches: {e}")
+
         # Mark job as complete
         complete_normalization_job(job_id, total_calculated)
 
