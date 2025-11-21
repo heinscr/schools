@@ -334,6 +334,7 @@ resource "aws_iam_role_policy" "salary_normalizer_access" {
           "dynamodb:GetItem",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
           "dynamodb:Query",
           "dynamodb:Scan",
           "dynamodb:BatchWriteItem"
