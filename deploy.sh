@@ -259,6 +259,9 @@ if [ -n "$SALARY_PROCESSOR_LAMBDA" ]; then
     # Copy required services (HybridContractExtractor and dependencies)
     mkdir -p "$PROCESSOR_BUILD_DIR/package/services"
     cp backend/services/hybrid_extractor.py "$PROCESSOR_BUILD_DIR/package/services/"
+    cp backend/services/extraction_utils.py "$PROCESSOR_BUILD_DIR/package/services/"
+    cp backend/services/extraction_common.py "$PROCESSOR_BUILD_DIR/package/services/"
+    cp backend/services/extraction_constants.py "$PROCESSOR_BUILD_DIR/package/services/"
     cp backend/services/contract_processor.py "$PROCESSOR_BUILD_DIR/package/services/"
     cp backend/services/table_extractor.py "$PROCESSOR_BUILD_DIR/package/services/"
     [ -f "backend/services/__init__.py" ] && cp backend/services/__init__.py "$PROCESSOR_BUILD_DIR/package/services/"

@@ -333,11 +333,13 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
       return { success: false, error: 'Clipboard data must have at least a header row and one data row' };
     }
 
-    // Enhanced education mapping
+    // Enhanced education mapping (matches backend's EDU_MAP)
     const eduMap = {
-      'B': 'B', 'BA': 'B', 'BACHELOR': 'B', "BACHELOR'S": 'B',
-      'M': 'M', 'MA': 'M', 'MASTER': 'M', "MASTER'S": 'M', '2M': 'M', 'CAGS': 'M',
-      'D': 'D', 'DOC': 'D', 'DOCTOR': 'D', "DOCTOR'S": 'D', 'DOCTORATE': 'D'
+      'B': 'B', 'BA': 'B', 'BACHELOR': 'B', "BACHELOR'S": 'B', 'BACCALAUREATE': 'B',
+      'M': 'M', 'MA': 'M', 'MASTER': 'M', "MASTER'S": 'M', 'MASTERS': 'M', '2M': 'M',
+      'CAGS': 'M',  // CAGS typically maps to M+60 but we'll handle that separately
+      'D': 'D', 'DOC': 'D', 'DOCTOR': 'D', "DOCTOR'S": 'D', 'DOCTORATE': 'D',
+      'PHD': 'D', 'EDD': 'D', 'PROV': 'D'
     };
 
     const headerTokens = [];
@@ -390,16 +392,37 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
 
     // Helper function to parse a column header token or phrase
     const parseColumnHeader = (tokens) => {
-      const combined = tokens.join(' ').replace(/['']/g, "'").toUpperCase();
+      let combined = tokens.join(' ').replace(/['']/g, "'").toUpperCase();
+
+      // Normalize patterns like backend does
+      combined = combined.replace(/\b(BA|MA|B|M)(\d{1,2})\b/g, '$1+$2');
+      combined = combined.replace(/[–—\-:]/g, '+');
+      combined = combined.replace(/\s*\+\s*/g, '+');
+
+      // Special case: CAGS alone maps to M+60
+      if (combined === 'CAGS' || combined.includes('CAGS') && !combined.includes('DOC')) {
+        // Check if there's a credit amount mentioned
+        const creditMatch = combined.match(/\+\s*(\d+)/);
+        if (creditMatch) {
+          return { education: 'M', credits: parseInt(creditMatch[1]), key: `M+${creditMatch[1]}` };
+        }
+        return { education: 'M', credits: 60, key: 'M+60' };
+      }
+
+      // Special case: CAGS+DOC or CAGS/DOC -> D
+      if (combined.includes('CAGS') && (combined.includes('DOC') || combined.includes('/'))) {
+        return { education: 'D', credits: 0, key: 'D' };
+      }
 
       // Try patterns like "BACHELOR'S DEGREE", "MASTER'S DEGREE +30", etc.
       let eduLevel = null;
       let credits = 0;
 
-      // Look for education level keywords
-      for (const [key, value] of Object.entries(eduMap)) {
+      // Look for education level keywords (longest match first)
+      const sortedKeys = Object.keys(eduMap).sort((a, b) => b.length - a.length);
+      for (const key of sortedKeys) {
         if (combined.includes(key)) {
-          eduLevel = value;
+          eduLevel = eduMap[key];
           break;
         }
       }
@@ -422,10 +445,43 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
     const columns = [];
 
     // First, try to parse all tokens as simple single-token headers
+    // This parser now mirrors the backend's extraction_utils.py normalize_lane_key logic
     const parsedTokens = headerTokens.map(token => {
-      const normalized = token.replace(/['']/g, "'").toUpperCase();
+      let normalized = token.replace(/['']/g, "'").toUpperCase();
 
-      // Try simple patterns first (e.g., "BA+15", "MA", "DOC", "B", "M+30")
+      // Normalize common patterns like backend does:
+      // BA15 -> BA+15, M30 -> M+30, MA15 -> MA+15
+      normalized = normalized.replace(/\b(BA|MA|B|M)(\d{1,2})\b/g, '$1+$2');
+
+      // Normalize separators: dashes/colons to plus
+      normalized = normalized.replace(/[–—\-:]/g, '+');
+
+      // Normalize plus signs (remove spaces around them)
+      normalized = normalized.replace(/\s*\+\s*/g, '+');
+
+      // Special case: CAGS maps to M+60
+      if (normalized === 'CAGS') {
+        return { education: 'M', credits: 60, key: 'M+60', original: token, parsed: true };
+      }
+
+      // Special case: Handle CAGS+DOC or CAGS/DOC -> D
+      if (normalized.includes('CAGS') && (normalized.includes('DOC') || normalized.includes('/'))) {
+        return { education: 'D', credits: 0, key: 'D', original: token, parsed: true };
+      }
+
+      // Special case: B30/MA or B+30/MA -> M (equivalent to MA)
+      if (normalized.match(/B\+?30\/MA/)) {
+        return { education: 'M', credits: 0, key: 'M', original: token, parsed: true };
+      }
+
+      // Special case: MA+45/CAGS or M+60/CAGS -> M with the credit amount
+      const cagsWithCredits = normalized.match(/M[A]?\+(\d+)\/CAGS/);
+      if (cagsWithCredits) {
+        const credits = parseInt(cagsWithCredits[1]);
+        return { education: 'M', credits, key: `M+${credits}`, original: token, parsed: true };
+      }
+
+      // Try simple patterns (e.g., "BA+15", "MA", "DOC", "B", "M+30")
       const simpleMatch = normalized.match(/^([A-Z]+)(\+(\d+))?$/);
       if (simpleMatch) {
         const eduRaw = simpleMatch[1];
