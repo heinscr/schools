@@ -10,10 +10,12 @@ from schemas import DistrictCreate, DistrictUpdate
 
 
 class FakeTable:
-    def __init__(self, get_item=None, scan_items=None, query_items=None):
+    def __init__(self, get_item=None, scan_items=None, query_items=None, query_items_list=None):
         self._get_item = get_item
         self._scan_items = scan_items or []
         self._query_items = query_items or []
+        self._query_items_list = query_items_list or []  # For multiple query calls
+        self._query_call_count = 0
         self.puts = []
         self.deletes = []
         self.queries = []
@@ -32,6 +34,12 @@ class FakeTable:
 
     def query(self, **kwargs):
         self.queries.append(kwargs)
+        # If query_items_list is provided, return items based on call count
+        if self._query_items_list:
+            if self._query_call_count < len(self._query_items_list):
+                items = self._query_items_list[self._query_call_count]
+                self._query_call_count += 1
+                return {'Items': items}
         return {'Items': self._query_items}
 
     def delete_item(self, Key):
@@ -61,15 +69,18 @@ def test_delete_district_false_when_no_items():
 
 
 def test_search_districts_combines_unique(monkeypatch):
-    # Name scan returns d1; town query returns d1 and d2; final should include d1 and d2
-    scan_items = [
+    # Name query on GSI_METADATA returns d1; town query returns d1 and d2; final should include d1 and d2
+    # First query call: name search on GSI_METADATA
+    name_query_items = [
         {
             'district_id': 'd1', 'name': 'Alpha', 'name_lower': 'alpha', 'main_address': '',
             'towns': [], 'district_type': 'municipal', 'created_at': 'c', 'updated_at': 'u', 'entity_type': 'district'
         }
     ]
-    query_items = [{'district_id': 'd1'}, {'district_id': 'd2'}]
-    tbl = FakeTable(scan_items=scan_items, query_items=query_items)
+    # Second query call: town search on GSI_TOWN
+    town_query_items = [{'district_id': 'd1'}, {'district_id': 'd2'}]
+
+    tbl = FakeTable(query_items_list=[name_query_items, town_query_items])
 
     def fake_get(table, district_id):
         return {

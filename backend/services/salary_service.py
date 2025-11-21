@@ -19,9 +19,9 @@ from boto3.dynamodb.conditions import Key, Attr
 
 from config import (
     VALID_EDUCATION_LEVELS,
-    VALID_CREDITS,
     MIN_STEP,
-    MAX_STEP
+    get_max_step,
+    get_valid_credits
 )
 
 # Configure logging
@@ -56,8 +56,9 @@ def validate_credits(credits: Optional[str]) -> int:
     except (ValueError, TypeError):
         raise ValueError(f"Invalid credits '{credits}'. Must be an integer")
 
-    if credits_int not in VALID_CREDITS:
-        raise ValueError(f"Invalid credits {credits_int}. Must be one of: {', '.join(map(str, sorted(VALID_CREDITS)))}")
+    valid_credits = get_valid_credits()
+    if credits_int not in valid_credits:
+        raise ValueError(f"Invalid credits {credits_int}. Must be one of: {', '.join(map(str, sorted(valid_credits)))}")
     return credits_int
 
 
@@ -71,8 +72,9 @@ def validate_step(step: Optional[str]) -> int:
     except (ValueError, TypeError):
         raise ValueError(f"Invalid step '{step}'. Must be an integer")
 
-    if not (MIN_STEP <= step_int <= MAX_STEP):
-        raise ValueError(f"Invalid step {step_int}. Must be between {MIN_STEP} and {MAX_STEP}")
+    max_step = get_max_step()
+    if not (MIN_STEP <= step_int <= max_step):
+        raise ValueError(f"Invalid step {step_int}. Must be between {MIN_STEP} and {max_step}")
     return step_int
 
 

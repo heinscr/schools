@@ -13,8 +13,10 @@ import { logger } from '../utils/logger';
 class AuthService {
   constructor() {
     this.tokenKey = 'cognito_id_token';
+    this.refreshTokenKey = 'cognito_refresh_token';
     this.userKey = 'cognito_user';
     this.userPool = null;
+    this.refreshTimer = null;
   }
 
   /**
@@ -127,10 +129,15 @@ class AuthService {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: (result) => {
           const idToken = result.getIdToken().getJwtToken();
-          
-          // Store the token
+          const refreshToken = result.getRefreshToken().getToken();
+
+          // Store both tokens
           this.setToken(idToken);
-          
+          this.setRefreshToken(refreshToken);
+
+          // Schedule token refresh
+          this.scheduleTokenRefresh(result.getIdToken());
+
           resolve({ success: true, idToken });
         },
         onFailure: (err) => {
@@ -223,6 +230,20 @@ class AuthService {
   }
 
   /**
+   * Get stored refresh token
+   */
+  getRefreshToken() {
+    return localStorage.getItem(this.refreshTokenKey);
+  }
+
+  /**
+   * Store refresh token
+   */
+  setRefreshToken(token) {
+    localStorage.setItem(this.refreshTokenKey, token);
+  }
+
+  /**
    * Get stored user info
    */
   getUser() {
@@ -242,12 +263,19 @@ class AuthService {
    */
   clearAuth() {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.userKey);
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = null;
+    }
   }
 
   /**
    * Handle OAuth redirect callback
    * Extracts token from URL hash and stores it
+   * Note: OAuth hosted UI flow doesn't provide refresh tokens in URL,
+   * so we can't set up auto-refresh for this flow
    */
   handleCallback() {
     const hash = window.location.hash.substring(1);
@@ -259,6 +287,10 @@ class AuthService {
     if (idToken) {
       this.setToken(idToken);
 
+      // Note: Refresh token is not available in OAuth hosted UI redirect
+      // User will need to re-login after token expires (typically 1 hour)
+      // To get refresh tokens, use direct authentication (authenticateUser method)
+
       // Parse user info from token
       try {
         const payload = this.parseJwt(idToken);
@@ -267,6 +299,9 @@ class AuthService {
           sub: payload.sub,
           groups: payload['cognito:groups'] || [],
         });
+
+        // Schedule token refresh (though it won't work without refresh token)
+        this.scheduleTokenRefresh({ getJwtToken: () => idToken });
       } catch (error) {
         logger.error('Failed to parse token:', error);
       }
@@ -353,6 +388,120 @@ class AuthService {
   isAdmin() {
     const user = this.getUser();
     return user?.is_admin || user?.groups?.includes('admins') || false;
+  }
+
+  /**
+   * Schedule automatic token refresh
+   * Refreshes 5 minutes before expiration
+   */
+  scheduleTokenRefresh(idToken) {
+    // Clear any existing timer
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+    }
+
+    try {
+      const payload = this.parseJwt(idToken.getJwtToken());
+      const expiresAt = payload.exp * 1000; // Convert to milliseconds
+      const now = Date.now();
+      const timeUntilExpiry = expiresAt - now;
+
+      // Refresh 5 minutes before expiration (or immediately if already expired)
+      const refreshTime = Math.max(0, timeUntilExpiry - 5 * 60 * 1000);
+
+      logger.log(`Token refresh scheduled in ${Math.round(refreshTime / 1000 / 60)} minutes`);
+
+      this.refreshTimer = setTimeout(() => {
+        this.refreshSession();
+      }, refreshTime);
+    } catch (error) {
+      logger.error('Failed to schedule token refresh:', error);
+    }
+  }
+
+  /**
+   * Refresh the current session using refresh token
+   */
+  async refreshSession() {
+    return new Promise((resolve, reject) => {
+      if (!this.userPool) {
+        logger.warn('Cannot refresh session: user pool not initialized');
+        reject(new Error('User pool not initialized'));
+        return;
+      }
+
+      const refreshToken = this.getRefreshToken();
+      if (!refreshToken) {
+        logger.warn('No refresh token available');
+        reject(new Error('No refresh token available'));
+        return;
+      }
+
+      const user = this.getUser();
+      if (!user || !user.email) {
+        logger.warn('No user email available for refresh');
+        reject(new Error('No user information available'));
+        return;
+      }
+
+      const cognitoUser = new CognitoUser({
+        Username: user.email,
+        Pool: this.userPool,
+      });
+
+      const { CognitoRefreshToken } = require('amazon-cognito-identity-js');
+      const token = new CognitoRefreshToken({ RefreshToken: refreshToken });
+
+      cognitoUser.refreshSession(token, (err, session) => {
+        if (err) {
+          logger.error('Token refresh failed:', err);
+          // Clear auth and force re-login
+          this.clearAuth();
+          reject(err);
+          return;
+        }
+
+        const idToken = session.getIdToken().getJwtToken();
+        const newRefreshToken = session.getRefreshToken().getToken();
+
+        // Update stored tokens
+        this.setToken(idToken);
+        this.setRefreshToken(newRefreshToken);
+
+        // Schedule next refresh
+        this.scheduleTokenRefresh(session.getIdToken());
+
+        logger.log('Token refreshed successfully');
+        resolve({ success: true, idToken });
+      });
+    });
+  }
+
+  /**
+   * Initialize automatic token refresh on app start
+   * Call this when the app loads to set up auto-refresh
+   */
+  initializeAutoRefresh() {
+    const token = this.getToken();
+    if (!token) return;
+
+    try {
+      const payload = this.parseJwt(token);
+      const now = Date.now() / 1000;
+
+      // If token is expired, try to refresh immediately
+      if (payload.exp <= now) {
+        logger.log('Token expired, attempting refresh...');
+        this.refreshSession().catch(() => {
+          logger.warn('Auto-refresh failed, user needs to log in again');
+        });
+      } else {
+        // Token is still valid, schedule refresh before expiration
+        this.scheduleTokenRefresh({ getJwtToken: () => token });
+      }
+    } catch (error) {
+      logger.error('Failed to initialize auto-refresh:', error);
+    }
   }
 }
 

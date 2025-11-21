@@ -54,19 +54,24 @@ def test_get_all_districts_respects_fetch_limit():
 
 def test_search_districts_respects_fetch_limit():
     mock_table = MagicMock()
-    # Simulate name scan + town query both happening
-    mock_table.scan.return_value = {'Items': [
+    # Simulate name query on GSI_METADATA + town query both happening
+    # query is called twice: once for name search on GSI_METADATA, once for town search on GSI_TOWN
+    name_query_result = {'Items': [
         {'district_id': 'DISTRICT#1', 'name': 'Alpha', 'name_lower': 'alpha', 'towns': [], 'entity_type': 'district', 'created_at': '2024-01-01', 'updated_at': '2024-01-01'}
     ]}
-    mock_table.query.return_value = {'Items': [
+    town_query_result = {'Items': [
         {'district_id': 'DISTRICT#2', 'district_name': 'Beta'}
     ]}
+    # Return name query result first, then town query result
+    mock_table.query.side_effect = [name_query_result, town_query_result]
+
     with patch.object(DynamoDBDistrictService, 'get_district', return_value={'id': 'DISTRICT#2', 'name': 'Beta'}):
         DynamoDBDistrictService.search_districts(mock_table, 'a', limit=2, offset=0)
-    scan_kwargs = mock_table.scan.call_args[1]
-    query_kwargs = mock_table.query.call_args[1]
-    assert scan_kwargs['Limit'] <= MAX_DYNAMODB_FETCH_LIMIT
-    assert query_kwargs['Limit'] <= MAX_DYNAMODB_FETCH_LIMIT
+
+    # Both query calls should respect the fetch limit
+    for call in mock_table.query.call_args_list:
+        query_kwargs = call[1]
+        assert query_kwargs['Limit'] <= MAX_DYNAMODB_FETCH_LIMIT
 
 
 def test_fetch_limit_calculation():

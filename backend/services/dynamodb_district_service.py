@@ -381,11 +381,32 @@ class DynamoDBDistrictService:
             # Limit operations to prevent DoS
             max_items_to_fetch = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
 
-            # Search by name with limit
-            name_results = table.scan(
-                FilterExpression=Attr('entity_type').eq('district') & Attr('name_lower').contains(query_text.lower()),
-                Limit=max_items_to_fetch
-            )
+            # Search by name using GSI_METADATA index with begins_with for prefix matching
+            # This is much more efficient than scanning the entire table
+            query_lower = query_text.lower()
+            name_results_items = []
+            last_evaluated_key = None
+
+            while True:
+                query_kwargs = {
+                    'IndexName': 'GSI_METADATA',
+                    'KeyConditionExpression': Key('SK').eq('METADATA') & Key('name_lower').begins_with(query_lower),
+                    'Limit': max_items_to_fetch
+                }
+
+                if last_evaluated_key:
+                    query_kwargs['ExclusiveStartKey'] = last_evaluated_key
+
+                name_results = table.query(**query_kwargs)
+                name_results_items.extend(name_results.get('Items', []))
+
+                # If we have enough items or no more pages, stop
+                if len(name_results_items) >= max_items_to_fetch:
+                    break
+
+                last_evaluated_key = name_results.get('LastEvaluatedKey')
+                if not last_evaluated_key:
+                    break
 
             # Search by town using GSI with limit
             town_results = table.query(
@@ -399,7 +420,7 @@ class DynamoDBDistrictService:
             seen_ids = set()
 
             # Add districts from name search first (these are already full district items)
-            for item in name_results.get('Items', []):
+            for item in name_results_items:
                 district_id = item['district_id']
                 if district_id not in seen_ids:
                     districts_map[district_id] = DynamoDBDistrictService._item_to_dict(item)

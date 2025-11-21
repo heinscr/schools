@@ -11,9 +11,9 @@ from boto3.dynamodb.conditions import Key
 
 from config import (
     VALID_EDUCATION_LEVELS,
-    VALID_CREDITS,
     MIN_STEP,
-    MAX_STEP
+    get_max_step,
+    get_valid_credits
 )
 
 logger = logging.getLogger(__name__)

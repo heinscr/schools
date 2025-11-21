@@ -828,8 +828,62 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
     <div className="modal-backdrop">
       <div className="modal-content edit-salary-modal">
         <div className="modal-header sticky-header">
-          <div className="header-top">
-            <h3>Edit Salary Table — {district.name}</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+              <h3 style={{ margin: 0 }}>Edit Salary Table — {district.name}</h3>
+              {/* Add Year Button - positioned under district name */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                {!showAddYear ? (
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setShowAddYear(true)}
+                    style={{ fontSize: '13px', padding: '6px 12px' }}
+                  >
+                    + Add New Year
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: '500', color: '#000' }}>School Year:</label>
+                    <select
+                      value={newYearInput}
+                      onChange={(e) => setNewYearInput(e.target.value)}
+                      style={{
+                        padding: '6px 10px',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '4px',
+                        fontSize: '13px',
+                        backgroundColor: '#ffffff',
+                        color: '#000',
+                        width: '130px'
+                      }}
+                    >
+                      {yearOptions.map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                    <span style={{ fontSize: '13px', color: '#666' }}>(Full Year)</span>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleAddYear}
+                      style={{ fontSize: '13px', padding: '6px 12px' }}
+                    >
+                      Add
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => {
+                        setShowAddYear(false);
+                        setNewYearInput('2025-2026');
+                        setError(null);
+                      }}
+                      style={{ fontSize: '13px', padding: '6px 12px' }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
             <button className="close-button" onClick={onClose} aria-label="Close">×</button>
           </div>
           <div className="color-key">
@@ -850,59 +904,6 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
             <div className="error-message">{error}</div>
           ) : (
             <div className="salary-editor">
-              {/* Add Year Button */}
-              <div style={{ marginBottom: '20px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-                {!showAddYear ? (
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => setShowAddYear(true)}
-                    style={{ fontSize: '14px', padding: '8px 16px' }}
-                  >
-                    + Add New Year
-                  </button>
-                ) : (
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '4px', flex: 1 }}>
-                    <label style={{ fontSize: '14px', fontWeight: '500', color: '#000' }}>School Year:</label>
-                    <select
-                      value={newYearInput}
-                      onChange={(e) => setNewYearInput(e.target.value)}
-                      style={{
-                        padding: '8px 12px',
-                        border: '1px solid #cbd5e1',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        backgroundColor: '#ffffff',
-                        color: '#000',
-                        width: '150px'
-                      }}
-                    >
-                      {yearOptions.map(year => (
-                        <option key={year} value={year}>{year}</option>
-                      ))}
-                    </select>
-                    <span style={{ fontSize: '14px', color: '#666' }}>(Full Year)</span>
-                    <button
-                      className="btn btn-primary"
-                      onClick={handleAddYear}
-                      style={{ fontSize: '14px', padding: '8px 16px' }}
-                    >
-                      Add
-                    </button>
-                    <button
-                      className="btn btn-secondary"
-                      onClick={() => {
-                        setShowAddYear(false);
-                        setNewYearInput('2025-2026');
-                        setError(null);
-                      }}
-                      style={{ fontSize: '14px', padding: '8px 16px' }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                )}
-              </div>
-
               {schedules.length === 0 ? (
                 <div>No salary data available. Add a new year to get started.</div>
               ) : (

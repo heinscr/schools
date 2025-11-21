@@ -1,13 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DistrictBrowser from './components/DistrictBrowser'
 import Login from './components/Login'
 import { DataCacheProvider } from './contexts/DataCacheContext'
 import ErrorBoundary from './components/ErrorBoundary'
+import authService from './services/auth'
 import './App.css'
 
 function App() {
   const [user, setUser] = useState(null)
   const [isAuthLoading, setIsAuthLoading] = useState(false)
+
+  // Initialize automatic token refresh on mount
+  useEffect(() => {
+    authService.initializeAutoRefresh();
+  }, [])
 
   const handleAuthChange = (userData) => {
     setUser(userData)

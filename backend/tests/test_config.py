@@ -64,8 +64,25 @@ class TestSalaryConfiguration:
     def test_step_range(self):
         """Test min and max step values"""
         assert config.MIN_STEP == 1
-        assert config.MAX_STEP == 15
+        assert config.MAX_STEP == 15  # Fallback value
         assert config.MIN_STEP < config.MAX_STEP
+
+    def test_get_max_step_function(self):
+        """Test dynamic get_max_step function"""
+        # When DYNAMODB_TABLE_NAME is not set, should return fallback value
+        max_step = config.get_max_step()
+        assert max_step == 15  # Should use fallback
+        assert isinstance(max_step, int)
+        assert max_step >= config.MIN_STEP
+
+    def test_get_valid_credits_function(self):
+        """Test dynamic get_valid_credits function"""
+        # When DYNAMODB_TABLE_NAME is not set, should return fallback value
+        valid_credits = config.get_valid_credits()
+        assert valid_credits == {0, 15, 30, 45, 60}  # Should use fallback
+        assert isinstance(valid_credits, set)
+        assert 0 in valid_credits
+        assert all(isinstance(c, int) for c in valid_credits)
 
 
 class TestDistrictTypeConfiguration:
