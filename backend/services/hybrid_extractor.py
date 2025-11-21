@@ -717,13 +717,19 @@ class HybridContractExtractor:
         # Find all table blocks
         table_blocks = [block for block in blocks if block['BlockType'] == 'TABLE']
 
-        tables = []
+        logger.info(f"Textract found {len(table_blocks)} table blocks total")
 
-        for table_block in table_blocks:
+        tables = []
+        skipped_small = 0
+        rejected_validation = 0
+
+        for table_idx, table_block in enumerate(table_blocks, start=1):
             # Skip small tables (likely not salary tables)
             row_count = sum(1 for rel in table_block.get('Relationships', [{}])[0].get('Ids', [])
                           if block_map.get(rel, {}).get('BlockType') == 'CELL')
             if row_count < 10:  # Need at least header + several data rows
+                logger.debug(f"Skipping Textract table {table_idx}: too few cells ({row_count})")
+                skipped_small += 1
                 continue
 
             # Extract cells
@@ -755,8 +761,31 @@ class HybridContractExtractor:
                     table_data.append(row_data)
 
                 # Check if this looks like a salary table
-                if self._is_salary_table(table_data):
+                is_salary = self._is_salary_table(table_data)
+
+                # Log table details for debugging
+                logger.debug(
+                    f"Textract table: {len(table_data)} rows x {len(table_data[0]) if table_data else 0} cols, "
+                    f"is_salary={is_salary}"
+                )
+
+                if is_salary:
                     tables.append(table_data)
+                else:
+                    # Log why table was rejected - show first 3 rows
+                    logger.info(
+                        f"Rejected Textract table ({len(table_data)} rows x {len(table_data[0]) if table_data else 0} cols). "
+                        f"First 3 rows: {table_data[:3]}"
+                    )
+                    rejected_validation += 1
+
+        # Summary log
+        logger.info(
+            f"Textract table summary: {len(table_blocks)} total blocks, "
+            f"{skipped_small} skipped (too small), "
+            f"{rejected_validation} rejected (validation), "
+            f"{len(tables)} accepted as salary tables"
+        )
 
         return tables
 
@@ -775,6 +804,7 @@ class HybridContractExtractor:
     def _is_salary_table(self, table: List[List[str]]) -> bool:
         """Check if a table looks like a salary schedule"""
         if not table or len(table) < 2:
+            logger.debug(f"Table rejected: too few rows ({len(table) if table else 0})")
             return False
 
         # Check header for education columns
@@ -784,6 +814,11 @@ class HybridContractExtractor:
         # Check first column for step numbers
         first_col = ' '.join([row[0] for row in table[:5] if row]).upper()
         has_steps = 'STEP' in first_col or any(str(i) in first_col for i in range(1, 6))
+
+        if not has_edu_cols:
+            logger.debug(f"Table rejected: no education columns found in header '{header_text}'")
+        if not has_steps:
+            logger.debug(f"Table rejected: no step markers found in first column '{first_col}'")
 
         return has_edu_cols and has_steps
 
