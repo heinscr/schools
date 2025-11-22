@@ -18,6 +18,9 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
   const [newYearInput, setNewYearInput] = useState('2025-2026');
   const [showAddYear, setShowAddYear] = useState(false);
 
+  // Per-schedule parse errors - doesn't block the whole modal
+  const [parseErrors, setParseErrors] = useState({});
+
   // Generate year options from 2025-2026 to 2030-2031
   const yearOptions = [];
   for (let startYear = 2025; startYear <= 2030; startYear++) {
@@ -63,9 +66,42 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
     setInputs(next);
   }, [schedules]);
 
+  // Per-cell validation errors
+  const [cellErrors, setCellErrors] = useState({});
+
   const setCell = (idx, step, education, credits, value) => {
     const key = `${idx}|${step}|${education}|${credits}`;
     setInputs(prev => ({ ...prev, [key]: value }));
+
+    // Real-time validation for this cell
+    if (value.trim()) {
+      // Check format: must be digits with optional 2 decimals
+      if (!/^\d+(?:\.\d{1,2})?$/.test(value)) {
+        setCellErrors(prev => ({ ...prev, [key]: 'Invalid format (use digits only, up to 2 decimals)' }));
+      } else {
+        const numValue = Number(value);
+        // Check minimum value (reasonable salary threshold)
+        if (numValue < 1000) {
+          setCellErrors(prev => ({ ...prev, [key]: 'Value too small (min: 1000)' }));
+        } else if (numValue > 500000) {
+          setCellErrors(prev => ({ ...prev, [key]: 'Value too large (max: 500000)' }));
+        } else {
+          // Valid - clear error for this cell
+          setCellErrors(prev => {
+            const updated = { ...prev };
+            delete updated[key];
+            return updated;
+          });
+        }
+      }
+    } else {
+      // Empty value - clear error
+      setCellErrors(prev => {
+        const updated = { ...prev };
+        delete updated[key];
+        return updated;
+      });
+    }
   };
 
   // Add a new year/period schedule
@@ -276,9 +312,17 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
     const parsed = parseClipboardData(text);
 
     if (!parsed.success) {
-      setError(parsed.error || 'Failed to parse clipboard data');
+      // Set per-schedule parse error instead of blocking entire modal
+      setParseErrors(prev => ({ ...prev, [scheduleIdx]: parsed.error || 'Failed to parse clipboard data' }));
       return;
     }
+
+    // Clear parse error for this schedule
+    setParseErrors(prev => {
+      const updated = { ...prev };
+      delete updated[scheduleIdx];
+      return updated;
+    });
 
     // Update the schedule with parsed data
     setSchedules(prev => {
@@ -306,8 +350,6 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
       updated[scheduleIdx] = schedule;
       return updated;
     });
-
-    setError(null);
   };
 
   // Handle raw input changes and re-parse
@@ -964,6 +1006,40 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                         )}
                       </div>
 
+                      {/* Parse Error Display */}
+                      {parseErrors[idx] && (
+                        <div style={{
+                          marginBottom: '12px',
+                          padding: '12px',
+                          backgroundColor: '#fef2f2',
+                          borderRadius: '4px',
+                          border: '1px solid #fecaca',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}>
+                          <div>
+                            <strong style={{ color: '#dc2626', fontSize: '14px' }}>Parse Error:</strong>
+                            <p style={{ margin: '4px 0 0 0', color: '#991b1b', fontSize: '13px' }}>{parseErrors[idx]}</p>
+                            <p style={{ margin: '4px 0 0 0', color: '#6b7280', fontSize: '12px', fontStyle: 'italic' }}>
+                              Edit the raw input below or paste new data to fix this error.
+                            </p>
+                          </div>
+                          <button
+                            className="btn btn-secondary"
+                            onClick={() => setParseErrors(prev => {
+                              const updated = { ...prev };
+                              delete updated[idx];
+                              return updated;
+                            })}
+                            style={{ fontSize: '12px', padding: '4px 8px' }}
+                            title="Dismiss error"
+                          >
+                            Dismiss
+                          </button>
+                        </div>
+                      )}
+
                       {/* Raw Input Editor */}
                       {showRawInputs[idx] && (
                         <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #cbd5e1' }}>
@@ -1041,10 +1117,13 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                                   const valKey = `${idx}|${step}|${c.education}|${c.credits}`;
                                   const isCalculated = Boolean(item?.isCalculated || item?.is_calculated);
                                   const edited = item ? isCellEdited(idx, step, c.education, c.credits, item.salary) : false;
+                                  const cellError = cellErrors[valKey];
 
-                                  // Determine cell class: edited takes priority, then calculated
+                                  // Determine cell class: error takes priority, then edited, then calculated
                                   let cellClass = 'salary-input';
-                                  if (edited) {
+                                  if (cellError) {
+                                    cellClass += ' error';
+                                  } else if (edited) {
                                     cellClass += ' edited';
                                   } else if (isCalculated) {
                                     cellClass += ' calculated';
@@ -1052,19 +1131,42 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
 
                                   return (
                                     <td key={c.key}>
-                                      <input
-                                        type="text"
-                                        inputMode="decimal"
-                                        pattern="^\\d+(?:\\.\\d{1,2})?$"
-                                        className={cellClass}
-                                        value={inputs[valKey] ?? ''}
-                                        placeholder={item && item.salary != null ? String(item.salary) : ''}
-                                        onChange={(e) => {
-                                          // strip $, commas, spaces as user types
-                                          const cleaned = (e.target.value || '').replace(/[,$]/g, '').replace(/^\$/,'').trim();
-                                          setCell(idx, step, c.education, c.credits, cleaned);
-                                        }}
-                                      />
+                                      <div style={{ position: 'relative' }}>
+                                        <input
+                                          type="text"
+                                          inputMode="decimal"
+                                          pattern="^\\d+(?:\\.\\d{1,2})?$"
+                                          className={cellClass}
+                                          value={inputs[valKey] ?? ''}
+                                          placeholder={item && item.salary != null ? String(item.salary) : ''}
+                                          onChange={(e) => {
+                                            // strip $, commas, spaces as user types
+                                            const cleaned = (e.target.value || '').replace(/[,$\s]/g, '').replace(/^\$/,'').trim();
+                                            setCell(idx, step, c.education, c.credits, cleaned);
+                                          }}
+                                          title={cellError || ''}
+                                        />
+                                        {cellError && (
+                                          <div style={{
+                                            position: 'absolute',
+                                            bottom: '100%',
+                                            left: '50%',
+                                            transform: 'translateX(-50%)',
+                                            marginBottom: '4px',
+                                            padding: '4px 8px',
+                                            backgroundColor: '#dc2626',
+                                            color: 'white',
+                                            fontSize: '11px',
+                                            borderRadius: '4px',
+                                            whiteSpace: 'nowrap',
+                                            zIndex: 10,
+                                            pointerEvents: 'none',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                          }}>
+                                            {cellError}
+                                          </div>
+                                        )}
+                                      </div>
                                     </td>
                                   );
                                 })}
@@ -1082,9 +1184,19 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
         </div>
         <div className="modal-actions sticky-footer">
           <button className="btn btn-secondary" onClick={onClose} disabled={saving}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleApply} disabled={saving || loading}>
+          <button
+            className="btn btn-primary"
+            onClick={handleApply}
+            disabled={saving || loading || Object.keys(cellErrors).length > 0}
+            title={Object.keys(cellErrors).length > 0 ? 'Fix validation errors before saving' : ''}
+          >
             {saving ? 'Applying…' : 'Apply Changes'}
           </button>
+          {Object.keys(cellErrors).length > 0 && (
+            <span style={{ color: '#dc2626', fontSize: '13px', marginLeft: '12px' }}>
+              {Object.keys(cellErrors).length} validation error{Object.keys(cellErrors).length > 1 ? 's' : ''} - fix before saving
+            </span>
+          )}
         </div>
       </div>
     </div>
