@@ -54,19 +54,19 @@ def test_get_all_districts_respects_fetch_limit():
 
 def test_search_districts_respects_fetch_limit():
     mock_table = MagicMock()
-    # Simulate name query on GSI_METADATA + town query both happening
-    # query is called twice: once for name search on GSI_METADATA, once for town search on GSI_TOWN
+    # Simulate name query + town query both happening
+    # Use a 4+ character query to pass validation
     name_query_result = {'Items': [
         {'district_id': 'DISTRICT#1', 'name': 'Alpha', 'name_lower': 'alpha', 'towns': [], 'entity_type': 'district', 'created_at': '2024-01-01', 'updated_at': '2024-01-01'}
     ]}
     town_query_result = {'Items': [
         {'district_id': 'DISTRICT#2', 'district_name': 'Beta'}
     ]}
-    # Return name query result first, then town query result
+    # Two query calls: first for name on GSI_METADATA, second for town on GSI_TOWN
     mock_table.query.side_effect = [name_query_result, town_query_result]
 
     with patch.object(DynamoDBDistrictService, 'get_district', return_value={'id': 'DISTRICT#2', 'name': 'Beta'}):
-        DynamoDBDistrictService.search_districts(mock_table, 'a', limit=2, offset=0)
+        DynamoDBDistrictService.search_districts(mock_table, 'alph', limit=2, offset=0)
 
     # Both query calls should respect the fetch limit
     for call in mock_table.query.call_args_list:

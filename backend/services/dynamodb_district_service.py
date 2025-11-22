@@ -373,6 +373,9 @@ class DynamoDBDistrictService:
         """
         Search districts by name or town
         Returns tuple of (districts, total_count)
+
+        For name searches, requires each space-separated token to be at least 4 characters
+        to prevent expensive table scans on short queries.
         """
         if not query_text:
             return DynamoDBDistrictService._get_all_districts(table, limit, offset)
@@ -381,23 +384,35 @@ class DynamoDBDistrictService:
             # Limit operations to prevent DoS
             max_items_to_fetch = min(offset + limit + 50, MAX_DYNAMODB_FETCH_LIMIT)
 
-            # Search by name using GSI_METADATA index with begins_with for prefix matching
-            # This is much more efficient than scanning the entire table
+            # Validate query tokens - each must be at least 4 characters
             query_lower = query_text.lower()
+            tokens = query_lower.split()
+
+            # Check if all tokens meet the minimum length requirement
+            if not all(len(token) >= 4 for token in tokens):
+                # If any token is too short, return empty results
+                # This prevents expensive scans on short queries
+                return [], 0
+
+            # Search by name using scan with contains for partial matching
+            # Requires 4+ character tokens to prevent DoS via expensive scans
             name_results_items = []
             last_evaluated_key = None
 
             while True:
-                query_kwargs = {
-                    'IndexName': 'GSI_METADATA',
-                    'KeyConditionExpression': Key('SK').eq('METADATA') & Key('name_lower').begins_with(query_lower),
-                    'Limit': max_items_to_fetch
+                scan_kwargs = {
+                    "IndexName": "GSI_METADATA",  # 👈 scan against your name_lower GSI
+                    "FilterExpression": (
+                        Attr("entity_type").eq("district") &
+                        Attr("name_lower").contains(query_lower)   # e.g., "charter"
+                    ),
+                    "Limit": max_items_to_fetch,
                 }
 
                 if last_evaluated_key:
-                    query_kwargs['ExclusiveStartKey'] = last_evaluated_key
+                    scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
 
-                name_results = table.query(**query_kwargs)
+                name_results = table.scan(**scan_kwargs)
                 name_results_items.extend(name_results.get('Items', []))
 
                 # If we have enough items or no more pages, stop

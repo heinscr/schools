@@ -69,15 +69,14 @@ def test_delete_district_false_when_no_items():
 
 
 def test_search_districts_combines_unique(monkeypatch):
-    # Name query on GSI_METADATA returns d1; town query returns d1 and d2; final should include d1 and d2
-    # First query call: name search on GSI_METADATA
+    # Name query returns d1; town query returns d1 and d2; final should include d1 and d2
+    # Use 4+ character query to pass validation
     name_query_items = [
         {
             'district_id': 'd1', 'name': 'Alpha', 'name_lower': 'alpha', 'main_address': '',
             'towns': [], 'district_type': 'municipal', 'created_at': 'c', 'updated_at': 'u', 'entity_type': 'district'
         }
     ]
-    # Second query call: town search on GSI_TOWN
     town_query_items = [{'district_id': 'd1'}, {'district_id': 'd2'}]
 
     tbl = FakeTable(query_items_list=[name_query_items, town_query_items])
@@ -89,9 +88,40 @@ def test_search_districts_combines_unique(monkeypatch):
         }
     monkeypatch.setattr(DynamoDBDistrictService, 'get_district', staticmethod(fake_get))
 
-    results, total = DynamoDBDistrictService.search_districts(tbl, 'Alpha', limit=10, offset=0)
+    results, total = DynamoDBDistrictService.search_districts(tbl, 'Alph', limit=10, offset=0)
     assert total == 2
     assert {r['id'] for r in results} == {'d1', 'd2'}
+
+
+def test_search_districts_short_query_returns_empty():
+    # Queries with tokens < 4 characters should return empty results
+    tbl = FakeTable()
+    results, total = DynamoDBDistrictService.search_districts(tbl, 'abc', limit=10, offset=0)
+    assert total == 0
+    assert results == []
+
+    # Multiple tokens - if any are too short, return empty
+    results, total = DynamoDBDistrictService.search_districts(tbl, 'ab cd', limit=10, offset=0)
+    assert total == 0
+    assert results == []
+
+
+def test_search_districts_long_query_passes_validation():
+    # Query with all tokens >= 4 characters should proceed
+    # First query call returns the district
+    query_items = [
+        {
+            'district_id': 'd1', 'name': 'Boston Public', 'name_lower': 'boston public',
+            'main_address': '', 'towns': [], 'district_type': 'municipal',
+            'created_at': 'c', 'updated_at': 'u', 'entity_type': 'district'
+        }
+    ]
+    # Second query call (town search) returns empty
+    tbl = FakeTable(query_items_list=[query_items, []])
+
+    results, total = DynamoDBDistrictService.search_districts(tbl, 'boston', limit=10, offset=0)
+    assert total == 1
+    assert results[0]['name'] == 'Boston Public'
 
 
 def test_update_district_returns_none_when_missing(monkeypatch):

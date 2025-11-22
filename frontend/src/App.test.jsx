@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import App from './App'
 
 vi.mock('./components/ChoroplethMap', () => ({ default: () => <div data-testid="choropleth-map" /> }))
@@ -23,7 +23,9 @@ afterAll(() => {
   global.fetch = originalFetch
 })
 
-it('renders the app header', () => {
+it('renders the app header', async () => {
   render(<App />)
-  expect(screen.getByText(/Massachusetts School Districts/i)).toBeInTheDocument()
+  await waitFor(() => {
+    expect(screen.getByText(/Massachusetts School Districts/i)).toBeInTheDocument()
+  })
 })
