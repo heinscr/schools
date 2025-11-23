@@ -1,0 +1,209 @@
+.contract-pdf-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.contract-pdf-modal {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1200px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.contract-pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.contract-pdf-title h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1f2937;
+}
+
+.contract-pdf-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pdf-action-btn {
+  background: transparent;
+  border: 1px solid #d1d5db;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  transition: all 0.2s;
+}
+
+.pdf-action-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pdf-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: #6b7280;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.pdf-close-btn:hover {
+  color: #1f2937;
+}
+
+.contract-pdf-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.pdf-zoom-controls,
+.pdf-page-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.pdf-zoom-controls button {
+  background: white;
+  border: 1px solid #d1d5db;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  transition: all 0.2s;
+}
+
+.pdf-zoom-controls button:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pdf-zoom-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.zoom-level {
+  font-size: 0.875rem;
+  color: #6b7280;
+  min-width: 60px;
+  text-align: center;
+}
+
+.pdf-page-info {
+  display: flex;
+  align-items: center;
+}
+
+.page-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.contract-pdf-viewer {
+  flex: 1;
+  overflow: auto;
+  background: #f3f4f6;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px;
+}
+
+.contract-pdf-viewer .react-pdf__Document {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contract-pdf-viewer .react-pdf__Page {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+.contract-pdf-viewer .react-pdf__Page:last-child {
+  margin-bottom: 0;
+}
+
+.contract-pdf-viewer .react-pdf__Page__canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.pdf-loading,
+.pdf-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.pdf-error {
+  color: #dc2626;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .contract-pdf-overlay {
+    padding: 10px;
+  }
+
+  .contract-pdf-modal {
+    width: 95%;
+    height: 95vh;
+  }
+
+  .contract-pdf-header {
+    padding: 12px 16px;
+  }
+
+  .contract-pdf-title h2 {
+    font-size: 1rem;
+  }
+
+  .contract-pdf-controls {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 16px;
+  }
+
+  .contract-pdf-viewer {
+    padding: 10px;
+  }
+}

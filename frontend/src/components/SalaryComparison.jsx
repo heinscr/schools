@@ -4,6 +4,7 @@ import { DataCacheContext } from '../contexts/DataCacheContext';
 import SalaryComparisonMap from './SalaryComparisonMap';
 import SalaryTable from './SalaryTable';
 import CustomSalaryFilter from './CustomSalaryFilter';
+import ContractPdfModal from './ContractPdfModal';
 import { DISTRICT_TYPE_OPTIONS } from '../constants/districtTypes';
 import { formatCurrency } from '../utils/formatters';
 import './SalaryComparison.css';
@@ -82,6 +83,8 @@ function SalaryComparison() {
   const [modalDistrictId, setModalDistrictId] = useState(null);
   const [modalDistrictInfo, setModalDistrictInfo] = useState(null);
   const [modalHighlight, setModalHighlight] = useState(null);
+  const [contractPdfUrl, setContractPdfUrl] = useState(null);
+  const [contractDistrictName, setContractDistrictName] = useState(null);
 
   const openDistrictModal = async (result) => {
     const districtId = result.district_id;
@@ -696,7 +699,8 @@ function SalaryComparison() {
                             try {
                               const response = await api.getContractPdf(result.district_name);
                               if (response && response.download_url) {
-                                window.open(response.download_url, '_blank');
+                                setContractPdfUrl(response.download_url);
+                                setContractDistrictName(result.district_name);
                               }
                             } catch (err) {
                               console.error('Failed to load contract:', err);
@@ -834,6 +838,18 @@ function SalaryComparison() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Contract PDF modal */}
+      {contractPdfUrl && contractDistrictName && (
+        <ContractPdfModal
+          districtName={contractDistrictName}
+          pdfUrl={contractPdfUrl}
+          onClose={() => {
+            setContractPdfUrl(null);
+            setContractDistrictName(null);
+          }}
+        />
       )}
     </div>
   );

@@ -1,7 +1,8 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import api from '../services/api';
 import DistrictEditor from './DistrictEditor';
 import SalaryUploadModal from './SalaryUploadModal';
+import ContractPdfModal from './ContractPdfModal';
 import Toast from './Toast';
 import ErrorBoundary from './ErrorBoundary';
 import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
@@ -58,6 +59,8 @@ function DistrictBrowser({ user }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all', 'name', 'town'
   const [salaryRefreshKey, setSalaryRefreshKey] = useState(0);
+  const [contractPdfUrl, setContractPdfUrl] = useState(null);
+  const [contractDistrictName, setContractDistrictName] = useState(null);
 
   const cache = useDataCache();
   const getDistrictUrl = cache.getDistrictUrl;
@@ -220,8 +223,8 @@ function DistrictBrowser({ user }) {
     try {
       const response = await api.getContractPdf(district.name);
       if (response && response.download_url) {
-        // Open the presigned URL in a new tab
-        window.open(response.download_url, '_blank');
+        setContractPdfUrl(response.download_url);
+        setContractDistrictName(district.name);
       } else {
         setToast({
           isOpen: true,
@@ -543,6 +546,18 @@ function DistrictBrowser({ user }) {
             </Suspense>
           </ErrorBoundary>
         </div>
+      )}
+
+      {/* Contract PDF modal */}
+      {contractPdfUrl && contractDistrictName && (
+        <ContractPdfModal
+          districtName={contractDistrictName}
+          pdfUrl={contractPdfUrl}
+          onClose={() => {
+            setContractPdfUrl(null);
+            setContractDistrictName(null);
+          }}
+        />
       )}
     </div>
     </>
