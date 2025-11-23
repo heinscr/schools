@@ -161,6 +161,37 @@ if [ -n "$BACKUP_REAPPLY_WORKER_LAMBDA" ]; then
 fi
 echo ""
 
+# Update backend .env file with Terraform outputs
+echo -e "${YELLOW}Updating backend/.env with infrastructure configuration...${NC}"
+BACKEND_ENV_FILE="../../backend/.env"
+
+# Read current .env content preserving other settings
+if [ -f "$BACKEND_ENV_FILE" ]; then
+    # Update or add S3_BUCKET_NAME
+    if grep -q "^S3_BUCKET_NAME=" "$BACKEND_ENV_FILE"; then
+        sed -i.bak "s|^S3_BUCKET_NAME=.*|S3_BUCKET_NAME=$S3_BUCKET|" "$BACKEND_ENV_FILE"
+    else
+        # Add after DynamoDB section if it doesn't exist
+        sed -i.bak "/^DYNAMODB_TABLE_NAME=/a\\
+\\
+# S3 Configuration\\
+S3_BUCKET_NAME=$S3_BUCKET" "$BACKEND_ENV_FILE"
+    fi
+
+    # Update AWS_REGION
+    sed -i.bak "s|^AWS_REGION=.*|AWS_REGION=$AWS_REGION|" "$BACKEND_ENV_FILE"
+
+    # Update DYNAMODB_TABLE_NAME
+    sed -i.bak "s|^DYNAMODB_TABLE_NAME=.*|DYNAMODB_TABLE_NAME=$DYNAMODB_TABLE|" "$BACKEND_ENV_FILE"
+
+    # Remove backup file
+    rm -f "$BACKEND_ENV_FILE.bak"
+
+    echo -e "${GREEN}✓ backend/.env updated${NC}"
+else
+    echo -e "${YELLOW}⚠ backend/.env not found, skipping update${NC}"
+fi
+
 cd ../..
 
 # Deploy Backend

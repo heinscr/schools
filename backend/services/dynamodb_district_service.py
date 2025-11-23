@@ -478,6 +478,7 @@ class DynamoDBDistrictService:
             'name': item['name'],
             'main_address': item.get('main_address', ''),
             'district_url': item.get('district_url', ''),
+            'contract_pdf': item.get('contract_pdf'),
             'towns': item.get('towns', []),
             'district_type': item.get('district_type', ''),
             'created_at': item['created_at'],

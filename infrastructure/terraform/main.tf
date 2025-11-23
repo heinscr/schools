@@ -427,7 +427,25 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
   })
 }
 
-# IAM Policy for Lambda to access S3 (for salary processing PDFs and JSON)
+# S3 CORS Configuration for contract PDFs
+resource "aws_s3_bucket_cors_configuration" "main" {
+  bucket = aws_s3_bucket.main.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "POST"]
+    allowed_origins = [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      var.cloudfront_domain_name != "" ? "https://${var.cloudfront_domain_name}" : "",
+      "https://${aws_cloudfront_distribution.frontend.domain_name}"
+    ]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
+# IAM Policy for Lambda to access S3 (for salary processing PDFs, JSON, and contract PDFs)
 resource "aws_iam_role_policy" "lambda_s3" {
   name = "${var.project_name}-lambda-s3"
   role = aws_iam_role.lambda.id

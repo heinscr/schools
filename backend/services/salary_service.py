@@ -497,28 +497,39 @@ def compare_salaries_across_districts(
                 # Process returned items
                 for item in response.get('Responses', {}).get(table.name, []):
                     district_id = item['PK'].replace('DISTRICT#', '')
-                    district_types_map[district_id] = item.get('district_type', 'unknown')
+                    district_types_map[district_id] = {
+                        'district_type': item.get('district_type', 'unknown'),
+                        'contract_pdf': item.get('contract_pdf')
+                    }
 
                 # Set unknown for any districts not found in batch
                 for district_id in batch_ids:
                     if district_id not in district_types_map:
-                        district_types_map[district_id] = 'unknown'
+                        district_types_map[district_id] = {
+                            'district_type': 'unknown',
+                            'contract_pdf': None
+                        }
 
         except Exception as e:
             logger.error(f"Error fetching district types: {str(e)}")
             # Set unknown for all districts on error
             for district_id in result_district_ids:
-                district_types_map[district_id] = 'unknown'
+                district_types_map[district_id] = {
+                    'district_type': 'unknown',
+                    'contract_pdf': None
+                }
 
     # Transform results for response
     rankings = []
     for index, item in enumerate(all_results):
         district_id = item.get('district_id')
+        district_info = district_types_map.get(district_id, {'district_type': 'unknown', 'contract_pdf': None})
         result = {
             'rank': index + 1,
             'district_id': district_id,
             'district_name': item.get('district_name'),
-            'district_type': district_types_map.get(district_id, 'unknown'),
+            'district_type': district_info.get('district_type', 'unknown'),
+            'contract_pdf': district_info.get('contract_pdf'),
             'school_year': item.get('school_year'),
             'period': item.get('period'),
             'education': item.get('education'),

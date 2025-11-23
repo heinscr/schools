@@ -434,6 +434,37 @@
   transform: scale(1.05);
 }
 
+/* Contract PDF button positioned below external link button */
+.contract-link-btn {
+  position: absolute;
+  top: 36px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e3a5f;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.contract-link-btn svg {
+  display: inline-block;
+}
+
+.contract-link-btn:hover:not(.disabled) {
+  color: #dc2626;
+  transform: scale(1.05);
+}
+
+.contract-link-btn.disabled {
+  color: #cbd5e0;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .edit-district-btn:active {
   transform: scale(0.95);
 }

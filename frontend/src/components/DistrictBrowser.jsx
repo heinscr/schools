@@ -216,6 +216,28 @@ function DistrictBrowser({ user }) {
     }
   };
 
+  const handleContractClick = async (district) => {
+    try {
+      const response = await api.getContractPdf(district.name);
+      if (response && response.download_url) {
+        // Open the presigned URL in a new tab
+        window.open(response.download_url, '_blank');
+      } else {
+        setToast({
+          isOpen: true,
+          message: 'Contract PDF not available for this district',
+          variant: 'error'
+        });
+      }
+    } catch (err) {
+      setToast({
+        isOpen: true,
+        message: `Failed to load contract: ${err.message}`,
+        variant: 'error'
+      });
+    }
+  };
+
   return (
     <>
       <Toast
@@ -362,6 +384,28 @@ function DistrictBrowser({ user }) {
                         </a>
                       );
                     })()}
+
+                    {/* contract PDF icon */}
+                    <button
+                      className={`contract-link-btn${district.contract_pdf ? '' : ' disabled'}`}
+                      title={district.contract_pdf ? `View ${district.name} contract PDF` : 'No contract available'}
+                      aria-label={district.contract_pdf ? `View ${district.name} contract PDF` : 'No contract available'}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (district.contract_pdf) {
+                          handleContractClick(district);
+                        }
+                      }}
+                      disabled={!district.contract_pdf}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                      </svg>
+                    </button>
 
                     {isAdmin && (
                       <button

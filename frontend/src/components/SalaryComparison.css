@@ -525,9 +525,51 @@
   transform: translateY(0);
 }
 
-/* Narrow the link cell padding so the column stays just slightly larger than the icon */
-.results-table td.link-cell {
-  padding: 6px 6px; /* smaller horizontal padding than default */
+.contract-cell {
+  width: 20px;
+  text-align: center;
+}
+
+.contract-button {
+  background: transparent;
+  border: none;
+  padding: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  color: #2563eb;
+}
+
+.contract-button:hover:not(.disabled) {
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  transform: scale(1.05);
+}
+
+.contract-button:active:not(.disabled) {
+  transform: scale(0.95);
+}
+
+.contract-button.disabled {
+  color: #cbd5e0;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.contract-col {
+  width: 20px;
+  text-align: center;
+}
+
+/* Narrow padding for icon cells to keep them close together */
+.results-table td.rank-cell,
+.results-table td.link-cell,
+.results-table td.contract-cell,
+.results-table td.details-cell {
+  padding: 16px 4px; /* reduced horizontal padding from default 20px to 4px */
   box-sizing: border-box;
   white-space: nowrap;
 }

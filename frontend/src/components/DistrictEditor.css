@@ -64,11 +64,11 @@
   padding: 24px;
 }
 
-.form-group {
+.district-editor-form .form-group {
   margin-bottom: 20px;
 }
 
-.form-group label {
+.district-editor-form .form-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
@@ -76,9 +76,9 @@
   font-size: 0.95rem;
 }
 
-.form-input,
-.form-select,
-.form-textarea {
+.district-editor-form .form-input,
+.district-editor-form .form-select,
+.district-editor-form .form-textarea {
   width: 100%;
   padding: 10px 12px;
   font-size: 1rem;
@@ -88,22 +88,28 @@
   color: #1e3a5f;
   transition: all 0.2s;
   font-family: inherit;
+  box-sizing: border-box;
 }
 
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
+.district-editor-form .form-input[type="file"] {
+  padding: 8px 12px;
+  box-sizing: border-box;
+}
+
+.district-editor-form .form-input:focus,
+.district-editor-form .form-select:focus,
+.district-editor-form .form-textarea:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.form-textarea {
+.district-editor-form .form-textarea {
   resize: vertical;
   min-height: 80px;
 }
 
-.form-help {
+.district-editor-form .form-help {
   display: block;
   margin-top: 6px;
   font-size: 0.85rem;
@@ -111,13 +117,13 @@
 }
 
 /* Town Input and List */
-.town-input-container {
+.district-editor-form .town-input-container {
   display: flex;
   gap: 8px;
   margin-bottom: 12px;
 }
 
-.town-input-container .form-input {
+.district-editor-form .town-input-container .form-input {
   flex: 1;
 }
 

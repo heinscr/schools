@@ -151,6 +151,7 @@ class DistrictBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     main_address: Optional[str] = Field(None, max_length=500)
     district_url: Optional[str] = Field(None, max_length=500)
+    contract_pdf: Optional[str] = Field(None, max_length=500)
 
     # Use reusable validators
     _validate_name = field_validator('name')(validate_name_field)

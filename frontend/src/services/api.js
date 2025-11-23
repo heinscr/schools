@@ -599,6 +599,65 @@ class ApiService {
 
     return response.json();
   }
+
+  /**
+   * Get contract PDF download URL for a district (unauthenticated)
+   * @param {string} districtName - District name
+   * @returns {Promise<Object>} - Response with download_url
+   */
+  async getContractPdf(districtName) {
+    const url = `${API_BASE_URL}/api/contracts/${encodeURIComponent(districtName)}`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // No contract available
+        }
+        throw new Error(`Failed to get contract PDF: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      if (error.message.includes('Failed to fetch')) {
+        logger.warn('Unable to connect to contract service');
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Admin: Upload contract PDF for a district
+   * @param {string} districtId - District ID
+   * @param {File} pdfFile - PDF file to upload
+   * @returns {Promise<Object>} - Upload result
+   */
+  async uploadContractPdf(districtId, pdfFile) {
+    const url = `${API_BASE_URL}/api/contracts/${districtId}`;
+
+    const formData = new FormData();
+    formData.append('file', pdfFile);
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        ...this._getAuthHeaders(),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to upload contract PDF: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
 }
 
 export default new ApiService();

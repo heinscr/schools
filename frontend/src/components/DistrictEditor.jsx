@@ -15,6 +15,9 @@ function DistrictEditor({ district, onClose, onSave }) {
   const [newTownInput, setNewTownInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [contractPdfFile, setContractPdfFile] = useState(null);
+  const [uploadingContract, setUploadingContract] = useState(false);
+  const [contractUploadProgress, setContractUploadProgress] = useState('');
   const _cache = useContext(DataCacheContext);
   const updateDistrictInCache = _cache?.updateDistrictInCache;
 
@@ -71,6 +74,24 @@ function DistrictEditor({ district, onClose, onSave }) {
     }
   };
 
+  const handleContractFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        setError('Contract must be a PDF file');
+        setContractPdfFile(null);
+        return;
+      }
+      if (file.size > 60 * 1024 * 1024) { // 60MB limit
+        setError('Contract PDF must be less than 60MB');
+        setContractPdfFile(null);
+        return;
+      }
+      setContractPdfFile(file);
+      setError(null);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -86,6 +107,25 @@ function DistrictEditor({ district, onClose, onSave }) {
     try {
       // call onSave (which will persist changes server-side)
       await onSave(formData);
+
+      // Upload contract PDF if one was selected
+      if (contractPdfFile) {
+        setUploadingContract(true);
+        setContractUploadProgress('Uploading contract PDF...');
+        try {
+          await api.uploadContractPdf(district.id, contractPdfFile);
+          setContractUploadProgress('Contract PDF uploaded successfully');
+        } catch (uploadErr) {
+          logger.debug('Failed to upload contract PDF:', uploadErr?.message || uploadErr);
+          setError(`District saved, but contract upload failed: ${uploadErr.message}`);
+          setSaving(false);
+          setUploadingContract(false);
+          setContractUploadProgress('');
+          return;
+        } finally {
+          setUploadingContract(false);
+        }
+      }
 
       // After save, fetch the fresh district data from API to ensure cache consistency
       try {
@@ -114,6 +154,7 @@ function DistrictEditor({ district, onClose, onSave }) {
       setError(err.message);
     } finally {
       setSaving(false);
+      setContractUploadProgress('');
     }
   };
 
@@ -243,21 +284,47 @@ function DistrictEditor({ district, onClose, onSave }) {
             </div>
           </div>
 
+          <div className="form-group">
+            <label htmlFor="contract-pdf">Contract PDF</label>
+            <input
+              type="file"
+              id="contract-pdf"
+              accept="application/pdf"
+              onChange={handleContractFileChange}
+              className="form-input"
+            />
+            {contractPdfFile && (
+              <small className="form-help">
+                Selected: {contractPdfFile.name} ({(contractPdfFile.size / 1024 / 1024).toFixed(2)} MB)
+              </small>
+            )}
+            {district.contract_pdf && !contractPdfFile && (
+              <small className="form-help">
+                Current contract: {district.contract_pdf.split('/').pop()} (upload new file to replace)
+              </small>
+            )}
+            {uploadingContract && (
+              <small className="form-help uploading">
+                {contractUploadProgress}
+              </small>
+            )}
+          </div>
+
           <div className="form-actions">
             <button
               type="button"
               onClick={onClose}
               className="btn btn-cancel"
-              disabled={saving}
+              disabled={saving || uploadingContract}
             >
               Cancel
             </button>
             <button
               type="submit"
               className="btn btn-save"
-              disabled={saving}
+              disabled={saving || uploadingContract}
             >
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving || uploadingContract ? (uploadingContract ? 'Uploading...' : 'Saving...') : 'Save Changes'}
             </button>
           </div>
         </form>
