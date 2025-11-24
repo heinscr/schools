@@ -414,7 +414,7 @@
 .external-link-btn {
   position: absolute;
   top: 8px;
-  right: 8px;
+  right: 36px;
   background: transparent;
   border: none;
   padding: 4px;
@@ -434,10 +434,10 @@
   transform: scale(1.05);
 }
 
-/* Contract PDF button positioned below external link button */
+/* Contract PDF button positioned horizontally next to external link button */
 .contract-link-btn {
   position: absolute;
-  top: 36px;
+  top: 8px;
   right: 8px;
   background: transparent;
   border: none;

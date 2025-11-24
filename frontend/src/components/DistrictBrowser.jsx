@@ -219,6 +219,31 @@ function DistrictBrowser({ user }) {
     }
   };
 
+  const handleAfterDistrictEditorClose = async () => {
+    // Refetch the district to get any updates made after save (like contract_pdf)
+    if (editingDistrict && editingDistrict.id) {
+      try {
+        const freshDistrict = await api.getDistrict(editingDistrict.id);
+
+        // Update cache
+        cache.updateDistrictInCache(freshDistrict);
+
+        // Update districts list
+        setDistricts(prev =>
+          prev.map(d => d.id === freshDistrict.id ? freshDistrict : d)
+        );
+
+        // Update selected district if it matches
+        if (selectedDistrict?.id === freshDistrict.id) {
+          setSelectedDistrict(freshDistrict);
+        }
+      } catch (err) {
+        console.error('Failed to refresh district after close:', err);
+      }
+    }
+    setEditingDistrict(null);
+  };
+
   const handleContractClick = async (district) => {
     try {
       const response = await api.getContractPdf(district.name);
@@ -494,7 +519,7 @@ function DistrictBrowser({ user }) {
 
       <DistrictEditor
         district={editingDistrict}
-        onClose={() => setEditingDistrict(null)}
+        onClose={handleAfterDistrictEditorClose}
         onSave={handleSaveDistrict}
         user={user}
       />
