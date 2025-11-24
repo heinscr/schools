@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -9,9 +9,26 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 function ContractPdfModal({ districtName, pdfUrl, onClose }) {
   const [numPages, setNumPages] = useState(null);
+  const [containerWidth, setContainerWidth] = useState(null);
   const [scale, setScale] = useState(1.0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const containerRef = useRef(null);
+
+  // Measure container width on mount and window resize
+  useEffect(() => {
+    const measureWidth = () => {
+      if (containerRef.current) {
+        // Account for padding (20px on each side = 40px total)
+        const width = containerRef.current.offsetWidth - 40;
+        setContainerWidth(width);
+      }
+    };
+
+    measureWidth();
+    window.addEventListener('resize', measureWidth);
+    return () => window.removeEventListener('resize', measureWidth);
+  }, []);
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -89,27 +106,29 @@ function ContractPdfModal({ districtName, pdfUrl, onClose }) {
           )}
         </div>
 
-        <div className="contract-pdf-viewer">
+        <div className="contract-pdf-viewer" ref={containerRef}>
           {loading && <div className="pdf-loading">Loading PDF...</div>}
           {error && <div className="pdf-error">{error}</div>}
 
-          <Document
-            file={pdfUrl}
-            onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={onDocumentLoadError}
-            loading=""
-            error=""
-          >
-            {Array.from(new Array(numPages), (el, index) => (
-              <Page
-                key={`page_${index + 1}`}
-                pageNumber={index + 1}
-                scale={scale}
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
-              />
-            ))}
-          </Document>
+          {containerWidth && (
+            <Document
+              file={pdfUrl}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
+              loading=""
+              error=""
+            >
+              {Array.from(new Array(numPages), (el, index) => (
+                <Page
+                  key={`page_${index + 1}`}
+                  pageNumber={index + 1}
+                  width={containerWidth * scale}
+                  renderTextLayer={true}
+                  renderAnnotationLayer={true}
+                />
+              ))}
+            </Document>
+          )}
         </div>
       </div>
     </div>
