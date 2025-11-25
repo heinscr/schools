@@ -85,6 +85,7 @@ function SalaryComparison() {
   const [modalHighlight, setModalHighlight] = useState(null);
   const [contractPdfUrl, setContractPdfUrl] = useState(null);
   const [contractDistrictName, setContractDistrictName] = useState(null);
+  const [lastSearchTime, setLastSearchTime] = useState(null);
 
   const openDistrictModal = async (result) => {
     const districtId = result.district_id;
@@ -402,6 +403,9 @@ function SalaryComparison() {
 
         // Update URL with current search parameters
         updateUrlParams(searchParams, selectedTypes, selectedDistricts, selectedTowns);
+
+        // Set timestamp to trigger map to exit selection mode
+        setLastSearchTime(Date.now());
       } catch (err) {
         setError(err?.message || String(err));
         setCachedResults(null);
@@ -594,7 +598,21 @@ function SalaryComparison() {
 
       {/* Map Section */}
       <div className="comparison-map-section">
-        <SalaryComparisonMap results={filteredResults?.results || []} />
+        <SalaryComparisonMap
+          results={filteredResults?.results || []}
+          selectedTowns={selectedTowns}
+          hasResults={filteredResults !== null && filteredResults.results && filteredResults.results.length > 0}
+          lastSearchTime={lastSearchTime}
+          onTownSelectionChange={(newSelectedTowns) => {
+            setSelectedTowns(newSelectedTowns);
+            // Apply filters with the new town selections
+            if (cachedResults) {
+              applyFilters(cachedResults, selectedTypes, selectedDistricts, newSelectedTowns);
+            }
+            // Update URL
+            updateUrlParams(searchParams, selectedTypes, selectedDistricts, newSelectedTowns);
+          }}
+        />
       </div>
 
       {filteredResults && (

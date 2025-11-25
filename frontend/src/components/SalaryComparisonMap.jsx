@@ -4,12 +4,20 @@ import { formatCurrency } from '../utils/formatters';
 import { logger } from '../utils/logger';
 import { useDataCache } from '../hooks/useDataCache';
 
-const SalaryComparisonMap = ({ results = [] }) => {
+const SalaryComparisonMap = ({
+  results = [],
+  onTownSelectionChange = null,
+  selectedTowns = new Set(),
+  hasResults = false,
+  lastSearchTime = null
+}) => {
   const containerRef = useRef(null);
   const cache = useDataCache();
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [selectionMode, setSelectionMode] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Load geo data from cache
   useEffect(() => {
@@ -50,6 +58,62 @@ const SalaryComparisonMap = ({ results = [] }) => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Helper functions for town selection
+  const toggleTownSelection = (townName) => {
+    if (!onTownSelectionChange) return;
+
+    const normalizedTown = townName.toLowerCase().trim();
+    const newSelection = new Set(selectedTowns);
+
+    if (newSelection.has(normalizedTown)) {
+      newSelection.delete(normalizedTown);
+    } else {
+      newSelection.add(normalizedTown);
+    }
+
+    onTownSelectionChange(newSelection);
+  };
+
+  const addTownToSelection = (townName) => {
+    if (!onTownSelectionChange) return;
+
+    const normalizedTown = townName.toLowerCase().trim();
+    if (!selectedTowns.has(normalizedTown)) {
+      const newSelection = new Set(selectedTowns);
+      newSelection.add(normalizedTown);
+      onTownSelectionChange(newSelection);
+    }
+  };
+
+  const clearAllSelections = () => {
+    if (onTownSelectionChange) {
+      onTownSelectionChange(new Set());
+    }
+  };
+
+  const toggleSelectionMode = () => {
+    setSelectionMode(prev => !prev);
+  };
+
+  // Handle global mouseup to stop dragging
+  useEffect(() => {
+    const handleMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false);
+      }
+    };
+
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => window.removeEventListener('mouseup', handleMouseUp);
+  }, [isDragging]);
+
+  // Auto-exit selection mode when a new search is executed
+  useEffect(() => {
+    if (lastSearchTime !== null) {
+      setSelectionMode(false);
+    }
+  }, [lastSearchTime]);
 
   // Render map
   useEffect(() => {
@@ -161,23 +225,97 @@ const SalaryComparisonMap = ({ results = [] }) => {
       .attr('class', 'town')
       .attr('fill', d => {
         const townName = d.properties?.TOWN?.toLowerCase().trim();
+
+        // In selection mode, show purple for selected towns
+        if (selectionMode && townName) {
+          return selectedTowns.has(townName) ? '#a855f7' : '#e7e7e7';
+        }
+
+        // Otherwise, show ranking colors for towns with results
         if (townName && townToRank[townName]) {
           const { rank, total } = townToRank[townName];
           return getColorForRank(rank, total);
         }
+
         return '#e7e7e7'; // Default light gray for towns not in results
       })
       .attr('stroke', '#ffffff')
       .attr('stroke-width', 0.5)
-      .style('cursor', 'pointer')
+      .style('cursor', selectionMode ? 'crosshair' : 'pointer')
+      .on('click', function(event, d) {
+        // Only handle clicks in selection mode
+        if (selectionMode) {
+          const townName = d.properties?.TOWN;
+          if (townName) {
+            toggleTownSelection(townName);
+          }
+        }
+      })
+      .on('mousedown', function(event, d) {
+        // Start drag selection in selection mode
+        if (selectionMode) {
+          setIsDragging(true);
+          const townName = d.properties?.TOWN;
+          if (townName) {
+            addTownToSelection(townName);
+          }
+        }
+      })
       .on('mouseover', function(event, d) {
         const townName = d.properties?.TOWN?.toLowerCase().trim();
-        if (townName && townToRank[townName]) {
-          d3.select(this)
-            .attr('stroke', '#333')
-            .attr('stroke-width', 2);
-          
-          // Show tooltip
+        const displayTownName = d.properties?.TOWN;
+
+        // Handle paint brush selection during drag
+        if (isDragging && selectionMode && townName) {
+          addTownToSelection(displayTownName);
+        }
+
+        // Highlight town border
+        d3.select(this)
+          .attr('stroke', '#333')
+          .attr('stroke-width', 2);
+
+        // Show tooltip based on mode
+        if (selectionMode && displayTownName) {
+          // Show tooltip in selection mode
+          // Get districts for this town from cache
+          const allDistricts = cache?.getAllDistricts() || [];
+          const districtsInTown = allDistricts.filter(district =>
+            district.towns && Array.isArray(district.towns) &&
+            district.towns.some(t => t.toLowerCase().trim() === townName)
+          );
+
+          let tooltipContent = `<strong>${displayTownName}</strong>`;
+
+          if (districtsInTown.length > 0) {
+            tooltipContent += '<br/><br/><span style="font-size: 12px; color: #ccc;">Districts:</span><br/>';
+            tooltipContent += districtsInTown
+              .slice(0, 5)  // Limit to first 5 districts
+              .map(d => `<span style="font-size: 12px;">${d.name}</span>`)
+              .join('<br/>');
+            if (districtsInTown.length > 5) {
+              tooltipContent += `<br/><span style="font-size: 12px; color: #ccc;">+${districtsInTown.length - 5} more</span>`;
+            }
+          }
+
+          const tooltip = d3.select('body')
+            .append('div')
+            .attr('class', 'map-tooltip')
+            .style('position', 'absolute')
+            .style('background', 'rgba(0, 0, 0, 0.8)')
+            .style('color', 'white')
+            .style('padding', '8px 12px')
+            .style('border-radius', '4px')
+            .style('font-size', '14px')
+            .style('pointer-events', 'none')
+            .style('z-index', '1000')
+            .html(tooltipContent);
+
+          tooltip
+            .style('left', (event.pageX + 10) + 'px')
+            .style('top', (event.pageY - 10) + 'px');
+        } else if (!selectionMode && townName && townToRank[townName]) {
+          // Show ranking tooltip when not in selection mode
           const info = townToRank[townName];
           const tooltip = d3.select('body')
             .append('div')
@@ -191,12 +329,12 @@ const SalaryComparisonMap = ({ results = [] }) => {
             .style('pointer-events', 'none')
             .style('z-index', '1000')
             .html(`
-              <strong>${d.properties?.TOWN || 'Unknown'}</strong><br/>
+              <strong>${displayTownName || 'Unknown'}</strong><br/>
               ${info.districtName}<br/>
               Rank: #${info.rank} of ${info.total}<br/>
               Salary: ${formatCurrency(info.salary)}
             `);
-          
+
           tooltip
             .style('left', (event.pageX + 10) + 'px')
             .style('top', (event.pageY - 10) + 'px');
@@ -206,7 +344,7 @@ const SalaryComparisonMap = ({ results = [] }) => {
         d3.select(this)
           .attr('stroke', '#ffffff')
           .attr('stroke-width', 0.5);
-        
+
         // Remove tooltip
         d3.select('.map-tooltip').remove();
       })
@@ -216,18 +354,67 @@ const SalaryComparisonMap = ({ results = [] }) => {
           .style('top', (event.pageY - 10) + 'px');
       });
 
-  }, [geoData, dimensions, results]);
+  }, [geoData, dimensions, results, selectionMode, selectedTowns, hasResults, isDragging, cache]);
 
   return (
-    <div 
-      ref={containerRef} 
-      style={{ 
-        width: '100%', 
-        height: '100%', 
+    <div
+      ref={containerRef}
+      style={{
+        width: '100%',
+        height: '100%',
         position: 'relative',
         background: '#f8f9fa'
       }}
     >
+      {/* Selection Mode Controls */}
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        display: 'flex',
+        gap: '8px',
+        zIndex: 10
+      }}>
+        <button
+          onClick={toggleSelectionMode}
+          style={{
+            background: selectionMode ? '#a855f7' : '#ffffff',
+            color: selectionMode ? '#ffffff' : '#333333',
+            border: '1px solid #d1d5db',
+            padding: '8px 16px',
+            borderRadius: '6px',
+            fontSize: '13px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.2s'
+          }}
+          title={selectionMode ? 'Exit Selection Mode' : 'Enter Selection Mode'}
+        >
+          {selectionMode ? '✓ Selection Mode' : 'Selection Mode'}
+        </button>
+        {selectedTowns.size > 0 && (
+          <button
+            onClick={clearAllSelections}
+            style={{
+              background: '#ffffff',
+              color: '#dc2626',
+              border: '1px solid #d1d5db',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.2s'
+            }}
+            title="Clear all selected towns"
+          >
+            Clear All ({selectedTowns.size})
+          </button>
+        )}
+      </div>
+
       {/* Legend only when results present */}
       {results && Array.isArray(results) && results.length > 0 && (
         <div style={{
