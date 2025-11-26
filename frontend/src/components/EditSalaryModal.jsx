@@ -21,11 +21,33 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
   // Per-schedule parse errors - doesn't block the whole modal
   const [parseErrors, setParseErrors] = useState({});
 
+  // Salary metadata for education/credit options
+  const [salaryMeta, setSalaryMeta] = useState(null);
+
   // Generate year options from 2025-2026 to 2030-2031
   const yearOptions = [];
   for (let startYear = 2025; startYear <= 2030; startYear++) {
     yearOptions.push(`${startYear}-${startYear + 1}`);
   }
+
+  // Fetch salary metadata on mount
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const data = await api.getGlobalSalaryMetadata();
+        if (!mounted) return;
+        setSalaryMeta(data || null);
+      } catch (err) {
+        if (!mounted) return;
+        console.error('Failed to load salary metadata:', err);
+        // Don't block modal if metadata fails - use defaults
+        setSalaryMeta(null);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -52,6 +74,61 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
   // State for raw clipboard input per schedule
   const [rawInputs, setRawInputs] = useState({});
   const [showRawInputs, setShowRawInputs] = useState({});
+
+  // Parse edu_credit_combos into a map for easy lookup
+  const eduCreditMap = useMemo(() => {
+    if (!salaryMeta || !Array.isArray(salaryMeta.edu_credit_combos)) return null;
+
+    const map = new Map(); // Map<education, Set<credits>>
+
+    for (const combo of salaryMeta.edu_credit_combos) {
+      if (!combo) continue;
+      const parts = String(combo).split('+');
+      const edu = parts[0];
+      const cred = parts.length > 1 ? parseInt(parts[1], 10) : 0;
+
+      if (edu && !Number.isNaN(cred)) {
+        if (!map.has(edu)) {
+          map.set(edu, new Set());
+        }
+        map.get(edu).add(cred);
+      }
+    }
+
+    return map.size > 0 ? map : null;
+  }, [salaryMeta]);
+
+  // Default options if metadata is not available
+  const DEFAULT_EDU_OPTIONS = ['B', 'M', 'D'];
+  const DEFAULT_CREDITS = [0, 15, 30, 45, 60, 75];
+
+  // Get all unique education levels from metadata
+  const educationOptions = useMemo(() => {
+    if (!eduCreditMap) return DEFAULT_EDU_OPTIONS;
+
+    const order = ['B', 'M', 'D'];
+    const eduSet = new Set(eduCreditMap.keys());
+    const found = order.filter(o => eduSet.has(o));
+    const rest = Array.from(eduSet).filter(e => !order.includes(e));
+    const final = [...found, ...rest];
+
+    return final.length > 0 ? final : DEFAULT_EDU_OPTIONS;
+  }, [eduCreditMap]);
+
+  // Get all unique credits from metadata
+  const creditOptions = useMemo(() => {
+    if (!eduCreditMap) return DEFAULT_CREDITS;
+
+    const allCredits = new Set();
+    for (const credits of eduCreditMap.values()) {
+      for (const c of credits) {
+        allCredits.add(c);
+      }
+    }
+
+    const sorted = Array.from(allCredits).sort((a, b) => a - b);
+    return sorted.length > 0 ? sorted : DEFAULT_CREDITS;
+  }, [eduCreditMap]);
 
   // Build an index for inputs: key `${idx}|${step}|${edu}|${credits}` -> string value
   useEffect(() => {
@@ -214,6 +291,30 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
         }
       });
 
+      return updated;
+    });
+  };
+
+  // Copy a column to a new education/credits column
+  const handleCopyColumn = (scheduleIdx, sourceEducation, sourceCredits, targetEducation, targetCredits) => {
+    // First, ensure the target column exists for all steps
+    handleAddColumn(scheduleIdx, targetEducation, targetCredits);
+
+    // Get all steps for this schedule
+    const schedule = schedules[scheduleIdx];
+    const steps = Array.from(new Set((schedule.salaries || []).map(s => s.step))).sort((a,b)=>a-b);
+
+    // Copy all values from source column to target column
+    setInputs(prev => {
+      const updated = { ...prev };
+      steps.forEach(step => {
+        const sourceKey = `${scheduleIdx}|${step}|${sourceEducation}|${sourceCredits}`;
+        const targetKey = `${scheduleIdx}|${step}|${targetEducation}|${targetCredits}`;
+        const sourceValue = updated[sourceKey];
+        if (sourceValue !== undefined) {
+          updated[targetKey] = sourceValue;
+        }
+      });
       return updated;
     });
   };
@@ -984,7 +1085,12 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
 
                       {/* Add Column and Add Step Controls */}
                       <div style={{ marginBottom: '12px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                        <AddColumnControl scheduleIdx={idx} onAddColumn={handleAddColumn} />
+                        <AddColumnControl
+                          scheduleIdx={idx}
+                          onAddColumn={handleAddColumn}
+                          educationOptions={educationOptions}
+                          creditOptions={creditOptions}
+                        />
                         <AddStepControl scheduleIdx={idx} existingSteps={steps} onAddStep={handleAddStep} />
                         <button
                           className="btn btn-secondary"
@@ -1092,6 +1198,9 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
                                   column={c}
                                   onDelete={handleDeleteColumn}
                                   onRelabel={(newEducation, newCredits) => handleRelabelColumn(idx, c.education, c.credits, newEducation, newCredits)}
+                                  onCopy={(targetEducation, targetCredits) => handleCopyColumn(idx, c.education, c.credits, targetEducation, targetCredits)}
+                                  educationOptions={educationOptions}
+                                  creditOptions={creditOptions}
                                 />
                               ))}
                             </tr>
@@ -1204,16 +1313,16 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
 }
 
 // Component for adding a new column
-function AddColumnControl({ scheduleIdx, onAddColumn }) {
+function AddColumnControl({ scheduleIdx, onAddColumn, educationOptions, creditOptions }) {
   const [showForm, setShowForm] = useState(false);
-  const [education, setEducation] = useState('B');
-  const [credits, setCredits] = useState(0);
+  const [education, setEducation] = useState(educationOptions[0] || 'B');
+  const [credits, setCredits] = useState(creditOptions[0] || 0);
 
   const handleAdd = () => {
     onAddColumn(scheduleIdx, education, Number(credits));
     setShowForm(false);
-    setEducation('B');
-    setCredits(0);
+    setEducation(educationOptions[0] || 'B');
+    setCredits(creditOptions[0] || 0);
   };
 
   if (!showForm) {
@@ -1227,6 +1336,12 @@ function AddColumnControl({ scheduleIdx, onAddColumn }) {
       </button>
     );
   }
+
+  const educationLabels = {
+    'B': "Bachelor's (B)",
+    'M': "Master's (M)",
+    'D': 'Doctorate (D)'
+  };
 
   return (
     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
@@ -1243,9 +1358,11 @@ function AddColumnControl({ scheduleIdx, onAddColumn }) {
           color: '#000'
         }}
       >
-        <option value="B">Bachelor's (B)</option>
-        <option value="M">Master's (M)</option>
-        <option value="D">Doctorate (D)</option>
+        {educationOptions.map(edu => (
+          <option key={edu} value={edu}>
+            {educationLabels[edu] || edu}
+          </option>
+        ))}
       </select>
       <span style={{ fontSize: '13px', fontWeight: '500', color: '#000' }}>Credits:</span>
       <select
@@ -1261,12 +1378,11 @@ function AddColumnControl({ scheduleIdx, onAddColumn }) {
           width: '80px'
         }}
       >
-        <option value="0">0</option>
-        <option value="15">15</option>
-        <option value="30">30</option>
-        <option value="45">45</option>
-        <option value="60">60</option>
-        <option value="75">75</option>
+        {creditOptions.map(credit => (
+          <option key={credit} value={credit}>
+            {credit === 0 ? '0' : `${credit}`}
+          </option>
+        ))}
       </select>
       <button
         className="btn btn-primary"
@@ -1368,10 +1484,13 @@ function AddStepControl({ scheduleIdx, existingSteps, onAddStep }) {
 }
 
 // Component for column header with edit capability
-function ColumnHeader({ scheduleIdx, column, onDelete, onRelabel }) {
+function ColumnHeader({ scheduleIdx, column, onDelete, onRelabel, onCopy, educationOptions, creditOptions }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
   const [education, setEducation] = useState(column.education);
   const [credits, setCredits] = useState(column.credits);
+  const [targetEducation, setTargetEducation] = useState(educationOptions[0] || 'B');
+  const [targetCredits, setTargetCredits] = useState(creditOptions[0] || 0);
 
   const handleSave = () => {
     onRelabel(education, Number(credits));
@@ -1384,6 +1503,101 @@ function ColumnHeader({ scheduleIdx, column, onDelete, onRelabel }) {
     setIsEditing(false);
   };
 
+  const handleCopy = () => {
+    onCopy(targetEducation, Number(targetCredits));
+    setIsCopying(false);
+    setTargetEducation(educationOptions[0] || 'B');
+    setTargetCredits(creditOptions[0] || 0);
+  };
+
+  const handleCancelCopy = () => {
+    setIsCopying(false);
+    setTargetEducation(educationOptions[0] || 'B');
+    setTargetCredits(creditOptions[0] || 0);
+  };
+
+  if (isCopying) {
+    return (
+      <th key={column.key}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '8px', minWidth: '200px' }}>
+          <div style={{ fontSize: '12px', fontWeight: '600', color: '#1f2937', marginBottom: '4px' }}>
+            Copy {column.key} to:
+          </div>
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+            <select
+              value={targetEducation}
+              onChange={(e) => setTargetEducation(e.target.value)}
+              style={{
+                padding: '4px 6px',
+                border: '1px solid #cbd5e1',
+                borderRadius: '4px',
+                fontSize: '12px',
+                backgroundColor: '#ffffff',
+                color: '#000',
+                flex: 1
+              }}
+            >
+              {educationOptions.map(edu => (
+                <option key={edu} value={edu}>{edu}</option>
+              ))}
+            </select>
+            <select
+              value={targetCredits}
+              onChange={(e) => setTargetCredits(e.target.value)}
+              style={{
+                padding: '4px 6px',
+                border: '1px solid #cbd5e1',
+                borderRadius: '4px',
+                fontSize: '12px',
+                backgroundColor: '#ffffff',
+                color: '#000',
+                flex: 1
+              }}
+            >
+              {creditOptions.map(credit => (
+                <option key={credit} value={credit}>
+                  {credit === 0 ? '0' : `+${credit}`}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            <button
+              onClick={handleCopy}
+              style={{
+                padding: '4px 8px',
+                fontSize: '11px',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                flex: 1
+              }}
+            >
+              Copy
+            </button>
+            <button
+              onClick={handleCancelCopy}
+              style={{
+                padding: '4px 8px',
+                fontSize: '11px',
+                backgroundColor: '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                flex: 1
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </th>
+    );
+  }
+
   if (!isEditing) {
     return (
       <th key={column.key}>
@@ -1395,6 +1609,24 @@ function ColumnHeader({ scheduleIdx, column, onDelete, onRelabel }) {
           >
             {column.key}
           </span>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setIsCopying(true)}
+            title={`Copy column ${column.key} to another edu+cred`}
+            style={{
+              width: '20px',
+              height: '20px',
+              fontSize: '12px',
+              padding: '0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #cbd5e1',
+              backgroundColor: 'transparent'
+            }}
+          >
+            📋
+          </button>
           <button
             className="remove-btn"
             onClick={() => onDelete(scheduleIdx, column.education, column.credits)}
@@ -1425,9 +1657,9 @@ function ColumnHeader({ scheduleIdx, column, onDelete, onRelabel }) {
               flex: 1
             }}
           >
-            <option value="B">B</option>
-            <option value="M">M</option>
-            <option value="D">D</option>
+            {educationOptions.map(edu => (
+              <option key={edu} value={edu}>{edu}</option>
+            ))}
           </select>
           <select
             value={credits}
@@ -1442,12 +1674,11 @@ function ColumnHeader({ scheduleIdx, column, onDelete, onRelabel }) {
               flex: 1
             }}
           >
-            <option value="0">0</option>
-            <option value="15">+15</option>
-            <option value="30">+30</option>
-            <option value="45">+45</option>
-            <option value="60">+60</option>
-            <option value="75">+75</option>
+            {creditOptions.map(credit => (
+              <option key={credit} value={credit}>
+                {credit === 0 ? '0' : `+${credit}`}
+              </option>
+            ))}
           </select>
         </div>
         <div style={{ display: 'flex', gap: '4px' }}>
