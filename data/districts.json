@@ -2537,16 +2537,6 @@
       "district_url": "https://northamptonschools.org"
     },
     {
-      "district": "Northboro-Southboro",
-      "address": "53 Parkerville Road, Southborough, MA 01772",
-      "members": [
-        "Northboro-Southboro"
-      ],
-      "type": "municipal",
-      "notes": "Municipal (single-town) district.",
-      "district_url": "http://www.nsboro.k12.ma.us"
-    },
-    {
       "district": "Northborough",
       "address": "53 Parkerville Road, Southborough, MA 01772",
       "members": [
