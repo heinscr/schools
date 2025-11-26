@@ -12,7 +12,7 @@ from database import get_table
 from cognito_auth import require_admin_role
 from rate_limiter import limiter, GENERAL_RATE_LIMIT, WRITE_RATE_LIMIT
 from services.salary_jobs import SalaryJobsService, LocalSalaryJobsService
-from services.salary_service import invalidate_salary_cache
+from services.salary_service_optimized import invalidate_salary_cache
 from validation import validate_district_id
 
 # Configure logging

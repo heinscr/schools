@@ -297,7 +297,7 @@ class SalaryJobsService:
 
         # Invalidate caches after data update
         try:
-            from services.salary_service import invalidate_salary_cache, invalidate_comparison_cache
+            from services.salary_service_optimized import invalidate_salary_cache, invalidate_comparison_cache
             invalidate_salary_cache(district_id)  # Invalidate specific district cache
             invalidate_comparison_cache()  # Invalidate all comparison query caches
             logger.info(f"Invalidated caches for district {district_id}")
@@ -553,7 +553,7 @@ class SalaryJobsService:
 
         # Invalidate caches after data update
         try:
-            from services.salary_service import invalidate_salary_cache, invalidate_comparison_cache
+            from services.salary_service_optimized import invalidate_salary_cache, invalidate_comparison_cache
             invalidate_salary_cache(district_id)  # Invalidate specific district cache
             invalidate_comparison_cache()  # Invalidate all comparison query caches
             logger.info(f"Invalidated caches for district {district_id}")

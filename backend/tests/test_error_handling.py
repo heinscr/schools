@@ -256,7 +256,8 @@ def test_lambda_endpoint_errors_not_leaked(monkeypatch):
     client = TestClient(main.app)
 
     # Mock the salary service function to raise an exception
-    with patch('services.salary_service.get_salary_schedule_for_district') as mock_salary:
+    # The optimized implementation is the canonical module; patch it directly.
+    with patch('services.salary_service_optimized.get_salary_schedule_for_district') as mock_salary:
         mock_salary.side_effect = Exception("Internal error with sensitive details")
 
         # Test salary schedule endpoint with invalid district

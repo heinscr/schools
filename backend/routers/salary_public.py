@@ -7,12 +7,14 @@ import os
 import boto3
 import logging
 
-from services.salary_service import (
-    get_salary_schedule_for_district,
+# Use optimized implementations for public salary queries
+from services.salary_service_optimized import (
     compare_salaries_across_districts,
     get_district_salary_metadata,
     get_global_salary_metadata
 )
+# Use optimized schedule reader for district schedule queries
+from services.salary_service_optimized import get_salary_schedule_for_district_optimized as get_salary_schedule_for_district
 from rate_limiter import limiter, GENERAL_RATE_LIMIT
 
 # Configure logging

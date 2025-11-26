@@ -98,7 +98,7 @@ def handler(event, context):
         try:
             # Import at function level to avoid circular dependencies
             sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            from services.salary_service import invalidate_salary_cache, invalidate_comparison_cache
+            from services.salary_service_optimized import invalidate_salary_cache, invalidate_comparison_cache
             invalidate_salary_cache()  # Invalidate all district caches
             invalidate_comparison_cache()  # Invalidate all comparison query caches
             logger.info("Invalidated all caches after normalization")
