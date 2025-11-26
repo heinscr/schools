@@ -297,24 +297,57 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
 
   // Copy a column to a new education/credits column
   const handleCopyColumn = (scheduleIdx, sourceEducation, sourceCredits, targetEducation, targetCredits) => {
-    // First, ensure the target column exists for all steps
-    handleAddColumn(scheduleIdx, targetEducation, targetCredits);
+    setSchedules(prev => {
+      const updated = [...prev];
+      const schedule = { ...updated[scheduleIdx] };
+      const salaries = [...(schedule.salaries || [])];
 
-    // Get all steps for this schedule
-    const schedule = schedules[scheduleIdx];
-    const steps = Array.from(new Set((schedule.salaries || []).map(s => s.step))).sort((a,b)=>a-b);
+      // Get all existing steps for this schedule
+      const existingSteps = Array.from(new Set(salaries.map(s => s.step))).sort((a,b)=>a-b);
+      const steps = existingSteps.length > 0 ? existingSteps : [1];
 
-    // Copy all values from source column to target column
-    setInputs(prev => {
-      const updated = { ...prev };
+      // Get source values from current inputs
+      const sourceValues = {};
       steps.forEach(step => {
         const sourceKey = `${scheduleIdx}|${step}|${sourceEducation}|${sourceCredits}`;
-        const targetKey = `${scheduleIdx}|${step}|${targetEducation}|${targetCredits}`;
-        const sourceValue = updated[sourceKey];
-        if (sourceValue !== undefined) {
-          updated[targetKey] = sourceValue;
+        const sourceValue = inputs[sourceKey];
+        if (sourceValue !== undefined && sourceValue !== '') {
+          sourceValues[step] = parseFloat(sourceValue);
         }
       });
+
+      // Add new column cells for all steps with copied values
+      steps.forEach(step => {
+        // Check if this combination already exists
+        const existingIndex = salaries.findIndex(s =>
+          s.step === step &&
+          s.education === targetEducation &&
+          s.credits === targetCredits
+        );
+
+        const copiedSalary = sourceValues[step] || null;
+
+        if (existingIndex >= 0) {
+          // Update existing cell with copied value
+          salaries[existingIndex] = {
+            ...salaries[existingIndex],
+            salary: copiedSalary,
+            isCalculated: false
+          };
+        } else {
+          // Add new cell with copied value
+          salaries.push({
+            step,
+            education: targetEducation,
+            credits: targetCredits,
+            salary: copiedSalary,
+            isCalculated: false
+          });
+        }
+      });
+
+      schedule.salaries = salaries;
+      updated[scheduleIdx] = schedule;
       return updated;
     });
   };
