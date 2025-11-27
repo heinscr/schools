@@ -228,7 +228,7 @@ const SalaryComparisonMap = ({
 
         // In selection mode, show purple for selected towns
         if (selectionMode && townName) {
-          return selectedTowns.has(townName) ? '#a855f7' : '#e7e7e7';
+          return selectedTowns.has(townName) ? '#a855f7' : '#d0d0d0';
         }
 
         // Otherwise, show ranking colors for towns with results
@@ -237,7 +237,7 @@ const SalaryComparisonMap = ({
           return getColorForRank(rank, total);
         }
 
-        return '#e7e7e7'; // Default light gray for towns not in results
+        return '#d0d0d0'; // Default gray for towns not in results
       })
       .attr('stroke', '#ffffff')
       .attr('stroke-width', 0.5)
