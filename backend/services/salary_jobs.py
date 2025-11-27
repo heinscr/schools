@@ -380,11 +380,18 @@ class SalaryJobsService:
 
     def _load_salary_records(self, district_id: str, records: List[Dict]) -> int:
         """Load salary records into DynamoDB"""
+        from config import VALID_EDUCATION_LEVELS
+
         items = []
         for record in records:
             school_year = record['school_year']
             period = record['period']
             education = record['education']
+
+            # Validate education level
+            if education not in VALID_EDUCATION_LEVELS:
+                raise ValueError(f"Invalid education level '{education}'. Only B, M, and D are allowed.")
+
             credits = int(record['credits'])
             step = int(record['step'])
             salary = Decimal(str(record['salary']))

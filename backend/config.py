@@ -21,6 +21,7 @@ MAX_DYNAMODB_FETCH_LIMIT = 1000
 
 # Salary Configuration
 DEFAULT_SCHOOL_YEAR = "2021-2022"
+# ENFORCE: Only B (Bachelor's), M (Master's), and D (Doctorate) education levels are allowed
 VALID_EDUCATION_LEVELS = {'B', 'M', 'D'}
 MIN_STEP = 1
 

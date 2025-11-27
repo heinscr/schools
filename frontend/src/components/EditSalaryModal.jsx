@@ -98,22 +98,14 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
     return map.size > 0 ? map : null;
   }, [salaryMeta]);
 
-  // Default options if metadata is not available
-  const DEFAULT_EDU_OPTIONS = ['B', 'M', 'D'];
+  // Default credits if metadata is not available
   const DEFAULT_CREDITS = [0, 15, 30, 45, 60, 75];
 
-  // Get all unique education levels from metadata
+  // ENFORCE: Only allow B, M, D education levels (hardcoded)
   const educationOptions = useMemo(() => {
-    if (!eduCreditMap) return DEFAULT_EDU_OPTIONS;
-
-    const order = ['B', 'M', 'D'];
-    const eduSet = new Set(eduCreditMap.keys());
-    const found = order.filter(o => eduSet.has(o));
-    const rest = Array.from(eduSet).filter(e => !order.includes(e));
-    const final = [...found, ...rest];
-
-    return final.length > 0 ? final : DEFAULT_EDU_OPTIONS;
-  }, [eduCreditMap]);
+    // Always return only B, M, D regardless of metadata
+    return ['B', 'M', 'D'];
+  }, []);
 
   // Get all unique credits from metadata
   const creditOptions = useMemo(() => {
@@ -510,6 +502,7 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
     }
 
     // Enhanced education mapping (matches backend's EDU_MAP)
+    // ENFORCE: Only map to B, M, D - reject any other education levels
     const eduMap = {
       'B': 'B', 'BA': 'B', 'BACHELOR': 'B', "BACHELOR'S": 'B', 'BACCALAUREATE': 'B',
       'M': 'M', 'MA': 'M', 'MASTER': 'M', "MASTER'S": 'M', 'MASTERS': 'M', '2M': 'M',
@@ -518,16 +511,25 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
       'PHD': 'D', 'EDD': 'D', 'PROV': 'D'
     };
 
+    // Valid education levels - only B, M, D allowed
+    const VALID_EDUCATION = new Set(['B', 'M', 'D']);
+
     const headerTokens = [];
     let dataStartIdx = 0;
 
-    // Collect all header tokens until we hit a line starting with a number
+    // Collect all header tokens until we hit a line starting with a number or "Step #"
     for (let i = 0; i < lines.length; i++) {
       const parts = lines[i].split(/\s+/).filter(p => p.trim());
       const firstPart = parts[0];
 
       // If first part is a number, this is where data starts
       if (/^\d+$/.test(firstPart)) {
+        dataStartIdx = i;
+        break;
+      }
+
+      // If first part is "Step" followed by a number, this is where data starts
+      if (firstPart.toLowerCase() === 'step' && parts.length > 1 && /^\d+$/.test(parts[1])) {
         dataStartIdx = i;
         break;
       }
@@ -549,9 +551,16 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
     let numDataCols = 0;
     for (let i = dataStartIdx; i < Math.min(dataStartIdx + 10, lines.length); i++) {
       const parts = lines[i].split(/\s+/);
-      if (parts.length > 1 && /^\d+$/.test(parts[0])) {
-        // This line starts with a step number and has values
-        const valueCols = parts.slice(1).filter(p => {
+
+      // Determine where values start (after step number or "Step #")
+      let valueStartIdx = 1;
+      if (parts.length > 1 && parts[0].toLowerCase() === 'step' && /^\d+$/.test(parts[1])) {
+        valueStartIdx = 2; // Skip "Step" and the number
+      }
+
+      if (parts.length > valueStartIdx && (/^\d+$/.test(parts[0]) || parts[0].toLowerCase() === 'step')) {
+        // This line starts with a step number (or "Step #") and has values
+        const valueCols = parts.slice(valueStartIdx).filter(p => {
           const cleaned = p.replace(/[$,]/g, '').trim();
           return !isNaN(parseFloat(cleaned));
         }).length;
@@ -610,6 +619,10 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
       }
 
       if (eduLevel) {
+        // Validate that education level is one of B, M, D
+        if (!VALID_EDUCATION.has(eduLevel)) {
+          return null; // Reject invalid education levels
+        }
         const key = credits > 0 ? `${eduLevel}+${credits}` : eduLevel;
         return { education: eduLevel, credits, key };
       }
@@ -662,6 +675,10 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
       if (simpleMatch) {
         const eduRaw = simpleMatch[1];
         const education = eduMap[eduRaw] || eduRaw.charAt(0);
+        // Validate that education level is one of B, M, D
+        if (!VALID_EDUCATION.has(education)) {
+          return { original: token, parsed: false }; // Reject invalid education levels
+        }
         const credits = simpleMatch[3] ? parseInt(simpleMatch[3]) : 0;
         const key = credits > 0 ? `${education}+${credits}` : education;
         return { education, credits, key, original: token, parsed: true };
@@ -762,8 +779,16 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
       const parts = line.split(/\s+/);
       if (parts.length === 0) continue;
 
-      // Check if first part is a step number
-      const firstToken = parts[0];
+      // Check if first part is a step number or "Step" followed by a number
+      let firstToken = parts[0];
+      let startIdx = 1; // Index where salary values start
+
+      // Handle "Step #" format - if first token is "Step", use the second token as the step number
+      if (firstToken.toLowerCase() === 'step' && parts.length > 1) {
+        firstToken = parts[1];
+        startIdx = 2; // Skip both "Step" and the number
+      }
+
       const stepNum = parseInt(firstToken);
 
       if (!isNaN(stepNum) && stepNum >= 1) {
@@ -795,8 +820,8 @@ export default function EditSalaryModal({ district, onClose, onSuccess }) {
           data[stepNum] = {};
         }
 
-        // Parse values from this line (after the step number)
-        for (let j = 1; j < parts.length; j++) {
+        // Parse values from this line (after the step number or "Step #")
+        for (let j = startIdx; j < parts.length; j++) {
           const valueStr = parts[j].replace(/[$,]/g, '').trim();
           // Try to clean up OCR errors like "41.124.59" -> "41124.59"
           const cleaned = valueStr.replace(/\.(\d{3})\./g, '$1.');
