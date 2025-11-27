@@ -238,7 +238,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
 
         // If districts are still loading, show dimmed colors
         if (isDistrictsLoading) {
-          return '#d0d0d0'; // Light gray for all towns when loading
+          return '#e7e7e7'; // Lighter gray for all towns when loading
         }
 
         // Clicked town takes precedence with orange/amber color
@@ -248,7 +248,7 @@ const ChoroplethMap = ({ selectedDistrict, clickedTown, onTownClick, districtTyp
 
         // Then check if part of selected district (purple)
         const isSelected = selectedTowns.has(townName);
-        return isSelected ? '#7a0177' : '#e7e7e7';
+        return isSelected ? '#7a0177' : '#d0d0d0';
       })
       .on('mouseover', function(event, d) {
         // Skip hover interactions if districts are still loading
