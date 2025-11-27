@@ -389,7 +389,7 @@ class DynamoDBDistrictService:
             tokens = query_lower.split()
 
             # Check if all tokens meet the minimum length requirement
-            if not all(len(token) >= 4 for token in tokens):
+            if not all(len(token) >= 3 for token in tokens):
                 # If any token is too short, return empty results
                 # This prevents expensive scans on short queries
                 return [], 0
