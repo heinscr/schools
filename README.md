@@ -1,6 +1,6 @@
 # Massachusetts Teachers Contracts Lookup
 
-A comprehensive web application for exploring Massachusetts school districts and teacher salary schedules. Features interactive mapping, salary comparison tools, and detailed district information across all 356 Massachusetts public school districts.
+A comprehensive web application for exploring Massachusetts school districts and teacher salary schedules. Features interactive mapping, salary comparison tools, and detailed district information across all 356 Massachusetts public school districts. 
 
 ## Project Structure
 
