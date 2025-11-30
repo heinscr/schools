@@ -884,9 +884,9 @@ class HybridContractExtractor:
 
         # Determine which years to include
         if current_future_years:
-            # Have current or future years - use only those
+            # Have current or future years - use all of them
             years_to_include = sorted(current_future_years)
-            logger.info(f"Including current/future years: {years_to_include}")
+            logger.info(f"Including all current/future years: {years_to_include}")
         elif past_years:
             # Only have past years - use most recent one
             most_recent_past = max(past_years)
@@ -897,7 +897,7 @@ class HybridContractExtractor:
             logger.warning("No valid years found in records")
             return records
 
-        # For each year to include, filter to only the period that sorts last
+        # For each year to include, keep ALL periods (not just one)
         filtered_records = []
         for year in years_to_include:
             year_records = years_data[year]
@@ -910,14 +910,13 @@ class HybridContractExtractor:
                     periods[period] = []
                 periods[period].append(record)
 
-            # Select period that sorts last alphabetically
-            selected_period = max(periods.keys())
-            logger.info(f"Year {year}: selected period '{selected_period}' from {list(periods.keys())}")
+            logger.info(f"Year {year}: keeping all {len(periods)} period(s): {list(periods.keys())}")
 
-            # Add all records for this year+period
-            filtered_records.extend(periods[selected_period])
+            # Add ALL records for all periods in this year
+            for period_records in periods.values():
+                filtered_records.extend(period_records)
 
-        logger.info(f"Filtered from {len(records)} to {len(filtered_records)} records")
+        logger.info(f"Filtered from {len(records)} to {len(filtered_records)} records (kept all years and periods)")
         return filtered_records
 
     def extract_from_pdf(self, pdf_bytes: bytes, filename: str, district_name: str, s3_bucket: str, s3_key: str) -> Tuple[List[Dict], str]:
