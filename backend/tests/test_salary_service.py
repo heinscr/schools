@@ -43,6 +43,12 @@ def test_compare_salaries_basic(monkeypatch):
         {'PK': 'METADATA#MAXVALUES', 'SK': 'GLOBAL', 'max_step': 15, 'edu_credit_combos': ['B', 'M+30', 'M+45', 'M+60', 'D']}
     ]
 
+    # District metadata items (for district type filtering)
+    district_metadata_items = [
+        {'PK': 'DISTRICT#d1', 'SK': 'METADATA', 'district_type': 'municipal'},
+        {'PK': 'DISTRICT#d2', 'SK': 'METADATA', 'district_type': 'regional_academic'}
+    ]
+
     exact_items = [
         {
             'PK': 'DISTRICT#d1',
@@ -74,7 +80,7 @@ def test_compare_salaries_basic(monkeypatch):
         }
     ]
 
-    all_items = metadata_items + exact_items
+    all_items = metadata_items + district_metadata_items + exact_items
     monkeypatch.setattr(svc, 'table', FakeTable(all_items))
 
     resp = svc.compare_salaries_across_districts(FakeTable(all_items), 'M', 30, 5)

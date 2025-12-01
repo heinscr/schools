@@ -579,30 +579,28 @@ def compare_salaries_across_districts(
     # First, we need to fetch district types to filter
     result_district_ids_unfiltered = [item.get('district_id') for item in all_results]
 
-    # Fetch district types for filtering
-    dynamodb = boto3.resource('dynamodb')
+    # Fetch district types for filtering using simple get_item calls
     district_types_for_filtering = {}
-    tbl_name = getattr(table, 'name', 'TEST_TABLE')
 
     if result_district_ids_unfiltered:
         try:
-            for i in range(0, len(result_district_ids_unfiltered), 100):
-                batch_ids = result_district_ids_unfiltered[i:i+100]
-                keys = [{'PK': f'DISTRICT#{did}', 'SK': 'METADATA'} for did in batch_ids]
-
-                response = dynamodb.batch_get_item(
-                    RequestItems={
-                        tbl_name: {
-                            'Keys': keys
+            for district_id in result_district_ids_unfiltered:
+                try:
+                    response = table.get_item(
+                        Key={
+                            'PK': f'DISTRICT#{district_id}',
+                            'SK': 'METADATA'
                         }
-                    }
-                )
-
-                for item in response.get('Responses', {}).get(tbl_name, []):
-                    district_id = item['PK'].replace('DISTRICT#', '')
-                    district_types_for_filtering[district_id] = item.get('district_type', 'unknown')
+                    )
+                    if 'Item' in response:
+                        district_types_for_filtering[district_id] = response['Item'].get('district_type', 'unknown')
+                    else:
+                        district_types_for_filtering[district_id] = 'unknown'
+                except Exception as item_error:
+                    logger.warning(f"Error fetching district type for {district_id}: {str(item_error)}")
+                    district_types_for_filtering[district_id] = 'unknown'
         except Exception as e:
-            logger.error(f"Error fetching district types for filtering: {str(e)}")
+            logger.error(f"Error in district type filtering loop: {str(e)}")
 
     # Filter to only Municipal and Regional Academic districts
     ALLOWED_DISTRICT_TYPES = {'municipal', 'regional_academic'}
@@ -616,9 +614,11 @@ def compare_salaries_across_districts(
     result_district_ids = [item.get('district_id') for item in all_results]
 
     from utils.dynamodb import get_district_towns
+    tbl_name = getattr(table, 'name', 'TEST_TABLE')
     district_towns_map = get_district_towns(result_district_ids, tbl_name)
 
-    # Fetch district types using batch_get_item (dynamodb already initialized above)
+    # Fetch district types using batch_get_item
+    dynamodb = boto3.resource('dynamodb')
     district_types_map = {}
 
     if result_district_ids:
