@@ -486,7 +486,7 @@ function DistrictBrowser({ user }) {
           <div className="salary-section">
             <div className="salary-section-header">
               <h3>Salary Schedule</h3>
-              {isAdmin && (
+              {isAdmin && (selectedDistrict.district_type === 'municipal' || selectedDistrict.district_type === 'regional_academic') && (
                 <div className="salary-actions" role="group" aria-label="Salary actions">
                   <button
                     className="salary-action-button edit-salary-button"

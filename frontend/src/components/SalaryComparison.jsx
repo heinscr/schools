@@ -9,6 +9,11 @@ import { DISTRICT_TYPE_OPTIONS } from '../constants/districtTypes';
 import { formatCurrency } from '../utils/formatters';
 import './SalaryComparison.css';
 
+// Filter district types to only Municipal, Regional, and Custom for salary comparison
+const SALARY_COMPARISON_DISTRICT_TYPES = DISTRICT_TYPE_OPTIONS.filter(opt =>
+  opt.value === 'municipal' || opt.value === 'regional_academic'
+);
+
 // Helper functions for URL parameter management
 const getUrlParams = () => {
   const params = new URLSearchParams(window.location.search);
@@ -30,7 +35,7 @@ const updateUrlParams = (searchParams, selectedTypes, selectedDistricts, selecte
   if (searchParams.step) params.set('step', searchParams.step);
 
   // Only add types if not all are selected (default state)
-  const allTypes = DISTRICT_TYPE_OPTIONS.map(opt => opt.value);
+  const allTypes = SALARY_COMPARISON_DISTRICT_TYPES.map(opt => opt.value);
   if (selectedTypes.length > 0 && selectedTypes.length < allTypes.length) {
     params.set('types', selectedTypes.join(','));
   }
@@ -59,7 +64,7 @@ function SalaryComparison() {
   const [selectedTypes, setSelectedTypes] = useState(
     urlParams.types?.length > 0
       ? urlParams.types
-      : DISTRICT_TYPE_OPTIONS.map(opt => opt.value)
+      : SALARY_COMPARISON_DISTRICT_TYPES.map(opt => opt.value)
   );
   const [cachedResults, setCachedResults] = useState(null); // Full results from API (cached)
   const [filteredResults, setFilteredResults] = useState(null); // Filtered by district type
@@ -544,7 +549,7 @@ function SalaryComparison() {
 
         {/* District Type Filters - in same container */}
         <div className="district-type-filters-row">
-          {DISTRICT_TYPE_OPTIONS.map(opt => {
+          {SALARY_COMPARISON_DISTRICT_TYPES.map(opt => {
             const typeCount = cachedResults?.results.filter(r => r.district_type === opt.value).length || 0;
             return (
               <button

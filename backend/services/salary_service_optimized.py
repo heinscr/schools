@@ -575,15 +575,50 @@ def compare_salaries_across_districts(
     all_results = list(district_best_match.values())
     logger.info(f"After deduplication: {len(all_results)} districts")
 
+    # FILTER: Only include Municipal and Regional Academic districts
+    # First, we need to fetch district types to filter
+    result_district_ids_unfiltered = [item.get('district_id') for item in all_results]
+
+    # Fetch district types for filtering
+    dynamodb = boto3.resource('dynamodb')
+    district_types_for_filtering = {}
+    tbl_name = getattr(table, 'name', 'TEST_TABLE')
+
+    if result_district_ids_unfiltered:
+        try:
+            for i in range(0, len(result_district_ids_unfiltered), 100):
+                batch_ids = result_district_ids_unfiltered[i:i+100]
+                keys = [{'PK': f'DISTRICT#{did}', 'SK': 'METADATA'} for did in batch_ids]
+
+                response = dynamodb.batch_get_item(
+                    RequestItems={
+                        tbl_name: {
+                            'Keys': keys
+                        }
+                    }
+                )
+
+                for item in response.get('Responses', {}).get(tbl_name, []):
+                    district_id = item['PK'].replace('DISTRICT#', '')
+                    district_types_for_filtering[district_id] = item.get('district_type', 'unknown')
+        except Exception as e:
+            logger.error(f"Error fetching district types for filtering: {str(e)}")
+
+    # Filter to only Municipal and Regional Academic districts
+    ALLOWED_DISTRICT_TYPES = {'municipal', 'regional_academic'}
+    all_results = [
+        item for item in all_results
+        if district_types_for_filtering.get(item.get('district_id'), 'unknown') in ALLOWED_DISTRICT_TYPES
+    ]
+    logger.info(f"After filtering to Municipal/Regional: {len(all_results)} districts")
+
     # STEP 6: Fetch towns and district types for all result districts
     result_district_ids = [item.get('district_id') for item in all_results]
 
     from utils.dynamodb import get_district_towns
-    tbl_name = getattr(table, 'name', 'TEST_TABLE')
     district_towns_map = get_district_towns(result_district_ids, tbl_name)
 
-    # Fetch district types using batch_get_item
-    dynamodb = boto3.resource('dynamodb')
+    # Fetch district types using batch_get_item (dynamodb already initialized above)
     district_types_map = {}
 
     if result_district_ids:
