@@ -5,6 +5,7 @@ import { logger } from '../utils/logger';
 import BackupManager from './BackupManager';
 import ConfirmDialog from './ConfirmDialog';
 import Toast from './Toast';
+import MissingContractsModal from './MissingContractsModal';
 import './Login.css';
 
 function Login({ onAuthChange, onLoadingChange }) {
@@ -20,6 +21,7 @@ function Login({ onAuthChange, onLoadingChange }) {
   const [isNormalizing, setIsNormalizing] = useState(false);
   const [showBackupManager, setShowBackupManager] = useState(false);
   const [showNormalizeConfirm, setShowNormalizeConfirm] = useState(false);
+  const [showMissingContracts, setShowMissingContracts] = useState(false);
   const [toast, setToast] = useState({ isOpen: false, message: '', variant: 'success' });
 
   useEffect(() => {
@@ -188,6 +190,15 @@ function Login({ onAuthChange, onLoadingChange }) {
     setShowBackupManager(false);
   };
 
+  const handleOpenMissingContracts = () => {
+    setShowMissingContracts(true);
+    setShowMenu(false);
+  };
+
+  const handleCloseMissingContracts = () => {
+    setShowMissingContracts(false);
+  };
+
   const handleBackupSuccess = (result) => {
     setToast({
       isOpen: true,
@@ -335,6 +346,16 @@ function Login({ onAuthChange, onLoadingChange }) {
                 </svg>
                 Backup Manager
               </button>
+              <button
+                className="menu-button missing-contracts-button"
+                onClick={handleOpenMissingContracts}
+              >
+                <svg className="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <path d="M9 12h6m-6 4h6" />
+                </svg>
+                Missing Contracts
+              </button>
               <hr />
             </>
           )}
@@ -354,6 +375,13 @@ function Login({ onAuthChange, onLoadingChange }) {
         <BackupManager
           onClose={handleCloseBackupManager}
           onSuccess={handleBackupSuccess}
+        />
+      )}
+
+      {/* Missing Contracts Modal */}
+      {showMissingContracts && (
+        <MissingContractsModal
+          onClose={handleCloseMissingContracts}
         />
       )}
     </div>

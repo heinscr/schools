@@ -582,3 +582,97 @@ async def get_backup_reapply_status(
     except Exception as e:
         logger.error(f"Error getting backup reapply status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/districts/missing-contracts")
+@limiter.limit(GENERAL_RATE_LIMIT)
+async def get_districts_without_contracts(
+    request: Request,
+    year: str = Query(..., description="School year in format YYYY-YYYY (e.g., 2025-2026)"),
+    period: str = Query("Full Year", description="Contract period (e.g., 'Full Year')"),
+    user: dict = Depends(require_admin_role),
+    table = Depends(get_table)
+):
+    """
+    Admin endpoint: Get a list of districts (Regional or Municipal only) that do NOT have
+    contract data for the specified year and period.
+
+    Query Parameters:
+        year: School year (e.g., "2025-2026")
+        period: Contract period (default: "Full Year")
+
+    Returns:
+        List of districts that are missing contracts for the given year/period
+    """
+    try:
+        from services.dynamodb_district_service import DynamoDBDistrictService
+
+        # Step 1: Get all districts using the search_districts method (which fetches all districts)
+        all_districts, _ = DynamoDBDistrictService.search_districts(
+            table=table,
+            query_text=None,
+            limit=10000,  # Large limit to get all districts
+            offset=0
+        )
+
+        # Step 2: Filter to only Regional or Municipal districts
+        regional_or_municipal = [
+            d for d in all_districts
+            if d.get('district_type', '').lower() in ['regional', 'municipal']
+        ]
+
+        logger.info(f"Found {len(regional_or_municipal)} Regional/Municipal districts out of {len(all_districts)} total districts")
+
+        # Step 3: Query METADATA#AVAILABILITY for the given year and period
+        sk_value = f"YEAR#{year}#PERIOD#{period}"
+
+        try:
+            response = table.get_item(
+                Key={
+                    'PK': 'METADATA#AVAILABILITY',
+                    'SK': sk_value
+                }
+            )
+
+            availability_item = response.get('Item')
+
+            if not availability_item:
+                # No data for this year/period - all districts are missing contracts
+                logger.info(f"No availability data found for {year} / {period}")
+                return {
+                    "year": year,
+                    "period": period,
+                    "total_districts": len(regional_or_municipal),
+                    "missing_count": len(regional_or_municipal),
+                    "districts": regional_or_municipal
+                }
+
+            # Step 4: Get the districts map from the availability item
+            districts_with_data = availability_item.get('districts', {})
+            district_ids_with_data = set(districts_with_data.keys())
+
+            logger.info(f"Found {len(district_ids_with_data)} districts with data for {year} / {period}")
+
+            # Step 5: Filter out districts that have data
+            districts_without_contracts = [
+                d for d in regional_or_municipal
+                if d['id'] not in district_ids_with_data
+            ]
+
+            logger.info(f"Found {len(districts_without_contracts)} districts without contracts")
+
+            return {
+                "year": year,
+                "period": period,
+                "total_districts": len(regional_or_municipal),
+                "missing_count": len(districts_without_contracts),
+                "districts": districts_without_contracts
+            }
+
+        except Exception as e:
+            logger.error(f"Error querying availability data: {e}")
+            raise HTTPException(status_code=500, detail=f"Error querying availability data: {str(e)}")
+
+    except Exception as e:
+        logger.error(f"Error getting districts without contracts: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

@@ -16,7 +16,10 @@ class ApiService {
     // Per-fetch-function town cache to avoid cross-test leakage when tests replace global.fetch
     // Keyed by the fetch function instance (WeakMap) -> Map(townKey -> responseJson)
     this._townCacheByFetch = new WeakMap();
+    // Track if we're currently refreshing to prevent multiple simultaneous refresh attempts
+    this._refreshInProgress = false;
   }
+
   /**
    * Get authentication headers for API requests
    */
@@ -28,6 +31,58 @@ class ApiService {
       };
     }
     return {};
+  }
+
+  /**
+   * Wrapper for fetch that automatically handles token refresh on 401/403 errors
+   * @param {string} url - URL to fetch
+   * @param {Object} options - Fetch options
+   * @param {boolean} isRetry - Internal flag to prevent infinite retry loops
+   * @returns {Promise<Response>} - Fetch response
+   */
+  async _fetchWithAutoRefresh(url, options = {}, isRetry = false) {
+    const response = await fetch(url, options);
+
+    // If we get a 401 or 403 and this is not already a retry, attempt token refresh
+    if ((response.status === 401 || response.status === 403) && !isRetry) {
+      logger.log('Request failed with auth error, attempting token refresh...');
+
+      try {
+        // Prevent multiple simultaneous refresh attempts
+        if (this._refreshInProgress) {
+          logger.log('Token refresh already in progress, waiting...');
+          // Wait a bit and retry with the (hopefully) refreshed token
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } else {
+          this._refreshInProgress = true;
+          try {
+            await authService.refreshSession();
+            logger.log('Token refreshed successfully, retrying request...');
+          } finally {
+            this._refreshInProgress = false;
+          }
+        }
+
+        // Update auth headers with the new token
+        const updatedOptions = {
+          ...options,
+          headers: {
+            ...(options.headers || {}),
+            ...this._getAuthHeaders(),
+          },
+        };
+
+        // Retry the request once with the new token
+        return await this._fetchWithAutoRefresh(url, updatedOptions, true);
+      } catch (refreshError) {
+        logger.error('Token refresh failed:', refreshError);
+        // If refresh fails, return the original 401/403 response
+        // The calling code will handle showing the error to the user
+        return response;
+      }
+    }
+
+    return response;
   }
 
   /**
@@ -147,7 +202,7 @@ class ApiService {
   async createDistrict(districtData) {
     const url = `${API_BASE_URL}/api/districts`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -176,7 +231,7 @@ class ApiService {
   async updateDistrict(districtId, districtData) {
     const url = `${API_BASE_URL}/api/districts/${districtId}`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -200,7 +255,7 @@ class ApiService {
     const json = await response.json();
     // Clear all per-fetch town caches on update so subsequent town lookups go to network
     this._townCacheByFetch = new WeakMap();
-    
+
     return json;
   }
 
@@ -312,7 +367,7 @@ class ApiService {
     const formData = new FormData();
     formData.append('file', pdfFile);
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'POST',
       headers: {
         ...this._getAuthHeaders(),
@@ -340,7 +395,7 @@ class ApiService {
   async getSalaryJob(districtId, jobId) {
     const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/jobs/${jobId}`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       headers: {
         ...this._getAuthHeaders(),
       },
@@ -367,7 +422,7 @@ class ApiService {
   async applySalaryData(districtId, jobId, exclusions = null) {
     const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/apply/${jobId}`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'PUT',
       headers: {
         ...this._getAuthHeaders(),
@@ -396,7 +451,7 @@ class ApiService {
   async manualApplySalaryRecords(districtId, records) {
     const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/manual-apply`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -425,7 +480,7 @@ class ApiService {
   async deleteSalaryJob(districtId, jobId) {
     const url = `${API_BASE_URL}/api/admin/districts/${districtId}/salary-schedule/jobs/${jobId}`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'DELETE',
       headers: {
         ...this._getAuthHeaders(),
@@ -451,7 +506,7 @@ class ApiService {
     // Use string concatenation to prevent bundler from transforming 'global' to 'globalThis'
     const url = `${API_BASE_URL}/api/admin/${'glo' + 'bal'}/normalization/status`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       headers: {
         ...this._getAuthHeaders(),
       },
@@ -476,7 +531,7 @@ class ApiService {
     // Use string concatenation to prevent bundler from transforming 'global' to 'globalThis'
     const url = `${API_BASE_URL}/api/admin/${'glo' + 'bal'}/normalize`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'POST',
       headers: {
         ...this._getAuthHeaders(),
@@ -501,7 +556,7 @@ class ApiService {
   async listBackups() {
     const url = `${API_BASE_URL}/api/admin/backup/list`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       headers: {
         ...this._getAuthHeaders(),
       },
@@ -526,7 +581,7 @@ class ApiService {
   async reapplyBackups(filenames) {
     const url = `${API_BASE_URL}/api/admin/backup/reapply`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -554,7 +609,7 @@ class ApiService {
   async startBackupReapplyJob(filenames) {
     const url = `${API_BASE_URL}/api/admin/backup/reapply/start`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -583,7 +638,7 @@ class ApiService {
       ? `${API_BASE_URL}/api/admin/backup/reapply/status?job_id=${jobId}`
       : `${API_BASE_URL}/api/admin/backup/reapply/status`;
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       headers: {
         ...this._getAuthHeaders(),
       },
@@ -640,7 +695,7 @@ class ApiService {
     const formData = new FormData();
     formData.append('file', pdfFile);
 
-    const response = await fetch(url, {
+    const response = await this._fetchWithAutoRefresh(url, {
       method: 'PUT',
       headers: {
         ...this._getAuthHeaders(),
@@ -654,6 +709,36 @@ class ApiService {
       }
       const errorText = await response.text();
       throw new Error(errorText || `Failed to upload contract PDF: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Admin: Get districts without contract data for a given year
+   * @param {string} year - School year (e.g., "2025-2026")
+   * @param {string} period - Contract period (default: "Full Year")
+   * @returns {Promise<Object>} - Response with districts missing contracts
+   */
+  async getDistrictsMissingContracts(year, period = 'Full Year') {
+    const queryParams = new URLSearchParams();
+    queryParams.append('year', year);
+    queryParams.append('period', period);
+
+    const url = `${API_BASE_URL}/api/admin/districts/missing-contracts?${queryParams.toString()}`;
+
+    const response = await this._fetchWithAutoRefresh(url, {
+      headers: {
+        ...this._getAuthHeaders(),
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Authentication required. Please log in as an administrator.');
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `Failed to get districts missing contracts: ${response.statusText}`);
     }
 
     return response.json();
