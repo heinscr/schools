@@ -618,7 +618,7 @@ async def get_districts_without_contracts(
         # Step 2: Filter to only Regional or Municipal districts
         regional_or_municipal = [
             d for d in all_districts
-            if d.get('district_type', '').lower() in ['regional', 'municipal']
+            if d.get('district_type', '').lower() in ['regional_academic', 'municipal']
         ]
 
         logger.info(f"Found {len(regional_or_municipal)} Regional/Municipal districts out of {len(all_districts)} total districts")
