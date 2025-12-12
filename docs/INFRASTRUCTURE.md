@@ -94,9 +94,9 @@ terraform destroy
 
 ## Documentation
 
-- **[Quick Start](/docs/TERRAFORM_QUICKSTART.md)** - 5-minute setup guide
-- **[Terraform Guide](/docs/terraform-guide.md)** - Comprehensive Terraform documentation
-- **[Deployment Guide](/docs/DEPLOYMENT_GUIDE.md)** - Legacy reference (deprecated)
+- **[Quick Start](QUICK_START.md)** - Fast development setup
+- **[Deployment Guide](DEPLOYMENT_GUIDE.md)** - Step-by-step deployment instructions
+- **[Custom Domain Setup](CUSTOM_DOMAIN_SETUP.md)** - CloudFront SSL configuration
 
 ## Configuration
 

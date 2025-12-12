@@ -84,10 +84,10 @@ terraform apply
 ```
 
 This creates:
-- `dev-teacher-salaries` - Main normalized table
-- `dev-teacher-salary-schedules` - Cache table
+- `ma-teachers-contracts-teacher-salaries` - Main normalized table
+- `ma-teachers-contracts-teacher-salary-schedules` - Cache table
 - Salary Lambda function
-- API Gateway routes
+- API Gateway routes (integrated with main API)
 
 ### 2. Load Data into DynamoDB
 
