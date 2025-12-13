@@ -133,6 +133,35 @@
   height: 16px;
 }
 
+.missing-contracts-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.missing-contracts-export-btn:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.missing-contracts-export-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.missing-contracts-export-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .missing-contracts-modal-body {
   flex: 1;
   overflow-y: auto;
