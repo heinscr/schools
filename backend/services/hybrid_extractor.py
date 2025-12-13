@@ -337,7 +337,7 @@ class HybridContractExtractor:
                         'district_id': district.lower().replace(' ', '-'),
                         'district_name': district,
                         'school_year': year,
-                        'period': 'full-year',
+                        'period': 'Full Year',
                         'education': education,
                         'credits': credits,
                         'step': step,

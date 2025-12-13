@@ -18,6 +18,7 @@ function MissingContractsModal({ onClose }) {
     yearOptions.push(`${startYear}-${endYear}`);
   }
 
+
   // Load data when year changes
   useEffect(() => {
     loadData();

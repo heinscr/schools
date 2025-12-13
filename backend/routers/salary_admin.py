@@ -14,6 +14,7 @@ from rate_limiter import limiter, GENERAL_RATE_LIMIT, WRITE_RATE_LIMIT
 from services.salary_jobs import SalaryJobsService, LocalSalaryJobsService
 from services.salary_service_optimized import invalidate_salary_cache
 from validation import validate_district_id
+from utils.period_normalizer import normalize_period
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -238,10 +239,15 @@ async def manual_apply_salary_schedule(
         raise HTTPException(status_code=400, detail="'records' must be a non-empty list")
 
     # Ensure district_name present when missing; types will be handled in service
+    # Also normalize period values to standard format
     district_name = district['name']
     for r in records:
-        if isinstance(r, dict) and 'district_name' not in r:
-            r['district_name'] = district_name
+        if isinstance(r, dict):
+            if 'district_name' not in r:
+                r['district_name'] = district_name
+            # Normalize period to "Full Year" format
+            if 'period' in r:
+                r['period'] = normalize_period(r['period'])
 
     logger.info(f"Manual apply invoked for district {district_id} with {len(records)} records; service type={type(salary_jobs_service).__name__}")
     try:
@@ -606,6 +612,9 @@ async def get_districts_without_contracts(
     """
     try:
         from services.dynamodb_district_service import DynamoDBDistrictService
+
+        # Normalize period to standard format
+        period = normalize_period(period)
 
         # Step 1: Get all districts using the search_districts method (which fetches all districts)
         all_districts, _ = DynamoDBDistrictService.search_districts(

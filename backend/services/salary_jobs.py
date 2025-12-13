@@ -12,6 +12,7 @@ import boto3
 from boto3.dynamodb.conditions import Key
 import logging
 from utils.normalization import generate_calculated_entries, pad_number, pad_salary
+from utils.period_normalizer import normalize_period
 from config import JOB_TTL_SECONDS
 
 logger = logging.getLogger(__name__)
@@ -385,7 +386,7 @@ class SalaryJobsService:
         items = []
         for record in records:
             school_year = record['school_year']
-            period = record['period']
+            period = normalize_period(record.get('period', 'Full Year'))
             education = record['education']
 
             # Validate education level
@@ -655,7 +656,7 @@ class SalaryJobsService:
         year_periods = {}
         for record in records:
             year = record['school_year']
-            period = record['period']
+            period = normalize_period(record.get('period', 'Full Year'))
             key = (year, period)
 
             if key not in year_periods:
@@ -709,7 +710,7 @@ class SalaryJobsService:
         year_periods = set()
         for record in records:
             year = record['school_year']
-            period = record['period']
+            period = normalize_period(record.get('period', 'Full Year'))
             year_periods.add((year, period))
 
         # Create or update METADATA#SCHEDULES items
