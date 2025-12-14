@@ -278,8 +278,8 @@ function SalaryTable({ districtId, highlight = null, refreshKey = 0 }) {
             )}
           </h3>
 
-          {/* Reserve vertical space based on globalMaxStep so the modal doesn't jump when rows render */}
-          <div className="salary-table-wrapper" style={{ minHeight: `${reservedHeight}px` }}>
+          {/* Let table height adjust to visible rows only */}
+          <div className="salary-table-wrapper">
             <table className="salary-table">
               <thead>
                 <tr>
