@@ -610,6 +610,11 @@ def compare_salaries_across_districts(
     ]
     logger.info(f"After filtering to Municipal/Regional: {len(all_results)} districts")
 
+    # STEP 5.5: Sort by salary in descending order (highest salary = rank 1)
+    # Ensure all salary values are treated as floats for proper ordering
+    all_results.sort(key=lambda x: float(x.get('salary', 0)), reverse=True)
+    logger.info(f"Sorted {len(all_results)} districts by salary (descending)")
+
     # STEP 6: Fetch towns and district types for all result districts
     result_district_ids = [item.get('district_id') for item in all_results]
 
