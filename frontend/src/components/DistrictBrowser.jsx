@@ -1,10 +1,12 @@
 import { useState, lazy, Suspense } from 'react';
 import api from '../services/api';
+import metrics from '../services/metrics';
 import DistrictEditor from './DistrictEditor';
 import SalaryUploadModal from './SalaryUploadModal';
 import ContractPdfModal from './ContractPdfModal';
 import Toast from './Toast';
 import ErrorBoundary from './ErrorBoundary';
+import AdminMetrics from './AdminMetrics';
 import { DISTRICT_TYPE_OPTIONS, DISTRICT_TYPE_ORDER } from '../constants/districtTypes';
 import { normalizeTownName } from '../utils/formatters';
 import { sortDistrictsByTypeAndName } from '../utils/sortDistricts';
@@ -21,6 +23,7 @@ function DistrictBrowser({ user }) {
   const [editingDistrict, setEditingDistrict] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAdminMetrics, setShowAdminMetrics] = useState(false);
   const EditSalaryModal = lazy(() => import('./EditSalaryModal'));
   const [toast, setToast] = useState({ isOpen: false, message: '', variant: 'success' });
   // District type filters
@@ -94,6 +97,7 @@ function DistrictBrowser({ user }) {
       setDistricts([]); // Clear districts if search is blank
       return;
     }
+    metrics.trackEvent('search', { source: 'district_search' });
     await loadDistricts(searchQuery, filterType);
   };
 
@@ -102,6 +106,7 @@ function DistrictBrowser({ user }) {
       setError(null);
       setClickedTown(null); // Clear clicked town when district is selected
       // Fetch full district details
+      metrics.trackEvent('select_district', { source: 'district_click' });
       const fullDistrict = await api.getDistrict(district.id);
       setSelectedDistrict(fullDistrict);
     } catch (err) {
@@ -281,25 +286,41 @@ function DistrictBrowser({ user }) {
           <h1>Massachusetts School Districts</h1>
           <div className="tab-navigation">
             <button
-              className={`tab-button ${activeTab === 'districts' ? 'active' : ''}`}
-              onClick={() => setActiveTab('districts')}
+              className={`tab-button ${activeTab === 'districts' && !showAdminMetrics ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('districts');
+                setShowAdminMetrics(false);
+              }}
             >
               🗺️ District Browser
             </button>
             <button
-              className={`tab-button ${activeTab === 'salaries' ? 'active' : ''}`}
-              onClick={() => setActiveTab('salaries')}
+              className={`tab-button ${activeTab === 'salaries' && !showAdminMetrics ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('salaries');
+                setShowAdminMetrics(false);
+              }}
             >
               💰 Compare Salaries
             </button>
+            {isAdmin && (
+              <button 
+                className={`tab-button ${showAdminMetrics ? 'active' : ''}`}
+                onClick={() => setShowAdminMetrics(true)}
+              >
+                📊 Admin Metrics
+              </button>
+            )}
           </div>
         </header>
 
-      {activeTab === 'districts' ? (
+      {showAdminMetrics ? (
+        <AdminMetrics onClose={() => setShowAdminMetrics(false)} />
+      ) : ( activeTab === 'districts' ? (
         <>
           <div className="search-section">
-        <form onSubmit={handleSearch} className="search-form">
-          <div className="search-controls">
+            <form onSubmit={handleSearch} className="search-form">
+              <div className="search-controls">
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
@@ -359,6 +380,8 @@ function DistrictBrowser({ user }) {
           </div>
         </form>
       </div>
+
+          
 
       {error && (
         <div className="error-message">
@@ -571,7 +594,7 @@ function DistrictBrowser({ user }) {
             </Suspense>
           </ErrorBoundary>
         </div>
-      )}
+      ))}
 
       {/* Contract PDF modal */}
       {contractPdfUrl && contractDistrictName && (

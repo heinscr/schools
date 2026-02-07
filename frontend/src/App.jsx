@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import metrics from './services/metrics'
 import DistrictBrowser from './components/DistrictBrowser'
 import Login from './components/Login'
 import { DataCacheProvider } from './contexts/DataCacheContext'
@@ -13,6 +14,8 @@ function App() {
   // Initialize automatic token refresh on mount
   useEffect(() => {
     authService.initializeAutoRefresh();
+    // Track initial page view (non-blocking)
+    metrics.trackEvent('page_view');
   }, [])
 
   const handleAuthChange = (userData) => {

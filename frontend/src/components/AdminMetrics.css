@@ -1,0 +1,102 @@
+.admin-metrics-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+  width: 100%;
+  padding: 20px;
+}
+
+.admin-metrics-content {
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.admin-metrics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.admin-metrics-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.admin-metrics-header div {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.metric-period-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+}
+
+.metric-period-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.metric-period-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.metric-period-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-metrics-body {
+  padding: 20px;
+  overflow-x: auto;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-metrics-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.admin-metrics-body table thead {
+  background: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.admin-metrics-body table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+}
+
+.admin-metrics-body table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+}
+
+.admin-metrics-body table tbody tr:hover {
+  background: #f9fafb;
+}

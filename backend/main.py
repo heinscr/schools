@@ -20,7 +20,7 @@ from slowapi.errors import RateLimitExceeded
 from fastapi import HTTPException
 
 # Import routers
-from routers import districts, auth, salary_public, salary_admin, contracts
+from routers import districts, auth, salary_public, salary_admin, contracts, metrics
 
 # Re-export commonly used items for backward compatibility with tests
 from services.dynamodb_district_service import DynamoDBDistrictService
@@ -107,6 +107,7 @@ app.include_router(auth.router)
 app.include_router(salary_public.router)
 app.include_router(salary_admin.router)
 app.include_router(contracts.router)
+app.include_router(metrics.router)
 
 
 @app.get("/")

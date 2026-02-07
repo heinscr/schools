@@ -5,6 +5,7 @@ Centralized configuration for magic numbers, strings, and settings
 import os
 import boto3
 from functools import lru_cache
+from zoneinfo import ZoneInfo
 
 # Query Configuration
 MAX_QUERY_LIMIT = 100
@@ -105,6 +106,19 @@ def get_valid_credits() -> set:
         return credits if credits else _VALID_CREDITS_FALLBACK
 
     return _VALID_CREDITS_FALLBACK
+
+
+# Primary timezone for metrics/date rollups. Use TZ database name (e.g. "America/New_York").
+# Defaults to UTC when not provided.
+PRIMARY_TIMEZONE = os.getenv('PRIMARY_TIMEZONE', 'UTC')
+
+def get_primary_timezone() -> ZoneInfo:
+    """Return ZoneInfo instance for primary site timezone."""
+    try:
+        return ZoneInfo(PRIMARY_TIMEZONE)
+    except Exception:
+        # Fallback to UTC on invalid config
+        return ZoneInfo('UTC')
 
 # For backward compatibility, keep these as constants but mark them as deprecated
 MAX_STEP = _MAX_STEP_FALLBACK  # Deprecated: Use get_max_step() instead
